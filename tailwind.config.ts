@@ -61,7 +61,20 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				}
+				},
+				'google-blue': 'hsl(var(--google-blue))',
+				'google-blue-hover': 'hsl(var(--google-blue-hover))',
+				'google-gray': 'hsl(var(--google-gray))',
+				'google-text': 'hsl(var(--google-text))',
+				'google-text-light': 'hsl(var(--google-text-light))'
+			},
+			boxShadow: {
+				'search': 'var(--search-shadow)',
+				'result': 'var(--result-shadow)'
+			},
+			transitionProperty: {
+				'search': 'var(--transition-search)',
+				'smooth': 'var(--transition-smooth)'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',

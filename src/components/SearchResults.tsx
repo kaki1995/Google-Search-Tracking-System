@@ -1,0 +1,288 @@
+import { useState, useEffect } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import { Search, Mic, Settings, MoreVertical } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+
+interface SearchResult {
+  title: string;
+  link: string;
+  snippet: string;
+  displayLink: string;
+}
+
+const SearchResults = () => {
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [query, setQuery] = useState(searchParams.get("q") || "");
+  const [results, setResults] = useState<SearchResult[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [apiKey, setApiKey] = useState("");
+  const [searchEngineId, setSearchEngineId] = useState("");
+  const [showApiForm, setShowApiForm] = useState(true);
+
+  useEffect(() => {
+    const savedApiKey = localStorage.getItem("googleApiKey");
+    const savedSearchEngineId = localStorage.getItem("googleSearchEngineId");
+    
+    if (savedApiKey && savedSearchEngineId) {
+      setApiKey(savedApiKey);
+      setSearchEngineId(savedSearchEngineId);
+      setShowApiForm(false);
+      performSearch(searchParams.get("q") || "", savedApiKey, savedSearchEngineId);
+    }
+  }, [searchParams]);
+
+  const saveCredentials = () => {
+    if (!apiKey.trim() || !searchEngineId.trim()) {
+      toast({
+        title: "Missing credentials",
+        description: "Please enter both API key and Search Engine ID",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    localStorage.setItem("googleApiKey", apiKey);
+    localStorage.setItem("googleSearchEngineId", searchEngineId);
+    setShowApiForm(false);
+    
+    const currentQuery = searchParams.get("q");
+    if (currentQuery) {
+      performSearch(currentQuery, apiKey, searchEngineId);
+    }
+  };
+
+  const performSearch = async (searchQuery: string, key: string, engineId: string) => {
+    if (!searchQuery.trim()) return;
+
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `https://www.googleapis.com/customsearch/v1?key=${key}&cx=${engineId}&q=${encodeURIComponent(
+          searchQuery
+        )}&num=10`
+      );
+
+      if (!response.ok) {
+        throw new Error(`Search failed: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      if (data.error) {
+        throw new Error(data.error.message);
+      }
+
+      const searchResults: SearchResult[] = data.items?.map((item: any) => ({
+        title: item.title,
+        link: item.link,
+        snippet: item.snippet,
+        displayLink: item.displayLink,
+      })) || [];
+
+      setResults(searchResults);
+    } catch (error) {
+      console.error("Search error:", error);
+      toast({
+        title: "Search failed",
+        description: error instanceof Error ? error.message : "Unable to perform search",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (query.trim()) {
+      navigate(`/search?q=${encodeURIComponent(query.trim())}`);
+      if (!showApiForm) {
+        performSearch(query.trim(), apiKey, searchEngineId);
+      }
+    }
+  };
+
+  const resetCredentials = () => {
+    localStorage.removeItem("googleApiKey");
+    localStorage.removeItem("googleSearchEngineId");
+    setApiKey("");
+    setSearchEngineId("");
+    setShowApiForm(true);
+    setResults([]);
+  };
+
+  if (showApiForm) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center px-4">
+        <div className="w-full max-w-md space-y-6 p-6 border rounded-lg shadow-result">
+          <div className="text-center space-y-2">
+            <h2 className="text-2xl font-semibold text-google-text">Setup Google Search</h2>
+            <p className="text-google-text-light text-sm">
+              Enter your Google Custom Search API credentials to enable search functionality.
+            </p>
+          </div>
+          
+          <div className="space-y-4">
+            <div>
+              <label htmlFor="apiKey" className="block text-sm font-medium text-google-text mb-2">
+                Google API Key
+              </label>
+              <Input
+                id="apiKey"
+                type="password"
+                value={apiKey}
+                onChange={(e) => setApiKey(e.target.value)}
+                placeholder="Enter your Google API key"
+                className="w-full"
+              />
+            </div>
+            
+            <div>
+              <label htmlFor="searchEngineId" className="block text-sm font-medium text-google-text mb-2">
+                Search Engine ID
+              </label>
+              <Input
+                id="searchEngineId"
+                type="text"
+                value={searchEngineId}
+                onChange={(e) => setSearchEngineId(e.target.value)}
+                placeholder="Enter your Custom Search Engine ID"
+                className="w-full"
+              />
+            </div>
+            
+            <Button onClick={saveCredentials} className="w-full">
+              Save & Continue
+            </Button>
+          </div>
+          
+          <div className="text-xs text-google-text-light space-y-2">
+            <p>To get these credentials:</p>
+            <ul className="list-disc list-inside space-y-1 ml-2">
+              <li>Visit <a href="https://console.developers.google.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Google Cloud Console</a></li>
+              <li>Create a project and enable Custom Search API</li>
+              <li>Generate an API key</li>
+              <li>Set up a Custom Search Engine at <a href="https://cse.google.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Google CSE</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <div className="border-b bg-background sticky top-0 z-10">
+        <div className="flex items-center px-4 py-3 gap-4">
+          {/* Logo */}
+          <button 
+            onClick={() => navigate("/")}
+            className="text-2xl font-normal hover:opacity-80 transition-opacity"
+          >
+            <span className="text-google-blue">G</span>
+            <span className="text-destructive">o</span>
+            <span className="text-yellow-500">o</span>
+            <span className="text-google-blue">g</span>
+            <span className="text-green-500">l</span>
+            <span className="text-destructive">e</span>
+          </button>
+
+          {/* Search Bar */}
+          <form onSubmit={handleSearch} className="flex-1 max-w-2xl">
+            <div className="relative">
+              <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-google-text-light">
+                <Search className="h-5 w-5" />
+              </div>
+              <Input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                className="w-full h-10 pl-12 pr-12 text-base border-border rounded-full shadow-search focus:shadow-lg transition-shadow duration-200 outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
+              />
+              <button
+                type="button"
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-google-text-light hover:text-google-text transition-colors"
+              >
+                <Mic className="h-4 w-4" />
+              </button>
+            </div>
+          </form>
+
+          {/* Settings */}
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={resetCredentials}
+              className="text-google-text-light hover:text-google-text"
+            >
+              <Settings className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-google-text-light hover:text-google-text"
+            >
+              <MoreVertical className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Results */}
+      <div className="max-w-2xl mx-auto px-4 py-6">
+        {loading ? (
+          <div className="space-y-4">
+            {[...Array(10)].map((_, i) => (
+              <div key={i} className="space-y-2 animate-pulse">
+                <div className="h-4 bg-muted rounded w-3/4"></div>
+                <div className="h-3 bg-muted rounded w-1/2"></div>
+                <div className="h-3 bg-muted rounded w-full"></div>
+                <div className="h-3 bg-muted rounded w-5/6"></div>
+              </div>
+            ))}
+          </div>
+        ) : results.length > 0 ? (
+          <div className="space-y-6">
+            <p className="text-sm text-google-text-light">
+              About {results.length} results
+            </p>
+            {results.map((result, index) => (
+              <div key={index} className="space-y-1">
+                <div className="text-sm text-google-text-light">
+                  {result.displayLink}
+                </div>
+                <a
+                  href={result.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block"
+                >
+                  <h3 className="text-xl text-primary hover:underline cursor-pointer">
+                    {result.title}
+                  </h3>
+                </a>
+                <p className="text-sm text-google-text leading-relaxed">
+                  {result.snippet}
+                </p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-google-text-light">
+              {searchParams.get("q") ? "No results found" : "Enter a search query to get started"}
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default SearchResults;
