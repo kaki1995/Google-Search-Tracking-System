@@ -81,31 +81,28 @@ const SearchHome = () => {
         <div className="text-center text-sm text-google-text-light">
           Google available in:{" "}
           <a href="#" className="text-primary hover:underline">
-            हिन्दी
+            Español
           </a>{" "}
           <a href="#" className="text-primary hover:underline">
-            বাংলা
+            Français
           </a>{" "}
           <a href="#" className="text-primary hover:underline">
-            తెలుగు
+            Deutsch
           </a>{" "}
           <a href="#" className="text-primary hover:underline">
-            मराठी
+            Italiano
           </a>{" "}
           <a href="#" className="text-primary hover:underline">
-            தமிழ்
+            Português
           </a>{" "}
           <a href="#" className="text-primary hover:underline">
-            ગુજરાતી
+            中文
           </a>{" "}
           <a href="#" className="text-primary hover:underline">
-            ಕನ್ನಡ
+            日本語
           </a>{" "}
           <a href="#" className="text-primary hover:underline">
-            മലയാളം
-          </a>{" "}
-          <a href="#" className="text-primary hover:underline">
-            ਪੰਜਾਬੀ
+            한국어
           </a>
         </div>
       </div>
