@@ -79,7 +79,7 @@ const SearchHome = () => {
 
         {/* Language Links */}
         <div className="text-center text-sm text-google-text-light">
-          Google offered in:{" "}
+          Google available in:{" "}
           <a href="#" className="text-primary hover:underline">
             हिन्दी
           </a>{" "}
