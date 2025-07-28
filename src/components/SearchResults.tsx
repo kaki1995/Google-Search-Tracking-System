@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { Search, Mic, Settings, MoreVertical } from "lucide-react";
+import { trackingService } from "@/lib/tracking";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -22,10 +23,18 @@ const SearchResults = () => {
   const [apiKey, setApiKey] = useState("");
   const [searchEngineId, setSearchEngineId] = useState("");
   const [showApiForm, setShowApiForm] = useState(true);
+  const [searchCount, setSearchCount] = useState(0);
+  const trackingInitialized = useRef(false);
 
   useEffect(() => {
     const savedApiKey = localStorage.getItem("googleApiKey");
     const savedSearchEngineId = localStorage.getItem("googleSearchEngineId");
+    
+    // Initialize tracking if not already done
+    if (!trackingInitialized.current) {
+      trackingService.startScrollTracking();
+      trackingInitialized.current = true;
+    }
     
     if (savedApiKey && savedSearchEngineId) {
       setApiKey(savedApiKey);
@@ -34,6 +43,13 @@ const SearchResults = () => {
       performSearch(searchParams.get("q") || "", savedApiKey, savedSearchEngineId);
     }
   }, [searchParams]);
+
+  // Cleanup tracking on unmount
+  useEffect(() => {
+    return () => {
+      trackingService.stopScrollTracking();
+    };
+  }, []);
 
   const saveCredentials = () => {
     if (!apiKey.trim() || !searchEngineId.trim()) {
@@ -84,6 +100,10 @@ const SearchResults = () => {
       })) || [];
 
       setResults(searchResults);
+      
+      // Track the search query
+      await trackingService.trackQuery(searchQuery, searchResults.length);
+      setSearchCount(prev => prev + 1);
     } catch (error) {
       console.error("Search error:", error);
       toast({
@@ -104,6 +124,18 @@ const SearchResults = () => {
         performSearch(query.trim(), apiKey, searchEngineId);
       }
     }
+  };
+
+  const handleResultClick = async (result: SearchResult, index: number) => {
+    // Track the click
+    await trackingService.trackClick(result.link, result.title, index + 1);
+    
+    // Open in new tab to allow continued searching
+    window.open(result.link, '_blank', 'noopener,noreferrer');
+  };
+
+  const handleFinishTask = () => {
+    navigate('/post-task-survey');
   };
 
   const resetCredentials = () => {
@@ -224,11 +256,11 @@ const SearchResults = () => {
               <Settings className="h-4 w-4" />
             </Button>
             <Button
-              variant="ghost"
+              onClick={handleFinishTask}
               size="sm"
-              className="text-google-text-light hover:text-google-text"
+              className="bg-green-600 hover:bg-green-700 text-white"
             >
-              <MoreVertical className="h-4 w-4" />
+              Finish Task
             </Button>
           </div>
         </div>
@@ -249,24 +281,39 @@ const SearchResults = () => {
           </div>
         ) : results.length > 0 ? (
           <div className="space-y-6">
-            <p className="text-sm text-google-text-light">
-              About {results.length} results
-            </p>
+            <div className="flex justify-between items-center">
+              <p className="text-sm text-google-text-light">
+                About {results.length} results
+              </p>
+              {searchCount > 0 && (
+                <div className="text-xs text-blue-600">
+                  Searches: {searchCount} | Clicks: {trackingService.getSessionData()?.searchPhase.clicks.length || 0}
+                </div>
+              )}
+            </div>
+            
+            {searchCount > 0 && (
+              <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                <p className="text-sm text-blue-800">
+                  <strong>Research Task:</strong> You're looking for the best restaurant for a special dinner. 
+                  Continue searching and clicking on relevant results. When ready to make your final decision, 
+                  click the "Finish Task" button above.
+                </p>
+              </div>
+            )}
             {results.map((result, index) => (
               <div key={index} className="space-y-1">
                 <div className="text-sm text-google-text-light">
                   {result.displayLink}
                 </div>
-                <a
-                  href={result.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block"
+                <button
+                  onClick={() => handleResultClick(result, index)}
+                  className="block text-left w-full"
                 >
                   <h3 className="text-xl text-primary hover:underline cursor-pointer">
                     {result.title}
                   </h3>
-                </a>
+                </button>
                 <p className="text-sm text-google-text leading-relaxed">
                   {result.snippet}
                 </p>
