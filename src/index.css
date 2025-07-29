@@ -114,5 +114,10 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+    background-image: url('/lovable-uploads/dc113bb5-9df6-48fe-b66b-c1b517855a3d.png');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
   }
 }
