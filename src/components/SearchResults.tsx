@@ -20,27 +20,21 @@ const SearchResults = () => {
   const [query, setQuery] = useState(searchParams.get("q") || "");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
-  const [apiKey, setApiKey] = useState("");
-  const [searchEngineId, setSearchEngineId] = useState("");
-  const [showApiForm, setShowApiForm] = useState(true);
+  const apiKey = "AIzaSyATKkbTWhLwe0RgeWoY_iiMW7w2QoPkWpw";
+  const searchEngineId = "007dc6ac33e6f436c";
   const [searchCount, setSearchCount] = useState(0);
   const trackingInitialized = useRef(false);
 
   useEffect(() => {
-    const savedApiKey = localStorage.getItem("googleApiKey");
-    const savedSearchEngineId = localStorage.getItem("googleSearchEngineId");
-    
     // Initialize tracking if not already done
     if (!trackingInitialized.current) {
       trackingService.startScrollTracking();
       trackingInitialized.current = true;
     }
     
-    if (savedApiKey && savedSearchEngineId) {
-      setApiKey(savedApiKey);
-      setSearchEngineId(savedSearchEngineId);
-      setShowApiForm(false);
-      performSearch(searchParams.get("q") || "", savedApiKey, savedSearchEngineId);
+    const currentQuery = searchParams.get("q");
+    if (currentQuery) {
+      performSearch(currentQuery, apiKey, searchEngineId);
     }
   }, [searchParams]);
 
@@ -51,25 +45,6 @@ const SearchResults = () => {
     };
   }, []);
 
-  const saveCredentials = () => {
-    if (!apiKey.trim() || !searchEngineId.trim()) {
-      toast({
-        title: "Missing credentials",
-        description: "Please enter both API key and Search Engine ID",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    localStorage.setItem("googleApiKey", apiKey);
-    localStorage.setItem("googleSearchEngineId", searchEngineId);
-    setShowApiForm(false);
-    
-    const currentQuery = searchParams.get("q");
-    if (currentQuery) {
-      performSearch(currentQuery, apiKey, searchEngineId);
-    }
-  };
 
   const performSearch = async (searchQuery: string, key: string, engineId: string) => {
     if (!searchQuery.trim()) return;
@@ -120,9 +95,7 @@ const SearchResults = () => {
     e.preventDefault();
     if (query.trim()) {
       navigate(`/search?q=${encodeURIComponent(query.trim())}`);
-      if (!showApiForm) {
-        performSearch(query.trim(), apiKey, searchEngineId);
-      }
+      performSearch(query.trim(), apiKey, searchEngineId);
     }
   };
 
@@ -137,74 +110,6 @@ const SearchResults = () => {
   const handleFinishTask = () => {
     navigate('/post-task-survey');
   };
-
-  const resetCredentials = () => {
-    localStorage.removeItem("googleApiKey");
-    localStorage.removeItem("googleSearchEngineId");
-    setApiKey("");
-    setSearchEngineId("");
-    setShowApiForm(true);
-    setResults([]);
-  };
-
-  if (showApiForm) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center px-4">
-        <div className="w-full max-w-md space-y-6 p-6 border rounded-lg shadow-result">
-          <div className="text-center space-y-2">
-            <h2 className="text-2xl font-semibold text-google-text">Setup Google Search</h2>
-            <p className="text-google-text-light text-sm">
-              Enter your Google Custom Search API credentials to enable search functionality.
-            </p>
-          </div>
-          
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="apiKey" className="block text-sm font-medium text-google-text mb-2">
-                Google API Key
-              </label>
-              <Input
-                id="apiKey"
-                type="password"
-                value={apiKey}
-                onChange={(e) => setApiKey(e.target.value)}
-                placeholder="Enter your Google API key"
-                className="w-full"
-              />
-            </div>
-            
-            <div>
-              <label htmlFor="searchEngineId" className="block text-sm font-medium text-google-text mb-2">
-                Search Engine ID
-              </label>
-              <Input
-                id="searchEngineId"
-                type="text"
-                value={searchEngineId}
-                onChange={(e) => setSearchEngineId(e.target.value)}
-                placeholder="Enter your Custom Search Engine ID"
-                className="w-full"
-              />
-            </div>
-            
-            <Button onClick={saveCredentials} className="w-full">
-              Save & Continue
-            </Button>
-          </div>
-          
-          <div className="text-xs text-google-text-light space-y-2">
-            <p>To get these credentials:</p>
-            <ul className="list-disc list-inside space-y-1 ml-2">
-              <li>Visit <a href="https://console.developers.google.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Google Cloud Console</a></li>
-              <li>Create a project and enable Custom Search API</li>
-              <li>Generate an API key</li>
-              <li>Set up a Custom Search Engine at <a href="https://cse.google.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Google CSE</a></li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -247,14 +152,6 @@ const SearchResults = () => {
 
           {/* Settings */}
           <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={resetCredentials}
-              className="text-google-text-light hover:text-google-text"
-            >
-              <Settings className="h-4 w-4" />
-            </Button>
             <Button
               onClick={handleFinishTask}
               size="sm"
