@@ -14,7 +14,7 @@ export default function Welcome() {
   };
 
   const handleExit = () => {
-    navigate("/");
+    navigate("/exit-study");
   };
 
   return (
@@ -52,24 +52,26 @@ export default function Welcome() {
 
           {/* Title */}
           <div className="text-center mb-6">
-            <h1 className="text-[26px] font-medium leading-8 text-[#1D1B20] mb-4">
-              Research Study: Google Search Behavior
+            <h1 className="text-[26px] font-medium leading-8 text-[#1D1B20] mb-6">
+              Welcome to Our Project Study
             </h1>
-            <div className="text-base leading-6 text-[#1D1B20] space-y-4 max-w-2xl mx-auto">
+            <div className="text-base leading-6 text-[#1D1B20] space-y-4 max-w-2xl mx-auto text-left">
               <p>
-                Thank you for participating in our research study on search behavior. 
-                This study will help us understand how people interact with search interfaces.
+                Thank you for your interest in participating!
               </p>
               <p>
-                The study will take approximately 10-15 minutes to complete. You will be asked to:
+                This study is part of a collaborative research project between <strong>Google's Istanbul Office</strong> and the <strong>Technical University of Munich</strong>. We are investigating how consumers search for products using online tools.
               </p>
-              <ul className="text-left space-y-2 ml-6">
-                <li>• Complete a brief background survey</li>
-                <li>• Perform search tasks</li>
-                <li>• Answer questions about your experience</li>
+              <ul className="space-y-2 ml-6 list-disc">
+                <li>The experiment will take approximately <strong>10-15 minutes</strong> to complete.</li>
+                <li>Your participation is <strong>voluntary and anonymous</strong>.</li>
+                <li>You may exit at any time by closing the window or clicking the "Exit" button.</li>
               </ul>
               <p>
-                Your participation is voluntary and all data will be kept confidential.
+                This study complies with the data protection regulations under the <strong>General Data Protection Regulation (GDPR)</strong>. No personally identifiable information will be collected or stored without your explicit consent.
+              </p>
+              <p>
+                If you choose to continue, we will provide further details about the task and how your responses will contribute to academic research on consumer search behavior.
               </p>
             </div>
           </div>
@@ -85,7 +87,7 @@ export default function Welcome() {
                   className="w-4 h-4 text-primary bg-gray-100 border-gray-300 rounded focus:ring-primary"
                 />
                 <span className="text-sm text-[#1D1B20]">
-                  I agree to participate in this research study
+                  I have read the above and voluntarily agree to participate in this study.
                 </span>
               </label>
             </div>

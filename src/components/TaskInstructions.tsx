@@ -1,105 +1,136 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { CheckCircle, Search, Clock, Target } from "lucide-react";
+import { useForm } from "react-hook-form";
+import BrowserBar from "@/components/BrowserBar";
+import StudyButton from "@/components/StudyButton";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+interface TaskForm {
+  budget: string;
+}
 
 const TaskInstructions = () => {
-  const [understood, setUnderstood] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
+  const form = useForm<TaskForm>();
 
-  const handleStartTask = () => {
-    navigate('/search-task');
+  const onSubmit = async (data: TaskForm) => {
+    setIsSubmitting(true);
+    
+    try {
+      // Save task preferences if needed
+      navigate('/search-task');
+    } catch (error) {
+      console.error('Error saving task data:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handlePreviousPage = () => {
+    navigate('/background-survey');
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-3xl">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold flex items-center gap-2">
-            <Target className="h-6 w-6 text-primary" />
-            Your Search Task
-          </CardTitle>
-          <CardDescription>
-            Please read these instructions carefully before beginning the search task.
-          </CardDescription>
-        </CardHeader>
-        
-        <CardContent className="space-y-6">
-          <Alert>
-            <Search className="h-4 w-4" />
-            <AlertDescription>
-              <strong>Your Task:</strong> You are planning a weekend trip to a new city and need to find 
-              the best restaurant for a special dinner. Use the search interface to find and decide on 
-              the most suitable restaurant option.
-            </AlertDescription>
-          </Alert>
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      <div className="w-full max-w-[905px] h-auto border-8 border-[#CAC4D0] rounded-[29px] bg-[#FEF7FF] overflow-hidden relative">
+        {/* Browser Bar */}
+        <div className="relative z-10">
+          <BrowserBar />
+        </div>
 
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold flex items-center gap-2">
-                <CheckCircle className="h-5 w-5 text-green-600" />
-                What to do:
-              </h3>
-              <ul className="list-disc pl-6 space-y-2 text-sm">
-                <li>Search for restaurant information using the provided search interface</li>
-                <li>Browse through search results and click on links that seem relevant</li>
-                <li>Consider factors like cuisine type, ratings, price, and location</li>
-                <li>Take your time to make an informed decision</li>
-                <li>At the end, you'll choose your final restaurant and explain why</li>
-              </ul>
-            </div>
-
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold flex items-center gap-2">
-                <Clock className="h-5 w-5 text-blue-600" />
-                Important Notes:
-              </h3>
-              <ul className="list-disc pl-6 space-y-2 text-sm">
-                <li>Search naturally - use whatever terms feel right to you</li>
-                <li>There's no "correct" answer - choose what appeals to you</li>
-                <li>You can search multiple times and refine your queries</li>
-                <li>Feel free to click on multiple restaurant links to compare</li>
-                <li>The task typically takes 5-10 minutes</li>
-              </ul>
-            </div>
+        {/* Content */}
+        <div className="relative z-10 px-8 py-6">
+          <div className="text-center mb-6">
+            <h1 className="text-[26px] font-medium leading-8 text-[#1D1B20] mb-4">
+              Your Search Task
+            </h1>
           </div>
 
-          <div className="bg-muted p-4 rounded-lg">
-            <h3 className="font-semibold mb-2">Remember:</h3>
-            <p className="text-sm text-muted-foreground">
-              We're studying how people search for information, not testing your knowledge. 
-              Search and browse naturally, as you would in real life. Your behavior and 
-              decision-making process are valuable regardless of which restaurant you ultimately choose.
+          {/* Scenario Box */}
+          <div className="border-2 border-dashed border-blue-500 rounded-lg p-6 mb-6">
+            <h3 className="font-semibold text-[#1D1B20] mb-4">Scenario:</h3>
+            
+            <p className="text-sm text-[#1D1B20] mb-4">
+              Imagine you are planning to buy a new smartphone for yourself. Please consider your <strong>real financial situation</strong> and <strong>actual consumption habits</strong>—just as you would in real life.
             </p>
+
+            <p className="text-sm text-[#1D1B20] mb-4">
+              On the next page, you will find a <strong>search interface</strong> designed specifically for this study. Use this interface to explore available smartphones, including their <strong>prices, features, and specifications</strong>.
+            </p>
+
+            <div className="bg-yellow-100 border-l-4 border-yellow-500 p-4 mb-4">
+              <p className="text-sm text-[#1D1B20]">
+                <strong>⚠ Important:</strong><br />
+                Please conduct <strong>all searches exclusively</strong> through this interface. To ensure we capture your complete search journey, <strong>do not use any external tools</strong> (e.g., Google, Amazon, price comparison websites, etc.).
+              </p>
+            </div>
+
+            <p className="text-sm text-[#1D1B20] mb-4">
+              Once you've completed your research and made a decision, you will be asked to <strong>provide details</strong> about your chosen smartphone, including:
+            </p>
+
+            <ul className="list-disc ml-6 mb-4 text-sm text-[#1D1B20]">
+              <li>Brand and model</li>
+              <li>Storage capacity (optional)</li>
+              <li>Color (optional)</li>
+              <li>Lowest price you found</li>
+              <li>Link to the shopping website</li>
+            </ul>
+
+            <p className="text-sm text-[#1D1B20] mb-6 italic">
+              You may return to the search page and review your search history at any time before submitting the survey.
+            </p>
+
+            <p className="text-sm text-[#1D1B20] mb-4">
+              Before beginning your search, please answer the following two preparatory questions:
+            </p>
+
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              {/* Question 10: Budget */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-[#1D1B20]">
+                  10. What is your smartphone budget? <span className="text-red-500">*</span><br />
+                  <span className="text-xs font-normal">(Please select one option based on your real-life financial habits.)</span>
+                </label>
+                <Select 
+                  onValueChange={(value) => form.setValue('budget', value)}
+                  required
+                >
+                  <SelectTrigger className="w-full bg-white">
+                    <SelectValue placeholder="Select your budget range" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white z-50">
+                    <SelectItem value="under-150">Under €150</SelectItem>
+                    <SelectItem value="150-299">€150-299</SelectItem>
+                    <SelectItem value="300-449">€300-449</SelectItem>
+                    <SelectItem value="450-599">€450-599</SelectItem>
+                    <SelectItem value="600-799">€600-799</SelectItem>
+                    <SelectItem value="over-800">Over €800</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </form>
           </div>
 
-          <div className="flex items-center space-x-2">
-            <input 
-              type="checkbox" 
-              id="understood" 
-              checked={understood}
-              onChange={(e) => setUnderstood(e.target.checked)}
-              className="rounded"
-            />
-            <label htmlFor="understood" className="text-sm">
-              I have read and understood the task instructions
-            </label>
+          {/* Buttons */}
+          <div className="flex justify-center gap-4">
+            <StudyButton
+              variant="secondary"
+              onClick={handlePreviousPage}
+            >
+              Previous Page
+            </StudyButton>
+            <StudyButton
+              variant="primary"
+              onClick={form.handleSubmit(onSubmit)}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Loading..." : "Next Page"}
+            </StudyButton>
           </div>
-        </CardContent>
-
-        <CardFooter>
-          <Button 
-            onClick={handleStartTask} 
-            disabled={!understood}
-            className="w-full"
-            size="lg"
-          >
-            Start Search Task
-          </Button>
-        </CardFooter>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 };

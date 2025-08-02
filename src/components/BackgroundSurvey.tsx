@@ -1,22 +1,24 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import BrowserBar from "@/components/BrowserBar";
+import StudyButton from "@/components/StudyButton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { trackingService } from "@/lib/tracking";
 
 interface SurveyForm {
-  age: string;
+  ageGroup: string;
   gender: string;
   education: string;
-  searchFrequency: string;
-  internetExperience: string;
-  primaryDevice: string;
+  employment: string;
+  nationality: string;
+  country: string;
+  chatbotFamiliarity: string;
+  dataQuality: string;
+  chatbotUsage: string;
 }
 
 const BackgroundSurvey = () => {
@@ -37,195 +39,264 @@ const BackgroundSurvey = () => {
     }
   };
 
+  const handlePreviousPage = () => {
+    navigate('/');
+  };
+
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-2xl">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold">Background Information</CardTitle>
-          <CardDescription>
-            Please provide some basic information about yourself. This helps us understand our participants better.
-          </CardDescription>
-        </CardHeader>
-        
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
-            <CardContent className="space-y-6">
-              <FormField
-                control={form.control}
-                name="age"
-                rules={{ required: "Please enter your age" }}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Age</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="number" 
-                        placeholder="e.g., 25" 
-                        {...field} 
-                        min="18" 
-                        max="100"
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      <div className="w-full max-w-[905px] h-auto border-8 border-[#CAC4D0] rounded-[29px] bg-[#FEF7FF] overflow-hidden relative">
+        {/* Browser Bar */}
+        <div className="relative z-10">
+          <BrowserBar />
+        </div>
+
+        {/* Content */}
+        <div className="relative z-10 px-8 py-6">
+          <div className="text-center mb-6">
+            <h1 className="text-[26px] font-medium leading-8 text-[#1D1B20] mb-4">
+              Your Personal Background
+            </h1>
+          </div>
+
+          {/* Survey Form in Blue Dotted Box */}
+          <div className="border-2 border-dashed border-blue-500 rounded-lg p-6 mb-6">
+            <p className="text-sm text-[#1D1B20] mb-6">
+              Please answer the following questions to help us better understand your background. All responses are anonymous and used for research purposes only.
+            </p>
+
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              {/* Question 1: Age Group */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-[#1D1B20]">
+                  1. What is your age group? <span className="text-red-500">*</span>
+                </label>
+                <Select 
+                  onValueChange={(value) => form.setValue('ageGroup', value)}
+                  required
+                >
+                  <SelectTrigger className="w-full bg-white">
+                    <SelectValue placeholder="Select age group" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white z-50">
+                    <SelectItem value="under-18">Under 18</SelectItem>
+                    <SelectItem value="18-24">18-24</SelectItem>
+                    <SelectItem value="25-34">25-34</SelectItem>
+                    <SelectItem value="35-44">35-44</SelectItem>
+                    <SelectItem value="45-54">45-54</SelectItem>
+                    <SelectItem value="55-above">55 and above</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Question 2: Gender */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-[#1D1B20]">
+                  2. What is your gender? <span className="text-red-500">*</span>
+                </label>
+                <Select 
+                  onValueChange={(value) => form.setValue('gender', value)}
+                  required
+                >
+                  <SelectTrigger className="w-full bg-white">
+                    <SelectValue placeholder="Select gender" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white z-50">
+                    <SelectItem value="female">Female</SelectItem>
+                    <SelectItem value="male">Male</SelectItem>
+                    <SelectItem value="non-binary">Non-binary / Diverse</SelectItem>
+                    <SelectItem value="prefer-not-to-say">Prefer not to say</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Question 3: Education */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-[#1D1B20]">
+                  3. What is your highest level of education? <span className="text-red-500">*</span>
+                </label>
+                <Select 
+                  onValueChange={(value) => form.setValue('education', value)}
+                  required
+                >
+                  <SelectTrigger className="w-full bg-white">
+                    <SelectValue placeholder="Select education level" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white z-50">
+                    <SelectItem value="high-school">High school or below</SelectItem>
+                    <SelectItem value="professional-training">Professional training school/college</SelectItem>
+                    <SelectItem value="bachelors">Bachelor's degree</SelectItem>
+                    <SelectItem value="masters">Master's degree</SelectItem>
+                    <SelectItem value="doctorate">Doctorate / PhD</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Question 4: Employment */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-[#1D1B20]">
+                  4. What is your current employment status? <span className="text-red-500">*</span>
+                </label>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="student"
+                        {...form.register('employment', { required: true })}
+                        value="student"
+                        className="w-4 h-4"
                       />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                      <Label htmlFor="student" className="text-sm">Student</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="employed"
+                        {...form.register('employment')}
+                        value="employed"
+                        className="w-4 h-4"
+                      />
+                      <Label htmlFor="employed" className="text-sm">Employed or self-employed</Label>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="unemployed"
+                        {...form.register('employment')}
+                        value="unemployed"
+                        className="w-4 h-4"
+                      />
+                      <Label htmlFor="unemployed" className="text-sm">Unemployed</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="other-employment"
+                        {...form.register('employment')}
+                        value="other"
+                        className="w-4 h-4"
+                      />
+                      <Label htmlFor="other-employment" className="text-sm">Other: _________</Label>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-              <FormField
-                control={form.control}
-                name="gender"
-                rules={{ required: "Please select your gender" }}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Gender</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select gender" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="male">Male</SelectItem>
-                        <SelectItem value="female">Female</SelectItem>
-                        <SelectItem value="non-binary">Non-binary</SelectItem>
-                        <SelectItem value="prefer-not-to-say">Prefer not to say</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {/* Question 5: Nationality */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-[#1D1B20]">
+                  5. What is your nationality? <span className="text-red-500">*</span>
+                </label>
+                <Input 
+                  {...form.register('nationality', { required: true })}
+                  className="w-full bg-white"
+                  placeholder="Enter your nationality"
+                />
+              </div>
 
-              <FormField
-                control={form.control}
-                name="education"
-                rules={{ required: "Please select your education level" }}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Highest Level of Education</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select education level" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="high-school">High School</SelectItem>
-                        <SelectItem value="some-college">Some College</SelectItem>
-                        <SelectItem value="bachelors">Bachelor's Degree</SelectItem>
-                        <SelectItem value="masters">Master's Degree</SelectItem>
-                        <SelectItem value="doctorate">Doctorate</SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {/* Question 6: Country of Residence */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-[#1D1B20]">
+                  6. What is your current country of residence? <span className="text-red-500">*</span>
+                </label>
+                <Input 
+                  {...form.register('country', { required: true })}
+                  className="w-full bg-white"
+                  placeholder="Enter your country of residence"
+                />
+              </div>
 
-              <FormField
-                control={form.control}
-                name="searchFrequency"
-                rules={{ required: "Please select how often you search online" }}
-                render={({ field }) => (
-                  <FormItem className="space-y-3">
-                    <FormLabel>How often do you search for information online?</FormLabel>
-                    <FormControl>
-                      <RadioGroup
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        className="flex flex-col space-y-1"
-                      >
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="multiple-daily" id="multiple-daily" />
-                          <Label htmlFor="multiple-daily">Multiple times per day</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="daily" id="daily" />
-                          <Label htmlFor="daily">Once per day</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="weekly" id="weekly" />
-                          <Label htmlFor="weekly">A few times per week</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="monthly" id="monthly" />
-                          <Label htmlFor="monthly">A few times per month</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="rarely" id="rarely" />
-                          <Label htmlFor="rarely">Rarely</Label>
-                        </div>
-                      </RadioGroup>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {/* Question 7: AI Chatbot Familiarity */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-[#1D1B20]">
+                  7. How familiar are you with AI chatbots such as ChatGPT? <span className="text-red-500">*</span>
+                </label>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-[#1D1B20]">1 - Not familiar at all</span>
+                  <span className="text-xs text-[#1D1B20]">7 - Extremely familiar</span>
+                </div>
+                <RadioGroup
+                  onValueChange={(value) => form.setValue('chatbotFamiliarity', value)}
+                  className="flex justify-between"
+                  required
+                >
+                  {[1, 2, 3, 4, 5, 6, 7].map((num) => (
+                    <div key={num} className="flex flex-col items-center space-y-1">
+                      <RadioGroupItem value={num.toString()} id={`familiarity-${num}`} />
+                      <Label htmlFor={`familiarity-${num}`} className="text-xs">{num}</Label>
+                    </div>
+                  ))}
+                </RadioGroup>
+              </div>
 
-              <FormField
-                control={form.control}
-                name="internetExperience"
-                rules={{ required: "Please select your internet experience level" }}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>How would you rate your internet/computer experience?</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select experience level" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="beginner">Beginner</SelectItem>
-                        <SelectItem value="intermediate">Intermediate</SelectItem>
-                        <SelectItem value="advanced">Advanced</SelectItem>
-                        <SelectItem value="expert">Expert</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {/* Question 8: Data Quality */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-[#1D1B20]">
+                  8. To ensure high data quality, please select "1 - Strongly Disagree" for this question. <span className="text-red-500">*</span>
+                </label>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-[#1D1B20]">1 - Strongly Disagree</span>
+                  <span className="text-xs text-[#1D1B20]">7 - Strongly Agree</span>
+                </div>
+                <RadioGroup
+                  onValueChange={(value) => form.setValue('dataQuality', value)}
+                  className="flex justify-between"
+                  required
+                >
+                  {[1, 2, 3, 4, 5, 6, 7].map((num) => (
+                    <div key={num} className="flex flex-col items-center space-y-1">
+                      <RadioGroupItem value={num.toString()} id={`quality-${num}`} />
+                      <Label htmlFor={`quality-${num}`} className="text-xs">{num}</Label>
+                    </div>
+                  ))}
+                </RadioGroup>
+              </div>
 
-              <FormField
-                control={form.control}
-                name="primaryDevice"
-                rules={{ required: "Please select your primary device" }}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>What device do you primarily use for internet searching?</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select primary device" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="desktop">Desktop Computer</SelectItem>
-                        <SelectItem value="laptop">Laptop</SelectItem>
-                        <SelectItem value="smartphone">Smartphone</SelectItem>
-                        <SelectItem value="tablet">Tablet</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </CardContent>
+              {/* Question 9: AI Chatbot Usage */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-[#1D1B20]">
+                  9. On average, how often do you use AI chatbots per week? <span className="text-red-500">*</span>
+                </label>
+                <Select 
+                  onValueChange={(value) => form.setValue('chatbotUsage', value)}
+                  required
+                >
+                  <SelectTrigger className="w-full bg-white">
+                    <SelectValue placeholder="Select usage frequency" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white z-50">
+                    <SelectItem value="0-times">0 times</SelectItem>
+                    <SelectItem value="1-2-times">1-2 times</SelectItem>
+                    <SelectItem value="3-5-times">3-5 times</SelectItem>
+                    <SelectItem value="6-10-times">6-10 times</SelectItem>
+                    <SelectItem value="more-than-10">More than 10 times</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </form>
+          </div>
 
-            <CardFooter>
-              <Button 
-                type="submit" 
-                className="w-full" 
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? "Saving..." : "Continue to Task Instructions"}
-              </Button>
-            </CardFooter>
-          </form>
-        </Form>
-      </Card>
+          {/* Buttons */}
+          <div className="flex justify-center gap-4">
+            <StudyButton
+              variant="secondary"
+              onClick={handlePreviousPage}
+            >
+              Previous Page
+            </StudyButton>
+            <StudyButton
+              variant="primary"
+              onClick={form.handleSubmit(onSubmit)}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Saving..." : "Next Page"}
+            </StudyButton>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
