@@ -8,63 +8,53 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 60 9% 18%;
+    /* Study design colors */
+    --schemes-outline-variant: 202 21% 80%; /* #CAC4D0 */
+    --schemes-surface: 300 100% 98%; /* #FEF7FF */
+    --schemes-surface-container: 276 21% 94%; /* #F3EDF7 */
+    --schemes-on-surface: 260 10% 11%; /* #1D1B20 */
+    --schemes-outline: 264 9% 48%; /* #79747E */
+    --schemes-primary: 260 48% 54%; /* #6750A4 */
+    --schemes-on-primary: 0 0% 100%; /* #FFF */
+    --m3-white: 0 0% 100%; /* #FFF */
+    --m3-black: 0 0% 0%; /* #000 */
 
-    --card: 0 0% 100%;
-    --card-foreground: 60 9% 18%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 60 9% 18%;
-
-    --primary: 217 91% 60%;
-    --primary-foreground: 0 0% 100%;
-
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 60 9% 18%;
-
-    --muted: 210 40% 98%;
-    --muted-foreground: 25 5% 45%;
-
-    --accent: 210 40% 96%;
-    --accent-foreground: 60 9% 18%;
-
-    --destructive: 0 84% 60%;
+    /* Base colors mapped to study design */
+    --background: 300 100% 98%; /* #FEF7FF */
+    --foreground: 0 0% 0%; /* #000 */
+    --card: 300 100% 98%; /* #FEF7FF */
+    --card-foreground: 0 0% 0%;
+    --popover: 300 100% 98%;
+    --popover-foreground: 0 0% 0%;
+    --primary: 260 48% 54%; /* #6750A4 */
+    --primary-foreground: 0 0% 100%; /* #FFF */
+    --secondary: 276 21% 94%; /* #F3EDF7 */
+    --secondary-foreground: 0 0% 0%;
+    --muted: 276 21% 94%;
+    --muted-foreground: 264 9% 48%; /* #79747E */
+    --accent: 276 21% 94%;
+    --accent-foreground: 0 0% 0%;
+    --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
+    --border: 202 21% 80%; /* #CAC4D0 */
+    --input: 276 21% 94%; /* #F3EDF7 */
+    --ring: 260 48% 54%; /* #6750A4 */
 
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 217 91% 60%;
-
-    /* Google-inspired design tokens */
-    --google-blue: 217 91% 60%;
-    --google-blue-hover: 217 91% 55%;
-    --google-gray: 60 4% 96%;
-    --google-text: 60 9% 18%;
-    --google-text-light: 25 5% 45%;
-    --search-shadow: 0 2px 5px rgba(32, 33, 36, 0.28);
-    --result-shadow: 0 1px 6px rgba(32, 33, 36, 0.18);
-    
-    /* Animations */
-    --transition-smooth: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-search: box-shadow 0.2s ease-in-out;
+    /* Study specific tokens */
+    --study-border: 202 21% 80%; /* #CAC4D0 */
+    --study-surface: 300 100% 98%; /* #FEF7FF */
+    --study-primary: 260 48% 54%; /* #6750A4 */
+    --study-text: 260 10% 11%; /* #1D1B20 */
+    --study-text-secondary: 264 9% 48%; /* #79747E */
 
     --radius: 0.5rem;
-
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
