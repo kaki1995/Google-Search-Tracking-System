@@ -1,269 +1,514 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { trackingService } from "@/lib/tracking";
 
-interface PostTaskForm {
-  satisfaction: number[];
-  difficulty: string;
-  confidence: number[];
-  strategy: string;
-  mostImportantFactor: string;
-  additionalComments: string;
-}
+const postTaskFormSchema = z.object({
+  familiarity: z.string().min(1, "This field is required"),
+  satisfaction: z.string().min(1, "This field is required"),
+  relevance: z.string().min(1, "This field is required"),
+  understanding: z.string().min(1, "This field is required"),
+  easeOfUse: z.string().min(1, "This field is required"),
+  trust: z.string().min(1, "This field is required"),
+  usefulness: z.string().min(1, "This field is required"),
+  dataQuality: z.string().min(1, "This field is required"),
+  difficulty: z.string().min(1, "This field is required"),
+  timeSpent: z.string().min(1, "This field is required"),
+  searchType: z.string().min(1, "This field is required"),
+});
 
-const PostTaskSurvey = () => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+type PostTaskForm = z.infer<typeof postTaskFormSchema>;
+
+export default function PostTaskSurvey() {
   const navigate = useNavigate();
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const form = useForm<PostTaskForm>({
-    defaultValues: {
-      satisfaction: [5],
-      confidence: [5],
-      additionalComments: ""
-    }
+    resolver: zodResolver(postTaskFormSchema),
   });
 
-  const onSubmit = async (data: PostTaskForm) => {
+  const onSubmit = (data: PostTaskForm) => {
+    setShowConfirmDialog(true);
+  };
+
+  const handleConfirmSubmission = async () => {
     setIsSubmitting(true);
-    
     try {
-      await trackingService.trackPostTaskSurvey({
-        ...data,
-        satisfaction: data.satisfaction[0],
-        confidence: data.confidence[0]
-      });
-      navigate('/final-decision');
+      const formData = form.getValues();
+      await trackingService.trackEvent('post_task_survey_completed');
+      setShowConfirmDialog(false);
+      navigate('/thank-you');
     } catch (error) {
-      console.error('Error saving post-task survey:', error);
+      console.error('Error submitting survey:', error);
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  const handleReturnToPrevious = () => {
+    setShowConfirmDialog(false);
+  };
+
+  const scaleOptions = [
+    { value: "1", label: "1 - Not at all familiar" },
+    { value: "2", label: "2" },
+    { value: "3", label: "3" },
+    { value: "4", label: "4" },
+    { value: "5", label: "5" },
+    { value: "6", label: "6" },
+    { value: "7", label: "7 - Extremely familiar" }
+  ];
+
+  const satisfactionOptions = [
+    { value: "1", label: "1 - Not at all satisfied" },
+    { value: "2", label: "2" },
+    { value: "3", label: "3" },
+    { value: "4", label: "4" },
+    { value: "5", label: "5" },
+    { value: "6", label: "6" },
+    { value: "7", label: "7 - Extremely satisfied" }
+  ];
+
+  const relevanceOptions = [
+    { value: "1", label: "1 - Not relevant at all" },
+    { value: "2", label: "2" },
+    { value: "3", label: "3" },
+    { value: "4", label: "4" },
+    { value: "5", label: "5" },
+    { value: "6", label: "6" },
+    { value: "7", label: "7 - Highly relevant" }
+  ];
+
+  const easeOptions = [
+    { value: "1", label: "1 - Not easy at all" },
+    { value: "2", label: "2" },
+    { value: "3", label: "3" },
+    { value: "4", label: "4" },
+    { value: "5", label: "5" },
+    { value: "6", label: "6" },
+    { value: "7", label: "7 - Very easy" }
+  ];
+
+  const trustOptions = [
+    { value: "1", label: "1 - Not trust at all" },
+    { value: "2", label: "2" },
+    { value: "3", label: "3" },
+    { value: "4", label: "4" },
+    { value: "5", label: "5" },
+    { value: "6", label: "6" },
+    { value: "7", label: "7 - Completely trust" }
+  ];
+
+  const usefulnessOptions = [
+    { value: "1", label: "1 - Not useful at all" },
+    { value: "2", label: "2" },
+    { value: "3", label: "3" },
+    { value: "4", label: "4" },
+    { value: "5", label: "5" },
+    { value: "6", label: "6" },
+    { value: "7", label: "7 - Extremely useful" }
+  ];
+
+  const difficultyOptions = [
+    { value: "1", label: "1 - Not difficult at all" },
+    { value: "2", label: "2" },
+    { value: "3", label: "3" },
+    { value: "4", label: "4" },
+    { value: "5", label: "5" },
+    { value: "6", label: "6" },
+    { value: "7", label: "7 - Very difficult" }
+  ];
+
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-2xl">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold">Post-Task Questions</CardTitle>
-          <CardDescription>
-            Please reflect on the search task you just completed and answer the following questions.
-          </CardDescription>
-        </CardHeader>
-        
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
-            <CardContent className="space-y-6">
-              <FormField
-                control={form.control}
-                name="satisfaction"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      How satisfied are you with your restaurant choice?
-                      <span className="ml-2 text-sm text-muted-foreground">
-                        (Current: {field.value?.[0] || 5}/10)
-                      </span>
-                    </FormLabel>
-                    <FormControl>
-                      <div className="px-2">
-                        <Slider
-                          min={1}
-                          max={10}
-                          step={1}
-                          value={field.value}
+    <div className="min-h-screen bg-background py-8 px-4">
+      <div className="max-w-4xl mx-auto">
+        <Card className="bg-white shadow-sm">
+          <CardHeader className="text-center pb-6">
+            <CardTitle className="text-3xl font-semibold text-gray-900">Search Experience Feedback</CardTitle>
+            <p className="text-gray-600 mt-2">Please answer the following questions based on your experience during the task.</p>
+          </CardHeader>
+          <CardContent className="space-y-8">
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                
+                {/* Question 16 */}
+                <FormField
+                  control={form.control}
+                  name="familiarity"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-base font-medium text-gray-900">
+                        16. How familiar were you with the topic of this task before starting? <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <RadioGroup
                           onValueChange={field.onChange}
-                          className="w-full"
-                        />
-                        <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                          <span>Very Unsatisfied</span>
-                          <span>Very Satisfied</span>
-                        </div>
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="difficulty"
-                rules={{ required: "Please rate the task difficulty" }}
-                render={({ field }) => (
-                  <FormItem className="space-y-3">
-                    <FormLabel>How difficult was it to find the information you needed?</FormLabel>
-                    <FormControl>
-                      <RadioGroup
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        className="flex flex-col space-y-1"
-                      >
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="very-easy" id="very-easy" />
-                          <Label htmlFor="very-easy">Very Easy</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="easy" id="easy" />
-                          <Label htmlFor="easy">Easy</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="neutral" id="neutral" />
-                          <Label htmlFor="neutral">Neither Easy nor Difficult</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="difficult" id="difficult" />
-                          <Label htmlFor="difficult">Difficult</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="very-difficult" id="very-difficult" />
-                          <Label htmlFor="very-difficult">Very Difficult</Label>
-                        </div>
-                      </RadioGroup>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="confidence"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      How confident are you in your final decision?
-                      <span className="ml-2 text-sm text-muted-foreground">
-                        (Current: {field.value?.[0] || 5}/10)
-                      </span>
-                    </FormLabel>
-                    <FormControl>
-                      <div className="px-2">
-                        <Slider
-                          min={1}
-                          max={10}
-                          step={1}
                           value={field.value}
+                          className="grid grid-cols-1 gap-2"
+                        >
+                          {scaleOptions.map((option) => (
+                            <div key={option.value} className="flex items-center space-x-2">
+                              <RadioGroupItem value={option.value} id={`familiarity-${option.value}`} />
+                              <label htmlFor={`familiarity-${option.value}`} className="text-sm text-gray-700 cursor-pointer">
+                                {option.label}
+                              </label>
+                            </div>
+                          ))}
+                        </RadioGroup>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Question 17 */}
+                <FormField
+                  control={form.control}
+                  name="satisfaction"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-base font-medium text-gray-900">
+                        17. How satisfied were you with your overall search experience? <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <RadioGroup
                           onValueChange={field.onChange}
-                          className="w-full"
-                        />
-                        <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                          <span>Not Confident</span>
-                          <span>Very Confident</span>
-                        </div>
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                          value={field.value}
+                          className="grid grid-cols-1 gap-2"
+                        >
+                          {satisfactionOptions.map((option) => (
+                            <div key={option.value} className="flex items-center space-x-2">
+                              <RadioGroupItem value={option.value} id={`satisfaction-${option.value}`} />
+                              <label htmlFor={`satisfaction-${option.value}`} className="text-sm text-gray-700 cursor-pointer">
+                                {option.label}
+                              </label>
+                            </div>
+                          ))}
+                        </RadioGroup>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name="strategy"
-                rules={{ required: "Please describe your search strategy" }}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      Briefly describe your search strategy. How did you approach finding the right restaurant?
-                    </FormLabel>
-                    <FormControl>
-                      <Textarea 
-                        placeholder="e.g., I started with broad searches and then got more specific..."
-                        className="min-h-[100px]"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                {/* Question 18 */}
+                <FormField
+                  control={form.control}
+                  name="relevance"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-base font-medium text-gray-900">
+                        18. How relevant were the search results you received? <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <RadioGroup
+                          onValueChange={field.onChange}
+                          value={field.value}
+                          className="grid grid-cols-1 gap-2"
+                        >
+                          {relevanceOptions.map((option) => (
+                            <div key={option.value} className="flex items-center space-x-2">
+                              <RadioGroupItem value={option.value} id={`relevance-${option.value}`} />
+                              <label htmlFor={`relevance-${option.value}`} className="text-sm text-gray-700 cursor-pointer">
+                                {option.label}
+                              </label>
+                            </div>
+                          ))}
+                        </RadioGroup>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name="mostImportantFactor"
-                rules={{ required: "Please select the most important factor" }}
-                render={({ field }) => (
-                  <FormItem className="space-y-3">
-                    <FormLabel>What was the most important factor in your final decision?</FormLabel>
-                    <FormControl>
-                      <RadioGroup
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        className="flex flex-col space-y-1"
-                      >
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="ratings" id="ratings" />
-                          <Label htmlFor="ratings">Customer ratings/reviews</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="cuisine" id="cuisine" />
-                          <Label htmlFor="cuisine">Type of cuisine</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="price" id="price" />
-                          <Label htmlFor="price">Price range</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="location" id="location" />
-                          <Label htmlFor="location">Location/convenience</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="atmosphere" id="atmosphere" />
-                          <Label htmlFor="atmosphere">Atmosphere/ambiance</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="other" id="other" />
-                          <Label htmlFor="other">Other</Label>
-                        </div>
-                      </RadioGroup>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                {/* Question 19 */}
+                <FormField
+                  control={form.control}
+                  name="understanding"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-base font-medium text-gray-900">
+                        19. How easy was it to understand the information in the search results? <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <RadioGroup
+                          onValueChange={field.onChange}
+                          value={field.value}
+                          className="grid grid-cols-1 gap-2"
+                        >
+                          {easeOptions.map((option) => (
+                            <div key={option.value} className="flex items-center space-x-2">
+                              <RadioGroupItem value={option.value} id={`understanding-${option.value}`} />
+                              <label htmlFor={`understanding-${option.value}`} className="text-sm text-gray-700 cursor-pointer">
+                                {option.label}
+                              </label>
+                            </div>
+                          ))}
+                        </RadioGroup>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name="additionalComments"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      Any additional comments about your search experience? (Optional)
-                    </FormLabel>
-                    <FormControl>
-                      <Textarea 
-                        placeholder="Share any thoughts about the search process, interface, or task..."
-                        className="min-h-[80px]"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </CardContent>
+                {/* Question 20 */}
+                <FormField
+                  control={form.control}
+                  name="easeOfUse"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-base font-medium text-gray-900">
+                        20. How easy was it to use the search tool? <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <RadioGroup
+                          onValueChange={field.onChange}
+                          value={field.value}
+                          className="grid grid-cols-1 gap-2"
+                        >
+                          {easeOptions.map((option) => (
+                            <div key={option.value} className="flex items-center space-x-2">
+                              <RadioGroupItem value={option.value} id={`easeOfUse-${option.value}`} />
+                              <label htmlFor={`easeOfUse-${option.value}`} className="text-sm text-gray-700 cursor-pointer">
+                                {option.label}
+                              </label>
+                            </div>
+                          ))}
+                        </RadioGroup>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-            <CardFooter>
-              <Button 
-                type="submit" 
-                className="w-full" 
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? "Saving..." : "Continue to Final Decision"}
-              </Button>
-            </CardFooter>
-          </form>
-        </Form>
-      </Card>
+                {/* Question 21 */}
+                <FormField
+                  control={form.control}
+                  name="trust"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-base font-medium text-gray-900">
+                        21. How much did you trust the results provided by the search tool? <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <RadioGroup
+                          onValueChange={field.onChange}
+                          value={field.value}
+                          className="grid grid-cols-1 gap-2"
+                        >
+                          {trustOptions.map((option) => (
+                            <div key={option.value} className="flex items-center space-x-2">
+                              <RadioGroupItem value={option.value} id={`trust-${option.value}`} />
+                              <label htmlFor={`trust-${option.value}`} className="text-sm text-gray-700 cursor-pointer">
+                                {option.label}
+                              </label>
+                            </div>
+                          ))}
+                        </RadioGroup>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Question 22 */}
+                <FormField
+                  control={form.control}
+                  name="usefulness"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-base font-medium text-gray-900">
+                        22. How useful was the search tool in helping you complete the task? <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <RadioGroup
+                          onValueChange={field.onChange}
+                          value={field.value}
+                          className="grid grid-cols-1 gap-2"
+                        >
+                          {usefulnessOptions.map((option) => (
+                            <div key={option.value} className="flex items-center space-x-2">
+                              <RadioGroupItem value={option.value} id={`usefulness-${option.value}`} />
+                              <label htmlFor={`usefulness-${option.value}`} className="text-sm text-gray-700 cursor-pointer">
+                                {option.label}
+                              </label>
+                            </div>
+                          ))}
+                        </RadioGroup>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Question 23 */}
+                <FormField
+                  control={form.control}
+                  name="dataQuality"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-base font-medium text-gray-900">
+                        23. To help us ensure data quality, please select "2" for this question. <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <RadioGroup
+                          onValueChange={field.onChange}
+                          value={field.value}
+                          className="grid grid-cols-1 gap-2"
+                        >
+                          {[1,2,3,4,5,6,7].map((num) => (
+                            <div key={num} className="flex items-center space-x-2">
+                              <RadioGroupItem value={num.toString()} id={`dataQuality-${num}`} />
+                              <label htmlFor={`dataQuality-${num}`} className="text-sm text-gray-700 cursor-pointer">
+                                {num}
+                              </label>
+                            </div>
+                          ))}
+                        </RadioGroup>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Question 24 */}
+                <FormField
+                  control={form.control}
+                  name="difficulty"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-base font-medium text-gray-900">
+                        24. Did you find the task difficult? <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <RadioGroup
+                          onValueChange={field.onChange}
+                          value={field.value}
+                          className="grid grid-cols-1 gap-2"
+                        >
+                          {difficultyOptions.map((option) => (
+                            <div key={option.value} className="flex items-center space-x-2">
+                              <RadioGroupItem value={option.value} id={`difficulty-${option.value}`} />
+                              <label htmlFor={`difficulty-${option.value}`} className="text-sm text-gray-700 cursor-pointer">
+                                {option.label}
+                              </label>
+                            </div>
+                          ))}
+                        </RadioGroup>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Question 25 */}
+                <FormField
+                  control={form.control}
+                  name="timeSpent"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-base font-medium text-gray-900">
+                        25. Approximately how long did it take you to complete the task? <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select time range" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="less-than-2">Less than 2 minutes</SelectItem>
+                          <SelectItem value="3-5">3-5 minutes</SelectItem>
+                          <SelectItem value="6-10">6-10 minutes</SelectItem>
+                          <SelectItem value="more-than-10">More than 10 minutes</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Question 26 */}
+                <FormField
+                  control={form.control}
+                  name="searchType"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-base font-medium text-gray-900">
+                        26. Which type of search tool did you use during the task? <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <RadioGroup
+                          onValueChange={field.onChange}
+                          value={field.value}
+                          className="space-y-2"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="traditional" id="traditional" />
+                            <label htmlFor="traditional" className="text-sm text-gray-700 cursor-pointer">
+                              A traditional search engine showing a list of clickable links (e.g., Google)
+                            </label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="conversational" id="conversational" />
+                            <label htmlFor="conversational" className="text-sm text-gray-700 cursor-pointer">
+                              A conversational AI that provided direct answers in a chat format (e.g., ChatGPT)
+                            </label>
+                          </div>
+                        </RadioGroup>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="flex justify-between pt-6">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => navigate('/search-result-log')}
+                    className="px-6"
+                  >
+                    Previous Page
+                  </Button>
+                  <Button type="submit" className="px-8">
+                    Submission
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Confirmation Dialog */}
+      <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Confirm Submission</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to submit your responses? Once submitted, you cannot make changes.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex gap-2">
+            <Button variant="outline" onClick={handleReturnToPrevious}>
+              Return
+            </Button>
+            <Button onClick={handleConfirmSubmission} disabled={isSubmitting}>
+              {isSubmitting ? "Submitting..." : "Yes"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
-};
-
-export default PostTaskSurvey;
+}

@@ -29,12 +29,16 @@ const App = () => (
           <Route path="/exit-study" element={<ExitStudy />} />
           <Route path="/background-survey" element={<BackgroundSurvey />} />
           <Route path="/task-instructions" element={<TaskInstructions />} />
-          <Route path="/google-search" element={<GoogleSearchInterface />} />
-          <Route path="/search-task" element={<SearchResults />} />
-          <Route path="/search" element={<SearchResults />} />
           <Route path="/search-result-log" element={<SearchResultLog />} />
           <Route path="/post-task-survey" element={<PostTaskSurvey />} />
-          <Route path="/final-decision" element={<FinalDecision />} />
+          <Route path="/thank-you" element={<div className="min-h-screen flex items-center justify-center p-8">
+            <div className="max-w-2xl mx-auto text-center space-y-6">
+              <div className="text-6xl mb-8">🌸</div>
+              <h1 className="text-3xl font-semibold text-gray-900 mb-4">Thank You for Your Participation!</h1>
+              <p className="text-lg text-gray-700 mb-2">If you have questions, reach us at:</p>
+              <p className="text-lg font-medium text-primary">research@yourproject.com</p>
+            </div>
+          </div>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

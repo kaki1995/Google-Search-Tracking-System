@@ -19,7 +19,7 @@ const TaskInstructions = () => {
     
     try {
       // Save task preferences if needed
-      navigate('/search-task');
+      navigate('/search-result-log');
     } catch (error) {
       console.error('Error saving task data:', error);
     } finally {
@@ -32,45 +32,49 @@ const TaskInstructions = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <div className="w-full max-w-[905px] h-auto border-8 border-[#CAC4D0] rounded-[29px] bg-[#FEF7FF] overflow-hidden relative">
-        {/* Browser Bar */}
-        <div className="relative z-10">
-          <BrowserBar />
-        </div>
-
+    <div className="min-h-screen bg-background py-8 px-4">
+      <div className="max-w-4xl mx-auto">
         {/* Content */}
-        <div className="relative z-10 px-8 py-6">
-          <div className="text-center mb-6">
-            <h1 className="text-[26px] font-medium leading-8 text-[#1D1B20] mb-4">
-              Your Search Task
+        <div className="bg-white rounded-lg shadow-sm border p-8">
+          <div className="text-center mb-8">
+            <div className="text-5xl mb-4">📱</div>
+            <h1 className="text-3xl font-semibold text-gray-900 mb-6">
+              Task Instructions
             </h1>
           </div>
 
           {/* Scenario Box */}
-          <div className="border-2 border-dashed border-blue-500 rounded-lg p-6 mb-6">
-            <h3 className="font-semibold text-[#1D1B20] mb-4">Scenario:</h3>
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
+            <div className="flex items-center gap-2 mb-4">
+              <span className="text-2xl">🎯</span>
+              <h3 className="font-semibold text-gray-900">Scenario:</h3>
+            </div>
             
-            <p className="text-sm text-[#1D1B20] mb-4">
+            <p className="text-base text-gray-700 mb-4 leading-relaxed">
               Imagine you are planning to buy a new smartphone for yourself. Please consider your <strong>real financial situation</strong> and <strong>actual consumption habits</strong>—just as you would in real life.
             </p>
 
-            <p className="text-sm text-[#1D1B20] mb-4">
+            <p className="text-base text-gray-700 mb-4 leading-relaxed">
               On the next page, you will find a <strong>search interface</strong> designed specifically for this study. Use this interface to explore available smartphones, including their <strong>prices, features, and specifications</strong>.
             </p>
 
-            <div className="bg-yellow-100 border-l-4 border-yellow-500 p-4 mb-4">
-              <p className="text-sm text-[#1D1B20]">
-                <strong>⚠ Important:</strong><br />
-                Please conduct <strong>all searches exclusively</strong> through this interface. To ensure we capture your complete search journey, <strong>do not use any external tools</strong> (e.g., Google, Amazon, price comparison websites, etc.).
-              </p>
+            <div className="bg-amber-50 border-l-4 border-amber-400 p-4 mb-4">
+              <div className="flex items-start gap-2">
+                <span className="text-xl">⚠️</span>
+                <div>
+                  <p className="text-sm text-amber-800">
+                    <strong>Important:</strong><br />
+                    Please conduct <strong>all searches exclusively</strong> through this interface. To ensure we capture your complete search journey, <strong>do not use any external tools</strong> (e.g., Google, Amazon, price comparison websites, etc.).
+                  </p>
+                </div>
+              </div>
             </div>
 
-            <p className="text-sm text-[#1D1B20] mb-4">
+            <p className="text-base text-gray-700 mb-4 leading-relaxed">
               Once you've completed your research and made a decision, you will be asked to <strong>provide details</strong> about your chosen smartphone, including:
             </p>
 
-            <ul className="list-disc ml-6 mb-4 text-sm text-[#1D1B20]">
+            <ul className="list-disc ml-6 mb-4 text-base text-gray-700 space-y-1">
               <li>Brand and model</li>
               <li>Storage capacity (optional)</li>
               <li>Color (optional)</li>
@@ -78,26 +82,29 @@ const TaskInstructions = () => {
               <li>Link to the shopping website</li>
             </ul>
 
-            <p className="text-sm text-[#1D1B20] mb-6 italic">
-              You may return to the search page and review your search history at any time before submitting the survey.
+            <div className="bg-green-50 border border-green-200 rounded-md p-3 mb-6">
+              <p className="text-sm text-green-800 italic flex items-center gap-2">
+                <span>💡</span>
+                You may return to the search page and review your search history at any time before submitting the survey.
+              </p>
+            </div>
+
+            <p className="text-base text-gray-700 mb-4 font-medium">
+              Before beginning your search, please answer the following question:
             </p>
 
-            <p className="text-sm text-[#1D1B20] mb-4">
-              Before beginning your search, please answer the following two preparatory questions:
-            </p>
-
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               {/* Question 10: Budget */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-[#1D1B20]">
+              <div className="space-y-3">
+                <label className="text-base font-medium text-gray-900 block">
                   10. What is your smartphone budget? <span className="text-red-500">*</span><br />
-                  <span className="text-xs font-normal">(Please select one option based on your real-life financial habits.)</span>
+                  <span className="text-sm font-normal text-gray-600">(Please select one option based on your real-life financial habits.)</span>
                 </label>
                 <Select 
                   onValueChange={(value) => form.setValue('budget', value)}
                   required
                 >
-                  <SelectTrigger className="w-full bg-white">
+                  <SelectTrigger className="w-full bg-white border-gray-300">
                     <SelectValue placeholder="Select your budget range" />
                   </SelectTrigger>
                   <SelectContent className="bg-white z-50">
@@ -114,20 +121,20 @@ const TaskInstructions = () => {
           </div>
 
           {/* Buttons */}
-          <div className="flex justify-center gap-4">
-            <StudyButton
-              variant="secondary"
+          <div className="flex justify-between pt-6">
+            <button
               onClick={handlePreviousPage}
+              className="px-6 py-3 border border-gray-300 text-gray-700 bg-white rounded-lg hover:bg-gray-50 transition-colors font-medium"
             >
               Previous Page
-            </StudyButton>
-            <StudyButton
-              variant="primary"
+            </button>
+            <button
               onClick={form.handleSubmit(onSubmit)}
               disabled={isSubmitting}
+              className="px-8 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? "Loading..." : "Next Page"}
-            </StudyButton>
+            </button>
           </div>
         </div>
       </div>
