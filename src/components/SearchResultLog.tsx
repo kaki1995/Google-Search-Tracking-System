@@ -37,7 +37,7 @@ export default function SearchResultLog() {
           <h1 className="text-2xl font-bold text-foreground text-center">Search Experience Feedbacks</h1>
         </div>
 
-        <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+        <div className="mb-6 p-4 rounded-lg border border-blue-200 bg-sky-100">
           <p className="text-blue-800 text-sm">
             Based on your search activity, please provide the following information about your smartphone research:
           </p>
