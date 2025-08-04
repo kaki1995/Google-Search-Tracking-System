@@ -98,7 +98,7 @@ export default function Welcome() {
             <button onClick={handleExit} className="px-8 py-3 border border-gray-300 text-gray-700 bg-white rounded-lg hover:bg-gray-50 transition-colors font-medium">
               Exit Study
             </button>
-            <button onClick={handleContinue} disabled={agreed !== true} className="px-8 py-3 rounded-lg transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed text-slate-50 bg-sky-600 hover:bg-sky-500">
+            <button onClick={handleContinue} disabled={agreed !== true} className="px-8 py-3 rounded-lg transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed text-slate-50 bg-sky-700 hover:bg-sky-600">
               Continue to Study
             </button>
           </div>
