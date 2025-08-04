@@ -31,7 +31,7 @@ const App = () => <QueryClientProvider client={queryClient}>
           <Route path="/search-result-log" element={<SearchResultLog />} />
           <Route path="/post-task-survey" element={<PostTaskSurvey />} />
           <Route path="/thank-you" element={<div className="min-h-screen flex items-center justify-center p-8">
-            <div className="max-w-2xl text-center space-y-6 bg-white border border-border p-8 shadow-sm rounded-full mx-0">
+            <div className="max-w-2xl text-center space-y-6 bg-white border border-border p-8 shadow-sm mx-0 rounded-xl">
               
               <h1 className="text-3xl font-semibold text-gray-900 mb-4">Thank You for Your Participation!</h1>
               <p className="text-lg text-gray-700 mb-2">If you have questions, reach us at:</p>
