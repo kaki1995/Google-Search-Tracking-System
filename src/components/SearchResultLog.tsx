@@ -146,7 +146,7 @@ export default function SearchResultLog() {
                 <ArrowLeft className="w-4 h-4" />
                 Back to Search
               </Button>
-              <Button type="submit" disabled={isSubmitting} className="px-8">
+              <Button type="submit" disabled={isSubmitting} className="px-8 bg-sky-700 hover:bg-sky-600">
                 {isSubmitting ? "Loading..." : "Next Page"}
               </Button>
             </div>
