@@ -16,11 +16,8 @@ import TaskInstructions from "./components/TaskInstructions";
 import PostTaskSurvey from "./components/PostTaskSurvey";
 import FinalDecision from "./components/FinalDecision";
 import NotFound from "./pages/NotFound";
-
 const queryClient = new QueryClient();
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
+const App = () => <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
       <Sonner />
@@ -34,12 +31,8 @@ const App = () => (
           <Route path="/search-result-log" element={<SearchResultLog />} />
           <Route path="/post-task-survey" element={<PostTaskSurvey />} />
           <Route path="/thank-you" element={<div className="min-h-screen flex items-center justify-center p-8">
-            <div className="max-w-2xl mx-auto text-center space-y-6 bg-white rounded-lg border border-border p-8 shadow-sm">
-              <div className="flex items-center justify-center gap-8 mb-8">
-                <img src="/src/assets/google-logo.png" alt="Google" className="h-16 w-auto" />
-                <span className="text-4xl">×</span>
-                <img src="/src/assets/tum-logo.png" alt="TUM" className="h-16 w-auto" />
-              </div>
+            <div className="max-w-2xl text-center space-y-6 bg-white border border-border p-8 shadow-sm rounded-full mx-0">
+              
               <h1 className="text-3xl font-semibold text-gray-900 mb-4">Thank You for Your Participation!</h1>
               <p className="text-lg text-gray-700 mb-2">If you have questions, reach us at:</p>
               <p className="text-lg font-medium text-primary">research@yourproject.com</p>
@@ -50,7 +43,5 @@ const App = () => (
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
-  </QueryClientProvider>
-);
-
+  </QueryClientProvider>;
 export default App;

@@ -4,19 +4,15 @@ import { useForm } from "react-hook-form";
 import BrowserBar from "@/components/BrowserBar";
 import StudyButton from "@/components/StudyButton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
 interface TaskForm {
   budget: string;
 }
-
 const TaskInstructions = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
   const form = useForm<TaskForm>();
-
   const onSubmit = async (data: TaskForm) => {
     setIsSubmitting(true);
-    
     try {
       // Save task preferences if needed
       navigate('/search-result-log');
@@ -26,16 +22,13 @@ const TaskInstructions = () => {
       setIsSubmitting(false);
     }
   };
-
   const handlePreviousPage = () => {
     navigate('/background-survey');
   };
-
-  return (
-    <div className="min-h-screen bg-background py-8 px-4">
+  return <div className="min-h-screen bg-background py-8 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Content */}
-        <div className="bg-white rounded-lg shadow-sm border p-8">
+        <div className="bg-white shadow-sm border p-8 rounded-none">
           <div className="text-center mb-8">
             <div className="text-5xl mb-4">📱</div>
             <h1 className="text-3xl font-semibold text-gray-900 mb-6">
@@ -44,7 +37,7 @@ const TaskInstructions = () => {
           </div>
 
           {/* Scenario Box */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
+          <div className="border border-blue-200 rounded-lg p-6 mb-8 bg-transparent">
             <div className="flex items-center gap-2 mb-4">
               <span className="text-2xl">🎯</span>
               <h3 className="font-semibold text-gray-900">Scenario:</h3>
@@ -100,10 +93,7 @@ const TaskInstructions = () => {
                   10. What is your smartphone budget? <span className="text-red-500">*</span><br />
                   <span className="text-sm font-normal text-gray-600">(Please select one option based on your real-life financial habits.)</span>
                 </label>
-                <Select 
-                  onValueChange={(value) => form.setValue('budget', value)}
-                  required
-                >
+                <Select onValueChange={value => form.setValue('budget', value)} required>
                   <SelectTrigger className="w-full bg-white border-gray-300">
                     <SelectValue placeholder="Select your budget range" />
                   </SelectTrigger>
@@ -122,27 +112,18 @@ const TaskInstructions = () => {
 
           {/* Buttons */}
           <div className="flex justify-between pt-6">
-            <button
-              onClick={handlePreviousPage}
-              className="px-6 py-3 border border-gray-300 text-gray-700 bg-white rounded-lg hover:bg-gray-50 transition-colors font-medium"
-            >
+            <button onClick={handlePreviousPage} className="px-6 py-3 border border-gray-300 text-gray-700 bg-white rounded-lg hover:bg-gray-50 transition-colors font-medium">
               Previous Page
             </button>
-            <button
-              onClick={form.handleSubmit((data) => {
-                setIsSubmitting(true);
-                navigate('/search-interface');
-              })}
-              disabled={isSubmitting}
-              className="px-8 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-            >
+            <button onClick={form.handleSubmit(data => {
+            setIsSubmitting(true);
+            navigate('/search-interface');
+          })} disabled={isSubmitting} className="px-8 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed">
               {isSubmitting ? "Loading..." : "Next Page"}
             </button>
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default TaskInstructions;
