@@ -9,6 +9,7 @@ import ExitStudy from "./pages/ExitStudy";
 import SearchResults from "./components/SearchResults";
 import SearchResultLog from "./components/SearchResultLog";
 import GoogleSearchInterface from "./pages/GoogleSearchInterface";
+import SearchInterface from "./pages/SearchInterface";
 import ConsentScreen from "./components/ConsentScreen";
 import BackgroundSurvey from "./components/BackgroundSurvey";
 import TaskInstructions from "./components/TaskInstructions";
@@ -29,11 +30,16 @@ const App = () => (
           <Route path="/exit-study" element={<ExitStudy />} />
           <Route path="/background-survey" element={<BackgroundSurvey />} />
           <Route path="/task-instructions" element={<TaskInstructions />} />
+          <Route path="/search-interface" element={<SearchInterface />} />
           <Route path="/search-result-log" element={<SearchResultLog />} />
           <Route path="/post-task-survey" element={<PostTaskSurvey />} />
           <Route path="/thank-you" element={<div className="min-h-screen flex items-center justify-center p-8">
-            <div className="max-w-2xl mx-auto text-center space-y-6">
-              <div className="text-6xl mb-8">🌸</div>
+            <div className="max-w-2xl mx-auto text-center space-y-6 bg-white rounded-lg border border-border p-8 shadow-sm">
+              <div className="flex items-center justify-center gap-8 mb-8">
+                <img src="/src/assets/google-logo.png" alt="Google" className="h-16 w-auto" />
+                <span className="text-4xl">×</span>
+                <img src="/src/assets/tum-logo.png" alt="TUM" className="h-16 w-auto" />
+              </div>
               <h1 className="text-3xl font-semibold text-gray-900 mb-4">Thank You for Your Participation!</h1>
               <p className="text-lg text-gray-700 mb-2">If you have questions, reach us at:</p>
               <p className="text-lg font-medium text-primary">research@yourproject.com</p>
