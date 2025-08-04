@@ -2,23 +2,18 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import BrowserBar from "@/components/BrowserBar";
 import StudyButton from "@/components/StudyButton";
-
 export default function Welcome() {
   const [agreed, setAgreed] = useState<boolean | null>(null);
   const navigate = useNavigate();
-
   const handleContinue = () => {
     if (agreed === true) {
       navigate("/background-survey");
     }
   };
-
   const handleExit = () => {
     navigate("/exit-study");
   };
-
-  return (
-    <div className="min-h-screen bg-background py-8 px-4">
+  return <div className="min-h-screen bg-background py-8 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Content */}
         <div className="bg-white rounded-lg shadow-sm border p-8">
@@ -61,7 +56,7 @@ export default function Welcome() {
               <p>
                 This study is part of a collaborative research project between <strong>Google's Istanbul Office</strong> and the <strong>Technical University of Munich</strong>. We are investigating how consumers search for products using online tools.
               </p>
-              <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-400">
+              <div className="p-4 rounded-lg border-l-4 border-blue-400 bg-sky-100">
                 <ul className="space-y-2 list-none">
                   <li className="flex items-center gap-2">
                     <span className="text-blue-600">⏱️</span>
@@ -90,12 +85,7 @@ export default function Welcome() {
           <div className="flex flex-col items-center gap-6 mb-8">
             <div className="bg-gray-50 p-4 rounded-lg border max-w-2xl">
               <label className="flex items-start gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={agreed === true}
-                  onChange={(e) => setAgreed(e.target.checked)}
-                  className="w-5 h-5 text-primary bg-white border-gray-300 rounded focus:ring-primary mt-0.5"
-                />
+                <input type="checkbox" checked={agreed === true} onChange={e => setAgreed(e.target.checked)} className="w-5 h-5 text-primary bg-white border-gray-300 rounded focus:ring-primary mt-0.5" />
                 <span className="text-sm text-gray-700 leading-relaxed">
                   I have read the above and voluntarily agree to participate in this study.
                 </span>
@@ -105,22 +95,14 @@ export default function Welcome() {
 
           {/* Buttons */}
           <div className="flex justify-center gap-6">
-            <button
-              onClick={handleExit}
-              className="px-8 py-3 border border-gray-300 text-gray-700 bg-white rounded-lg hover:bg-gray-50 transition-colors font-medium"
-            >
+            <button onClick={handleExit} className="px-8 py-3 border border-gray-300 text-gray-700 bg-white rounded-lg hover:bg-gray-50 transition-colors font-medium">
               Exit Study
             </button>
-            <button
-              onClick={handleContinue}
-              disabled={agreed !== true}
-              className="px-8 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-            >
+            <button onClick={handleContinue} disabled={agreed !== true} className="px-8 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed">
               Continue to Study
             </button>
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 }
