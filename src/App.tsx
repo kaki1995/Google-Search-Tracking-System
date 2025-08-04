@@ -28,7 +28,7 @@ const App = () => <QueryClientProvider client={queryClient}>
           <Route path="/background-survey" element={<BackgroundSurvey />} />
           <Route path="/task-instructions" element={<TaskInstructions />} />
           <Route path="/search-interface" element={<SearchInterface />} />
-          <Route path="/search-result-log" element={<SearchResultLog />} className="rounded-3xl" />
+          <Route path="/search-result-log" element={<SearchResultLog />} />
           <Route path="/post-task-survey" element={<PostTaskSurvey />} />
           <Route path="/thank-you" element={<div className="min-h-screen flex items-center justify-center p-8">
             <div className="max-w-2xl text-center space-y-6 bg-white border border-border p-8 shadow-sm rounded-full mx-0">
