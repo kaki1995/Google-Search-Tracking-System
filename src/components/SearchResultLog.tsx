@@ -34,7 +34,7 @@ export default function SearchResultLog() {
       <div className="max-w-4xl mx-auto bg-white rounded-lg border border-border shadow-sm p-8">
         <div className="flex items-center gap-4 mb-6">
           
-          <h1 className="text-2xl font-bold text-foreground text-center">Search Experience Feedbacks</h1>
+          <h1 className="text-2xl font-bold text-foreground text-center">Search Results</h1>
         </div>
 
         <div className="mb-6 p-4 rounded-lg border border-blue-200 bg-sky-100">
