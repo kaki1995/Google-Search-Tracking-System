@@ -71,7 +71,7 @@ export default function SearchInterface() {
               <Button variant="outline" onClick={handleSearch} className="px-6 py-2 bg-gray-50 border border-gray-300 rounded text-sm text-gray-700 hover:shadow-sm hover:border-gray-400">
                 Google Search
               </Button>
-              <Button onClick={handleFinishTask} className="px-6 py-2 bg-secondary text-secondary-foreground hover:bg-secondary/90 flex items-center gap-2">
+              <Button onClick={handleFinishTask} className="px-6 py-2 flex items-center gap-2 bg-sky-400 hover:bg-sky-300 text-white">
                 <ArrowRight className="w-4 h-4" />
                 Finish Task
               </Button>
