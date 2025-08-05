@@ -20,7 +20,8 @@ export default function Welcome() {
           {/* Header with Icons */}
           <div className="text-center mb-8">
             <div className="flex items-center justify-center gap-3 mb-6">
-              <span className="text-4xl">🔍</span>
+              <span className="text-4xl">
+            </span>
               <div className="flex items-center gap-4">
                 {/* Google Logo */}
                 <div className="flex p-2.5 items-center">
@@ -40,7 +41,7 @@ export default function Welcome() {
                   </div>
                 </div>
               </div>
-              <span className="text-4xl">🎓</span>
+              
             </div>
           </div>
 
