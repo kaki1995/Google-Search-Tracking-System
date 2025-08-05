@@ -10,11 +10,105 @@ export type Database = {
   // Allows to automatically instanciate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "12.2.12 (cd3cf9e)"
+    PostgrestVersion: "13.0.4"
   }
   public: {
     Tables: {
-      [_ in never]: never
+      queries: {
+        Row: {
+          clicked_rank: number | null
+          clicked_url: string | null
+          query_duration_sec: number | null
+          query_id: string
+          query_reformulation: boolean | null
+          query_text: string
+          scroll_depth: number | null
+          search_results: Json | null
+          session_id: string
+          timestamp_query: string
+        }
+        Insert: {
+          clicked_rank?: number | null
+          clicked_url?: string | null
+          query_duration_sec?: number | null
+          query_id?: string
+          query_reformulation?: boolean | null
+          query_text: string
+          scroll_depth?: number | null
+          search_results?: Json | null
+          session_id: string
+          timestamp_query?: string
+        }
+        Update: {
+          clicked_rank?: number | null
+          clicked_url?: string | null
+          query_duration_sec?: number | null
+          query_id?: string
+          query_reformulation?: boolean | null
+          query_text?: string
+          scroll_depth?: number | null
+          search_results?: Json | null
+          session_id?: string
+          timestamp_query?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "queries_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "user_sessions"
+            referencedColumns: ["session_id"]
+          },
+        ]
+      }
+      user_sessions: {
+        Row: {
+          background_survey: Json | null
+          completed: boolean | null
+          consent_given: boolean | null
+          consent_timestamp: string | null
+          created_at: string
+          decision_confidence: number | null
+          device_type: string | null
+          exited_early: boolean | null
+          final_choice_url: string | null
+          search_experience_log_1: Json | null
+          search_experience_log_2: Json | null
+          session_id: string
+          user_id: string
+        }
+        Insert: {
+          background_survey?: Json | null
+          completed?: boolean | null
+          consent_given?: boolean | null
+          consent_timestamp?: string | null
+          created_at?: string
+          decision_confidence?: number | null
+          device_type?: string | null
+          exited_early?: boolean | null
+          final_choice_url?: string | null
+          search_experience_log_1?: Json | null
+          search_experience_log_2?: Json | null
+          session_id?: string
+          user_id: string
+        }
+        Update: {
+          background_survey?: Json | null
+          completed?: boolean | null
+          consent_given?: boolean | null
+          consent_timestamp?: string | null
+          created_at?: string
+          decision_confidence?: number | null
+          device_type?: string | null
+          exited_early?: boolean | null
+          final_choice_url?: string | null
+          search_experience_log_1?: Json | null
+          search_experience_log_2?: Json | null
+          session_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
