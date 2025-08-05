@@ -1,5 +1,4 @@
-import { collection, addDoc, updateDoc, doc, getDoc, setDoc } from 'firebase/firestore';
-import { db } from './firebase';
+import { supabase } from '@/integrations/supabase/client';
 import { v4 as uuidv4 } from 'uuid';
 
 export interface TrackingEvent {
@@ -48,11 +47,13 @@ class TrackingService {
   private isTracking = false;
 
   async initSession(token?: string): Promise<string> {
-    const sessionId = token || uuidv4();
+    const urlParams = new URLSearchParams(window.location.search);
+    const userIdFromUrl = urlParams.get('user') || token;
+    const sessionId = uuidv4();
     
     this.sessionData = {
       sessionId,
-      userId: sessionId, // Using session ID as user ID for anonymity
+      userId: userIdFromUrl || sessionId,
       deviceInfo: {
         userAgent: navigator.userAgent,
         screenWidth: window.screen.width,
@@ -71,6 +72,9 @@ class TrackingService {
 
     // Save to localStorage for session recovery
     localStorage.setItem('research_session', JSON.stringify(this.sessionData));
+    
+    // Initialize session in Supabase
+    await this.saveToSupabase();
     
     return sessionId;
   }
@@ -92,9 +96,9 @@ class TrackingService {
     // Update localStorage
     localStorage.setItem('research_session', JSON.stringify(this.sessionData));
 
-    // Save to Firebase
+    // Save to Supabase
     try {
-      await this.saveToFirebase();
+      await this.saveToSupabase();
     } catch (error) {
       console.error('Failed to save tracking data:', error);
     }
@@ -111,8 +115,8 @@ class TrackingService {
     });
   }
 
-  async trackQuery(query: string, resultsCount: number): Promise<void> {
-    if (!this.sessionData) return;
+  async trackQuery(query: string, resultsCount: number): Promise<string | null> {
+    if (!this.sessionData) return null;
 
     const queryData = {
       query,
@@ -127,9 +131,33 @@ class TrackingService {
       timestamp: Date.now(),
       data: queryData
     });
+
+    // Log to queries table
+    try {
+      const { data, error } = await supabase
+        .from('queries')
+        .insert({
+          session_id: this.sessionData.sessionId,
+          query_text: query,
+          search_results: [],
+          query_reformulation: this.isQueryReformulation(query)
+        })
+        .select('query_id')
+        .single();
+
+      if (error) {
+        console.error('Failed to log query to Supabase:', error);
+        return null;
+      }
+
+      return data.query_id;
+    } catch (error) {
+      console.error('Failed to log query to Supabase:', error);
+      return null;
+    }
   }
 
-  async trackClick(url: string, title: string, position: number): Promise<void> {
+  async trackClick(url: string, title: string, position: number, queryId?: string): Promise<void> {
     if (!this.sessionData) return;
 
     const clickData = {
@@ -146,6 +174,25 @@ class TrackingService {
       timestamp: Date.now(),
       data: clickData
     });
+
+    // Update queries table if queryId provided
+    if (queryId) {
+      try {
+        const { error } = await supabase
+          .from('queries')
+          .update({
+            clicked_url: url,
+            clicked_rank: position
+          })
+          .eq('query_id', queryId);
+
+        if (error) {
+          console.error('Failed to log click to Supabase:', error);
+        }
+      } catch (error) {
+        console.error('Failed to log click to Supabase:', error);
+      }
+    }
   }
 
   async trackScroll(scrollY: number): Promise<void> {
@@ -202,6 +249,82 @@ class TrackingService {
     });
   }
 
+  async updateSearchExperience1(data: any): Promise<void> {
+    if (!this.sessionData) return;
+    
+    try {
+      const { error } = await supabase
+        .from('user_sessions')
+        .update({
+          search_experience_log_1: data
+        })
+        .eq('session_id', this.sessionData.sessionId);
+
+      if (error) {
+        console.error('Failed to update search experience log 1:', error);
+      }
+    } catch (error) {
+      console.error('Failed to update search experience log 1:', error);
+    }
+  }
+
+  async updateSearchExperience2(data: any): Promise<void> {
+    if (!this.sessionData) return;
+    
+    try {
+      const { error } = await supabase
+        .from('user_sessions')
+        .update({
+          search_experience_log_2: data
+        })
+        .eq('session_id', this.sessionData.sessionId);
+
+      if (error) {
+        console.error('Failed to update search experience log 2:', error);
+      }
+    } catch (error) {
+      console.error('Failed to update search experience log 2:', error);
+    }
+  }
+
+  async markCompleted(): Promise<void> {
+    if (!this.sessionData) return;
+    
+    try {
+      const { error } = await supabase
+        .from('user_sessions')
+        .update({
+          completed: true
+        })
+        .eq('session_id', this.sessionData.sessionId);
+
+      if (error) {
+        console.error('Failed to mark session as completed:', error);
+      }
+    } catch (error) {
+      console.error('Failed to mark session as completed:', error);
+    }
+  }
+
+  async markExitedEarly(): Promise<void> {
+    if (!this.sessionData) return;
+    
+    try {
+      const { error } = await supabase
+        .from('user_sessions')
+        .update({
+          exited_early: true
+        })
+        .eq('session_id', this.sessionData.sessionId);
+
+      if (error) {
+        console.error('Failed to mark session as exited early:', error);
+      }
+    } catch (error) {
+      console.error('Failed to mark session as exited early:', error);
+    }
+  }
+
   startScrollTracking(): void {
     if (this.isTracking) return;
     
@@ -223,15 +346,43 @@ class TrackingService {
     this.isTracking = false;
   }
 
-  private async saveToFirebase(): Promise<void> {
+  private async saveToSupabase(): Promise<void> {
     if (!this.sessionData) return;
 
     try {
-      const docRef = doc(db, 'research_sessions', this.sessionData.sessionId);
-      await setDoc(docRef, this.sessionData, { merge: true });
+      const deviceType = this.sessionData.deviceInfo.isMobile ? 'mobile' : 'desktop';
+      
+      const { error } = await supabase
+        .from('user_sessions')
+        .upsert({
+          session_id: this.sessionData.sessionId,
+          user_id: this.sessionData.userId,
+          device_type: deviceType,
+          consent_given: this.sessionData.consentGiven,
+          consent_timestamp: this.sessionData.consentGiven ? new Date().toISOString() : null,
+          background_survey: this.sessionData.backgroundSurvey,
+          search_experience_log_1: null,
+          search_experience_log_2: this.sessionData.postTaskSurvey,
+          final_choice_url: this.sessionData.finalDecision?.url,
+          decision_confidence: this.sessionData.finalDecision?.confidence,
+          completed: false,
+          exited_early: false
+        });
+
+      if (error) {
+        console.error('Failed to save session data to Supabase:', error);
+      }
     } catch (error) {
-      console.error('Firebase save error:', error);
+      console.error('Failed to save session data to Supabase:', error);
     }
+  }
+
+  private isQueryReformulation(queryText: string): boolean {
+    const previousQueries = this.sessionData?.searchPhase.queries || [];
+    if (previousQueries.length === 0) return false;
+    
+    const lastQuery = previousQueries[previousQueries.length - 1];
+    return lastQuery.query !== queryText;
   }
 
   getSessionData(): SessionData | null {

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { trackingService } from "@/lib/tracking";
+import { performGoogleSearch } from "@/lib/googleSearch";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -21,9 +22,8 @@ const SearchResults = () => {
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
-  const apiKey = "AIzaSyATKkbTWhLwe0RgeWoY_iiMW7w2QoPkWpw";
-  const searchEngineId = "007dc6ac33e6f436c";
   const [searchCount, setSearchCount] = useState(0);
+  const [currentQueryId, setCurrentQueryId] = useState<string | null>(null);
   const trackingInitialized = useRef(false);
 
   useEffect(() => {
@@ -35,7 +35,7 @@ const SearchResults = () => {
     
     const currentQuery = searchParams.get("q");
     if (currentQuery) {
-      performSearch(currentQuery, apiKey, searchEngineId);
+      performSearch(currentQuery);
     }
   }, [searchParams]);
 
@@ -46,34 +46,12 @@ const SearchResults = () => {
     };
   }, []);
 
-  const performSearch = async (searchQuery: string, key: string, engineId: string) => {
+  const performSearch = async (searchQuery: string) => {
     if (!searchQuery.trim()) return;
 
     setLoading(true);
     try {
-      const response = await fetch(
-        `https://www.googleapis.com/customsearch/v1?key=${key}&cx=${engineId}&q=${encodeURIComponent(
-          searchQuery
-        )}&num=10`
-      );
-
-      if (!response.ok) {
-        throw new Error(`Search failed: ${response.status}`);
-      }
-
-      const data = await response.json();
-      
-      if (data.error) {
-        throw new Error(data.error.message);
-      }
-
-      const searchResults: SearchResult[] = data.items?.map((item: any) => ({
-        title: item.title,
-        link: item.link,
-        snippet: item.snippet,
-        displayLink: item.displayLink,
-      })) || [];
-
+      const searchResults = await performGoogleSearch(searchQuery);
       setResults(searchResults);
       
       // Add to search history
@@ -84,8 +62,9 @@ const SearchResults = () => {
         return prev;
       });
       
-      // Track the search query
-      await trackingService.trackQuery(searchQuery, searchResults.length);
+      // Track the search query and get query ID
+      const queryId = await trackingService.trackQuery(searchQuery, searchResults.length);
+      setCurrentQueryId(queryId);
       setSearchCount(prev => prev + 1);
     } catch (error) {
       console.error("Search error:", error);
@@ -103,13 +82,13 @@ const SearchResults = () => {
     e.preventDefault();
     if (query.trim()) {
       navigate(`/search?q=${encodeURIComponent(query.trim())}`);
-      performSearch(query.trim(), apiKey, searchEngineId);
+      performSearch(query.trim());
     }
   };
 
   const handleResultClick = async (result: SearchResult, index: number) => {
     // Track the click
-    await trackingService.trackClick(result.link, result.title, index + 1);
+    await trackingService.trackClick(result.link, result.title, index + 1, currentQueryId || undefined);
     
     // Open in new tab to allow continued searching
     window.open(result.link, '_blank', 'noopener,noreferrer');
