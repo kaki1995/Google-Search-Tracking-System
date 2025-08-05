@@ -64,8 +64,9 @@ Deno.serve(async (req) => {
       snippet: item.snippet
     }));
 
-    // Generate query ID
+    // Generate query ID and timestamp
     const queryId = crypto.randomUUID();
+    const timestamp = new Date().toISOString();
 
     // Log to Supabase queries table
     const { error: insertError } = await supabase
@@ -74,7 +75,7 @@ Deno.serve(async (req) => {
         query_id: queryId,
         session_id,
         query_text,
-        timestamp_query: new Date().toISOString(),
+        timestamp_query: timestamp,
         search_results: googleData,
         query_reformulation: false
       });
@@ -89,10 +90,13 @@ Deno.serve(async (req) => {
 
     console.log(`Query logged successfully with ID: ${queryId}`);
 
-    // Return formatted results
+    // Return formatted results with required structure
     return new Response(
       JSON.stringify({
         query_id: queryId,
+        query_text,
+        timestamp_query: timestamp,
+        total_results: googleData.searchInformation?.totalResults || "0",
         results: searchResults
       }),
       { 
