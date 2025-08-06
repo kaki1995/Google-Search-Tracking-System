@@ -57,24 +57,40 @@ export default function SearchInterface() {
               </span>
             </div>
 
-            {/* Search Box */}
-            <div className="relative mb-8 w-full max-w-[584px]">
-              <div className="flex items-center w-full h-[44px] border border-gray-300 rounded-full px-4 shadow-sm hover:shadow-md transition-shadow">
-                <Search className="w-4 h-4 text-gray-400 mr-3" />
-                <Input type="text" className="flex-1 outline-none border-0 bg-transparent" placeholder="Search Google or type a URL" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} onKeyPress={e => e.key === 'Enter' && handleSearch()} />
+            {/* Search Box with Inline Buttons */}
+            <div className="relative mb-8 w-full max-w-[800px]">
+              <div className="flex items-center gap-4">
+                {/* Search Input */}
+                <div className="flex items-center flex-1 h-[44px] border border-gray-300 rounded-full px-4 shadow-sm hover:shadow-md transition-shadow">
+                  <Search className="w-4 h-4 text-gray-400 mr-3" />
+                  <Input 
+                    type="text" 
+                    className="flex-1 outline-none border-0 bg-transparent" 
+                    placeholder="Search Google or type a URL" 
+                    value={searchQuery} 
+                    onChange={e => setSearchQuery(e.target.value)} 
+                    onKeyPress={e => e.key === 'Enter' && handleSearch()} 
+                  />
+                </div>
+                
+                {/* Action Buttons */}
+                <div className="flex gap-3">
+                  <Button 
+                    variant="outline" 
+                    onClick={handleSearch} 
+                    className="px-4 py-2 bg-gray-50 border border-gray-300 rounded text-sm text-gray-700 hover:shadow-sm hover:border-gray-400"
+                  >
+                    Google Search
+                  </Button>
+                  <Button 
+                    onClick={handleFinishTask} 
+                    className="px-4 py-2 flex items-center gap-2 bg-sky-400 hover:bg-sky-300 text-white"
+                  >
+                    <ArrowRight className="w-4 h-4" />
+                    Finish Task
+                  </Button>
+                </div>
               </div>
-              
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex gap-6">
-              <Button variant="outline" onClick={handleSearch} className="px-6 py-2 bg-gray-50 border border-gray-300 rounded text-sm text-gray-700 hover:shadow-sm hover:border-gray-400">
-                Google Search
-              </Button>
-              <Button onClick={handleFinishTask} className="px-6 py-2 flex items-center gap-2 bg-sky-400 hover:bg-sky-300 text-white">
-                <ArrowRight className="w-4 h-4" />
-                Finish Task
-              </Button>
             </div>
           </div>
         </div>
