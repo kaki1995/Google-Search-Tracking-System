@@ -50,6 +50,9 @@ export default function SearchInterface() {
         
         if (data.results) {
           setCurrentResults(data.results);
+          // Store query_id for click tracking
+          sessionStorage.setItem("current_query_id", data.query_id);
+          
           const newSearch = {
             query: searchQuery,
             timestamp: new Date(),
