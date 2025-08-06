@@ -118,7 +118,7 @@ const TaskInstructions = () => {
             <button onClick={form.handleSubmit(data => {
             setIsSubmitting(true);
             navigate('/search-interface');
-          })} disabled={isSubmitting} className="px-8 py-3 text-primary-foreground rounded-lg transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed bg-sky-700 hover:bg-sky-600">
+          })} disabled={isSubmitting} className="px-8 py-3 text-primary-foreground rounded-lg transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed bg-sky-600 hover:bg-sky-500">
               {isSubmitting ? "Loading..." : "Next Page"}
             </button>
           </div>
