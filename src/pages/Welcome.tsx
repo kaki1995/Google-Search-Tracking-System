@@ -22,20 +22,12 @@ export default function Welcome() {
             <div className="flex items-center justify-center gap-6 mb-6">
               {/* Google Logo */}
               <div className="flex items-center">
-                <img 
-                  src="/lovable-uploads/e465b544-8fc4-46ac-ace4-0a9db69dbacd.png" 
-                  alt="Google" 
-                  className="h-12 w-12"
-                />
+                <img src="/lovable-uploads/e465b544-8fc4-46ac-ace4-0a9db69dbacd.png" alt="Google" className="h-12 w-12" />
               </div>
               
               {/* TUM Logo */}
               <div className="flex items-center">
-                <img 
-                  src="/lovable-uploads/d96714fb-70e1-4232-aeb2-184df4ca4cea.png" 
-                  alt="Technical University of Munich" 
-                  className="h-12 w-auto"
-                />
+                <img src="/lovable-uploads/d96714fb-70e1-4232-aeb2-184df4ca4cea.png" alt="Technical University of Munich" className="h-12 w-auto" />
               </div>
             </div>
           </div>
@@ -94,7 +86,7 @@ export default function Welcome() {
             <button onClick={handleExit} className="px-8 py-3 border border-gray-300 text-gray-700 bg-white rounded-lg hover:bg-gray-50 transition-colors font-medium">
               Exit Study
             </button>
-            <button onClick={handleContinue} disabled={agreed !== true} className="px-8 py-3 rounded-lg transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed text-slate-50 bg-sky-700 hover:bg-sky-600">
+            <button onClick={handleContinue} disabled={agreed !== true} className="px-8 py-3 rounded-lg transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed text-slate-50 bg-sky-600 hover:bg-sky-500">
               Continue to Study
             </button>
           </div>
