@@ -17,31 +17,26 @@ export default function Welcome() {
       <div className="max-w-4xl mx-auto">
         {/* Content */}
         <div className="bg-white rounded-lg shadow-sm border p-8">
-          {/* Header with Icons */}
+          {/* Header with Logos */}
           <div className="text-center mb-8">
-            <div className="flex items-center justify-center gap-3 mb-6">
-              <span className="text-4xl">
-            </span>
-              <div className="flex items-center gap-4">
-                {/* Google Logo */}
-                <div className="flex p-2.5 items-center">
-                  <span className="text-3xl font-light">
-                    <span className="text-[#4285f4]">G</span>
-                    <span className="text-[#ea4335]">o</span>
-                    <span className="text-[#fbbc04]">o</span>
-                    <span className="text-[#4285f4]">g</span>
-                    <span className="text-[#34a853]">l</span>
-                    <span className="text-[#ea4335]">e</span>
-                  </span>
-                </div>
-                {/* TUM Logo */}
-                <div className="flex w-[80px] p-2 flex-col items-start">
-                  <div className="h-[36px] w-full bg-[#0065BD] rounded flex items-center justify-center">
-                    <span className="text-white font-bold text-xs">TUM</span>
-                  </div>
-                </div>
+            <div className="flex items-center justify-center gap-6 mb-6">
+              {/* Google Logo */}
+              <div className="flex items-center">
+                <img 
+                  src="/lovable-uploads/e465b544-8fc4-46ac-ace4-0a9db69dbacd.png" 
+                  alt="Google" 
+                  className="h-12 w-12"
+                />
               </div>
               
+              {/* TUM Logo */}
+              <div className="flex items-center">
+                <img 
+                  src="/lovable-uploads/d96714fb-70e1-4232-aeb2-184df4ca4cea.png" 
+                  alt="Technical University of Munich" 
+                  className="h-12 w-auto"
+                />
+              </div>
             </div>
           </div>
 
