@@ -5,42 +5,113 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Copy, Search, ArrowRight } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+
+interface SearchResult {
+  rank: number;
+  title: string;
+  link: string;
+  snippet: string;
+}
+
 interface SearchHistory {
   query: string;
   timestamp: Date;
-  results: number;
+  results: SearchResult[];
 }
+
 export default function SearchInterface() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [searchHistory, setSearchHistory] = useState<SearchHistory[]>([]);
-  const handleSearch = () => {
+  const [currentResults, setCurrentResults] = useState<SearchResult[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSearch = async () => {
     if (searchQuery.trim()) {
-      const newSearch = {
-        query: searchQuery,
-        timestamp: new Date(),
-        results: Math.floor(Math.random() * 10000) + 1000
-      };
-      setSearchHistory([...searchHistory, newSearch]);
-      setSearchQuery("");
-      toast({
-        title: "Search completed",
-        description: `Found ${newSearch.results} results for "${newSearch.query}"`
-      });
+      setIsLoading(true);
+      try {
+        // Get or create session ID
+        let sessionId = sessionStorage.getItem("session_id");
+        if (!sessionId) {
+          sessionId = crypto.randomUUID();
+          sessionStorage.setItem("session_id", sessionId);
+        }
+
+        const response = await fetch("/query", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            session_id: sessionId, 
+            query_text: searchQuery 
+          })
+        });
+
+        const data = await response.json();
+        
+        if (data.results) {
+          setCurrentResults(data.results);
+          const newSearch = {
+            query: searchQuery,
+            timestamp: new Date(),
+            results: data.results
+          };
+          setSearchHistory([...searchHistory, newSearch]);
+          toast({
+            title: "Search completed",
+            description: `Found ${data.results.length} results for "${searchQuery}"`
+          });
+        }
+      } catch (error) {
+        toast({
+          title: "Search failed",
+          description: "Unable to perform search. Please try again.",
+          variant: "destructive"
+        });
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
-  const handleCopyLink = (query: string) => {
-    const fakeLink = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
-    navigator.clipboard.writeText(fakeLink);
+
+  const handleResultClick = async (result: SearchResult) => {
+    try {
+      // Log the click
+      const sessionId = sessionStorage.getItem("session_id");
+      const queryId = sessionStorage.getItem("current_query_id");
+      
+      if (sessionId && queryId) {
+        await fetch("/log_click", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            query_id: queryId,
+            clicked_url: result.link,
+            clicked_rank: result.rank
+          })
+        });
+      }
+    } catch (error) {
+      console.error("Failed to log click:", error);
+    }
+    
+    // Open the link
+    window.open(result.link, "_blank");
+  };
+
+  const handleCopyLink = (link: string) => {
+    navigator.clipboard.writeText(link);
     toast({
       title: "Link copied",
-      description: "Search link has been copied to clipboard"
+      description: "Link has been copied to clipboard"
     });
   };
+
   const handleFinishTask = () => {
     navigate("/search-result-log");
   };
-  return <div className="min-h-screen bg-background p-6">
+
+  return (
+    <div className="min-h-screen bg-background p-6">
       <div className="max-w-4xl mx-auto">
         {/* Google Interface */}
         <div className="bg-white rounded-lg shadow-sm border border-border mb-8">
@@ -78,9 +149,10 @@ export default function SearchInterface() {
                   <Button 
                     variant="outline" 
                     onClick={handleSearch} 
+                    disabled={isLoading}
                     className="px-4 py-2 bg-gray-50 border border-gray-300 rounded text-sm text-gray-700 hover:shadow-sm hover:border-gray-400"
                   >
-                    Google Search
+                    {isLoading ? "Searching..." : "Google Search"}
                   </Button>
                   <Button 
                     onClick={handleFinishTask} 
@@ -95,24 +167,70 @@ export default function SearchInterface() {
           </div>
         </div>
 
+        {/* Search Results */}
+        {currentResults.length > 0 && (
+          <div className="w-full max-w-[700px] mx-auto mb-8">
+            {currentResults.map((result) => (
+              <div key={result.rank} className="py-3 border-b border-gray-200 last:border-b-0">
+                <div className="mb-1">
+                  <a 
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleResultClick(result);
+                    }}
+                    className="text-lg text-[#1a0dab] hover:underline cursor-pointer"
+                  >
+                    {result.title}
+                  </a>
+                </div>
+                <div className="text-sm text-[#006621] mb-1">
+                  {result.link}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleCopyLink(result.link)}
+                    className="ml-2 p-1 h-auto text-xs"
+                  >
+                    <Copy className="w-3 h-3" />
+                  </Button>
+                </div>
+                <div className="text-sm text-[#4d5156]">
+                  {result.snippet}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
         {/* Search History */}
-        {searchHistory.length > 0 && <Card className="p-6">
+        {searchHistory.length > 0 && (
+          <Card className="p-6">
             <h3 className="text-lg font-semibold mb-4 text-foreground">Search History</h3>
             <div className="space-y-3">
-              {searchHistory.map((search, index) => <div key={index} className="flex items-center justify-between p-3 bg-muted rounded-lg">
+              {searchHistory.map((search, index) => (
+                <div key={index} className="flex items-center justify-between p-3 bg-muted rounded-lg">
                   <div className="flex-1">
                     <p className="font-medium text-foreground">{search.query}</p>
                     <p className="text-sm text-muted-foreground">
-                      {search.timestamp.toLocaleTimeString()} - {search.results.toLocaleString()} results
+                      {search.timestamp.toLocaleTimeString()} - {search.results.length} results
                     </p>
                   </div>
-                  <Button variant="outline" size="sm" onClick={() => handleCopyLink(search.query)} className="ml-4">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => handleCopyLink(`https://www.google.com/search?q=${encodeURIComponent(search.query)}`)} 
+                    className="ml-4"
+                  >
                     <Copy className="w-4 h-4 mr-2" />
                     Copy Link
                   </Button>
-                </div>)}
+                </div>
+              ))}
             </div>
-          </Card>}
+          </Card>
+        )}
       </div>
-    </div>;
+    </div>
+  );
 }
