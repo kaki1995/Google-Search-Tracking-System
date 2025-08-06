@@ -211,7 +211,7 @@ export default function BackgroundSurvey() {
                 <Button type="button" variant="outline" onClick={() => navigate('/')} className="px-6">
                   Previous Page
                 </Button>
-                <Button type="submit" disabled={isSubmitting} className="px-8 bg-sky-700 hover:bg-sky-600 text-white">
+                <Button type="submit" disabled={isSubmitting} className="px-8 text-white bg-sky-600 hover:bg-sky-500">
                   {isSubmitting ? "Loading..." : "Next Page"}
                 </Button>
               </div>
