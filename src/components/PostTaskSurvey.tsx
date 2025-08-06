@@ -200,7 +200,7 @@ export default function PostTaskSurvey() {
                   <Button type="button" variant="outline" onClick={() => navigate('/search-result-log')} className="px-6">
                     Previous Page
                   </Button>
-                  <Button type="button" onClick={form.handleSubmit(handleSubmit)} className="px-8 bg-sky-700 hover:bg-sky-600">
+                  <Button type="button" onClick={form.handleSubmit(handleSubmit)} className="px-8 bg-sky-600 hover:bg-sky-500">
                     Submit Survey
                   </Button>
                 </div>
