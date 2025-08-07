@@ -207,7 +207,7 @@ export default function SearchResultLog() {
                 Previous Page
               </Button>
               <Button type="submit" disabled={isSubmitting} className="px-8 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
-                {isSubmitting ? "Loading..." : "Submit Survey"}
+                {isSubmitting ? "Loading..." : "Next Page"}
               </Button>
             </div>
           </form>
