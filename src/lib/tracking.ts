@@ -240,18 +240,19 @@ class TrackingService {
     console.log('Tracking background survey for session:', this.sessionData.sessionId);
     console.log('Survey data:', surveyData);
     
-    // Save directly to background_surveys table
+    // Save directly to background_surveys table with all fields
     try {
       const insertData = {
         session_id: this.sessionData.sessionId,
         age_group: surveyData.age,
         gender: surveyData.gender,
         education: surveyData.education,
+        employment: surveyData.employment,
+        nationality: surveyData.nationality,
         country: surveyData.country,
-        native_language: surveyData.language,
-        shopping_experience: parseInt(surveyData.experience_scale_q7),
-        product_research_familiarity: parseInt(surveyData.familiarity_scale_q8),
-        google_search_frequency: surveyData.search_frequency
+        ai_chatbot_familiarity: parseInt(surveyData.experience_scale_q7) || null,
+        data_quality_check: parseInt(surveyData.familiarity_scale_q8) || null,
+        ai_chatbot_frequency: surveyData.search_frequency
       };
       
       console.log('Inserting to background_surveys:', insertData);
@@ -264,10 +265,13 @@ class TrackingService {
 
       if (error) {
         console.error('Failed to save background survey:', error);
+        console.error('Error details:', error);
       } else {
         console.log('Background survey saved successfully:', data);
       }
     } catch (error) {
+      console.error('Failed to save background survey:', error);
+    }
       console.error('Failed to save background survey:', error);
     }
     
@@ -286,27 +290,24 @@ class TrackingService {
     console.log('Tracking post-task survey for session:', this.sessionData.sessionId);
     console.log('Post-task survey data:', surveyData);
     
-    // Save directly to post_survey table
+    // Save directly to post_survey table with all fields
     try {
       const insertData = {
         session_id: this.sessionData.sessionId,
-        interface_familiarity: parseInt(surveyData.search_familiarity) || null,
-        interface_confidence: parseInt(surveyData.search_confidence) || null,
+        search_familiarity: parseInt(surveyData.search_familiarity) || null,
+        search_confidence: parseInt(surveyData.search_confidence) || null,
         search_satisfaction: parseInt(surveyData.search_satisfaction) || null,
-        information_efficiency: parseInt(surveyData.search_efficiency) || null,
-        interface_ease_of_use: parseInt(surveyData.search_ease) || null,
-        interface_usefulness: parseInt(surveyData.search_usefulness) || null,
-        decision_support: parseInt(surveyData.search_support) || null,
-        interface_learnability: parseInt(surveyData.search_system_ease) || null,
-        interface_reuse_likelihood: parseInt(surveyData.search_again) || null,
-        search_enjoyment: surveyData.search_enjoyable,
-        interface_comparison_rating: surveyData.search_preference,
-        // Additional fields that might be in the form
-        smartphone_model: surveyData.smartphone_model || null,
-        price_range: surveyData.price_range || null,
-        purchase_platform: surveyData.where_to_buy || null,
-        purchase_likelihood: surveyData.purchase_decision || null,
-        decision_factors: surveyData.decision_reasoning || surveyData.search_improvement || null
+        search_efficiency: parseInt(surveyData.search_efficiency) || null,
+        search_ease: parseInt(surveyData.search_ease) || null,
+        search_usefulness: parseInt(surveyData.search_usefulness) || null,
+        search_support: parseInt(surveyData.search_support) || null,
+        search_system_ease: parseInt(surveyData.search_system_ease) || null,
+        search_again: parseInt(surveyData.search_again) || null,
+        advertisement_shameful: parseInt(surveyData.advertisement_shameful) || null,
+        advertisement_hopeful: parseInt(surveyData.advertisement_hopeful) || null,
+        task_duration: surveyData.task_duration || null,
+        search_tool_type: surveyData.search_tool_type || null,
+        search_improvement: surveyData.search_improvement || null
       };
       
       console.log('Inserting to post_survey:', insertData);
@@ -319,6 +320,7 @@ class TrackingService {
 
       if (error) {
         console.error('Failed to save post survey:', error);
+        console.error('Error details:', error);
       } else {
         console.log('Post survey saved successfully:', data);
       }
