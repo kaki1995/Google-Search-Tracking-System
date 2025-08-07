@@ -64,7 +64,7 @@ export default function SearchResultLog() {
     }
   };
   return <div className="min-h-screen bg-background p-6 md:p-8 lg:p-12">
-      <div className="max-w-6xl mx-auto bg-white rounded-lg border border-border shadow-sm p-8 md:p-12 lg:p-16">
+      <div className="max-w-6xl mx-auto bg-white rounded-lg shadow-sm p-8 md:p-12 lg:p-16">
         <h1 className="text-2xl font-bold text-foreground text-center mb-8">Your Search Results</h1>
 
         <div className="mb-6 p-4 rounded-lg border border-blue-200 bg-sky-100">

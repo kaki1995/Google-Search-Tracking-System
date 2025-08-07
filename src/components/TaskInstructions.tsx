@@ -41,7 +41,7 @@ const TaskInstructions = () => {
     <div className="min-h-screen bg-background py-8 px-6 md:px-8 lg:px-12">
       <div className="max-w-6xl mx-auto">
         {/* Content */}
-        <div className="bg-white shadow-sm border p-8 md:p-12 lg:p-16 rounded-none">
+        <div className="bg-white shadow-sm p-8 md:p-12 lg:p-16 rounded-none">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-semibold text-gray-900 mb-6">
               Your Search Task
@@ -87,7 +87,7 @@ const TaskInstructions = () => {
             </ul>
 
             <div className="bg-green-50 border border-green-200 rounded-md p-3">
-              <p className="text-sm text-green-800 italic flex items-center gap-2">
+              <p className="text-sm text-green-800 flex items-center gap-2">
                 <span>💡</span>
                 You may return to the search page and review your search history at any time before submitting the survey.
               </p>

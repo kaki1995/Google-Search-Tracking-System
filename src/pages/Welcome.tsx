@@ -32,7 +32,7 @@ export default function Welcome() {
   return <div className="min-h-screen bg-background py-8 px-6 md:px-8 lg:px-12">
       <div className="max-w-6xl mx-auto">
         {/* Content */}
-        <div className="bg-white rounded-lg shadow-sm border p-8 md:p-12 lg:p-16">
+        <div className="bg-white rounded-lg shadow-sm p-8 md:p-12 lg:p-16">
           {/* Header with Logos */}
           <div className="text-center mb-8">
             <div className="flex items-center justify-center gap-8 mb-6">
