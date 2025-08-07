@@ -121,13 +121,13 @@ const SearchResults = () => {
           <div className="flex items-center justify-between p-4 border-b">
             {/* Google Logo */}
             <div className="flex items-center">
-              <span className="text-2xl font-light">
-                <span className="text-[#4285f4]">G</span>
-                <span className="text-[#ea4335]">o</span>
-                <span className="text-[#fbbc04]">o</span>
-                <span className="text-[#4285f4]">g</span>
-                <span className="text-[#34a853]">l</span>
-                <span className="text-[#ea4335]">e</span>
+              <span className="text-3xl font-normal tracking-tight">
+                <span className="text-[#4285F4]">G</span>
+                <span className="text-[#EA4335]">o</span>
+                <span className="text-[#FBBC04]">o</span>
+                <span className="text-[#4285F4]">g</span>
+                <span className="text-[#34A853]">l</span>
+                <span className="text-[#EA4335]">e</span>
               </span>
             </div>
 
