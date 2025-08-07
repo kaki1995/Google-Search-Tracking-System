@@ -1,3 +1,4 @@
+
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const corsHeaders = {
@@ -14,6 +15,8 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  console.log('Query endpoint called with method:', req.method);
+
   try {
     // Initialize Supabase client
     const supabase = createClient(
@@ -22,15 +25,28 @@ Deno.serve(async (req) => {
     );
 
     if (req.method !== 'POST') {
+      console.log('Method not allowed:', req.method);
       return new Response(
         JSON.stringify({ error: 'Method not allowed' }),
         { status: 405, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    const { session_id, query_text } = await req.json();
+    let requestData;
+    try {
+      requestData = await req.json();
+    } catch (error) {
+      console.error('Failed to parse request JSON:', error);
+      return new Response(
+        JSON.stringify({ error: 'Invalid JSON in request body' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const { session_id, query_text } = requestData;
 
     if (!session_id || !query_text) {
+      console.log('Missing required fields:', { session_id, query_text });
       return new Response(
         JSON.stringify({ error: 'Missing session_id or query_text' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -39,15 +55,35 @@ Deno.serve(async (req) => {
 
     console.log(`Processing query: "${query_text}" for session: ${session_id}`);
 
+    // Test Google API access
+    if (!GOOGLE_API_KEY || !GOOGLE_SEARCH_ENGINE_ID) {
+      console.error('Missing Google API credentials');
+      return new Response(
+        JSON.stringify({ error: 'Missing Google API credentials' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     // Call Google Custom Search API
     const googleUrl = `https://www.googleapis.com/customsearch/v1?key=${GOOGLE_API_KEY}&cx=${GOOGLE_SEARCH_ENGINE_ID}&q=${encodeURIComponent(query_text)}`;
     
+    console.log('Making request to Google API...');
     const googleResponse = await fetch(googleUrl);
     
     if (!googleResponse.ok) {
-      console.error('Google API error:', googleResponse.status, googleResponse.statusText);
+      const errorText = await googleResponse.text();
+      console.error('Google API error:', googleResponse.status, googleResponse.statusText, errorText);
+      
+      // Check if it's an API key issue
+      if (googleResponse.status === 403) {
+        return new Response(
+          JSON.stringify({ error: 'Google API key invalid or quota exceeded' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      
       return new Response(
-        JSON.stringify({ error: 'Failed to fetch search results' }),
+        JSON.stringify({ error: `Google API error: ${googleResponse.status}` }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -69,6 +105,7 @@ Deno.serve(async (req) => {
     const timestamp = new Date().toISOString();
 
     // Log to Supabase experiment_queries table
+    console.log('Logging query to Supabase...');
     const { data: insertData, error: insertError } = await supabase
       .from('experiment_queries')
       .insert({
@@ -91,14 +128,18 @@ Deno.serve(async (req) => {
     console.log(`Query logged successfully with ID: ${actualQueryId}`);
 
     // Return formatted results with required structure
+    const response = {
+      query_id: actualQueryId,
+      query_text,
+      timestamp_query: timestamp,
+      total_results: googleData.searchInformation?.totalResults || "0",
+      results: searchResults
+    };
+
+    console.log('Returning successful response with', searchResults.length, 'results');
+
     return new Response(
-      JSON.stringify({
-        query_id: actualQueryId,
-        query_text,
-        timestamp_query: timestamp,
-        total_results: googleData.searchInformation?.totalResults || "0",
-        results: searchResults
-      }),
+      JSON.stringify(response),
       { 
         status: 200, 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
@@ -108,7 +149,7 @@ Deno.serve(async (req) => {
   } catch (error) {
     console.error('Query endpoint error:', error);
     return new Response(
-      JSON.stringify({ error: 'Internal server error' }),
+      JSON.stringify({ error: 'Internal server error', details: error.message }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
