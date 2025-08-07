@@ -18,6 +18,8 @@ interface PostTaskSurveyForm {
   search_support: string;
   search_system_ease: string;
   search_again: string;
+  advertisement_shameful: string;
+  advertisement_hopeful: string;
   task_duration: string;
   search_tool_type: string;
   search_improvement: string;
@@ -124,14 +126,28 @@ export default function PostTaskSurvey() {
                 field
               }) => <LikertScale field={field} question="How likely would you be to use this search interface again for similar tasks?" leftLabel="Very unlikely" rightLabel="Very likely" questionNumber="24" />} />
 
-                {/* Question 25: Task Duration */}
+                {/* Question 25: Advertisement Shameful */}
+                <FormField control={form.control} name="advertisement_shameful" rules={{
+                required: "This field is required"
+              }} render={({
+                field
+              }) => <LikertScale field={field} question="The advertisement made me feel" leftLabel="Not Shameful" rightLabel="Shameful" questionNumber="25" />} />
+
+                {/* Question 26: Advertisement Hopeful */}
+                <FormField control={form.control} name="advertisement_hopeful" rules={{
+                required: "This field is required"
+              }} render={({
+                field
+              }) => <LikertScale field={field} question="The advertisement made me feel" leftLabel="Not hopeful" rightLabel="Hopeful" questionNumber="26" />} />
+
+                {/* Question 27: Task Duration */}
                 <FormField control={form.control} name="task_duration" rules={{
                 required: "This field is required"
               }} render={({
                 field
               }) => <FormItem>
                       <FormLabel className="text-base font-medium text-gray-900">
-                        25. Approximately how long did it take you to complete the task? <span className="text-red-500">*</span>
+                        27. Approximately how long did it take you to complete the task? <span className="text-red-500">*</span>
                       </FormLabel>
                       <FormControl>
                         <RadioGroup onValueChange={field.onChange} value={field.value} className="flex flex-col space-y-2">
@@ -164,14 +180,14 @@ export default function PostTaskSurvey() {
                       <FormMessage />
                     </FormItem>} />
 
-                {/* Question 26: Search Tool Type */}
+                {/* Question 28: Search Tool Type */}
                 <FormField control={form.control} name="search_tool_type" rules={{
                 required: "This field is required"
               }} render={({
                 field
               }) => <FormItem>
                       <FormLabel className="text-base font-medium text-gray-900">
-                        26. Which type of search tool did you use during the task? <span className="text-red-500">*</span>
+                        28. Which type of search tool did you use during the task? <span className="text-red-500">*</span>
                       </FormLabel>
                       <FormControl>
                         <RadioGroup onValueChange={field.onChange} value={field.value} className="flex flex-col space-y-2">

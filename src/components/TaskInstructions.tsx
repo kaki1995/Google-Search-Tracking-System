@@ -101,17 +101,17 @@ const TaskInstructions = () => {
               {/* Question 10: Budget */}
               <div className="space-y-3">
                 <label className="text-base font-medium text-gray-900 block">
-                  10. What is your smartphone budget?*<br />
+                  10. What is your smartphone budget? <span className="text-red-500">*</span><br />
                   <span className="text-sm font-normal text-gray-600">(Please select one option based on your real-life financial habits.)</span>
                 </label>
-                <div className="space-y-2">
+                <div className="flex flex-wrap gap-4 mt-2">
                   <label className="flex items-center gap-2">
                     <input 
                       type="radio" 
                       name="budget" 
                       value="under-150" 
                       checked={budgetRange === "under-150"} 
-                      onChange={(e) => setBudgetRange(e.target.value)} 
+                      onChange={(e) => setBudgetRange(e.target.checked ? e.target.value : "")} 
                       className="w-4 h-4" 
                     />
                     <span className="text-sm">Under €150</span>
@@ -122,7 +122,7 @@ const TaskInstructions = () => {
                       name="budget" 
                       value="150-299" 
                       checked={budgetRange === "150-299"} 
-                      onChange={(e) => setBudgetRange(e.target.value)} 
+                      onChange={(e) => setBudgetRange(e.target.checked ? e.target.value : "")} 
                       className="w-4 h-4" 
                     />
                     <span className="text-sm">€150-299</span>
@@ -133,7 +133,7 @@ const TaskInstructions = () => {
                       name="budget" 
                       value="300-449" 
                       checked={budgetRange === "300-449"} 
-                      onChange={(e) => setBudgetRange(e.target.value)} 
+                      onChange={(e) => setBudgetRange(e.target.checked ? e.target.value : "")} 
                       className="w-4 h-4" 
                     />
                     <span className="text-sm">€300-449</span>
@@ -144,7 +144,7 @@ const TaskInstructions = () => {
                       name="budget" 
                       value="450-599" 
                       checked={budgetRange === "450-599"} 
-                      onChange={(e) => setBudgetRange(e.target.value)} 
+                      onChange={(e) => setBudgetRange(e.target.checked ? e.target.value : "")} 
                       className="w-4 h-4" 
                     />
                     <span className="text-sm">€450-599</span>
@@ -155,7 +155,7 @@ const TaskInstructions = () => {
                       name="budget" 
                       value="600-799" 
                       checked={budgetRange === "600-799"} 
-                      onChange={(e) => setBudgetRange(e.target.value)} 
+                      onChange={(e) => setBudgetRange(e.target.checked ? e.target.value : "")} 
                       className="w-4 h-4" 
                     />
                     <span className="text-sm">€600-799</span>
@@ -166,7 +166,7 @@ const TaskInstructions = () => {
                       name="budget" 
                       value="over-800" 
                       checked={budgetRange === "over-800"} 
-                      onChange={(e) => setBudgetRange(e.target.value)} 
+                      onChange={(e) => setBudgetRange(e.target.checked ? e.target.value : "")} 
                       className="w-4 h-4" 
                     />
                     <span className="text-sm">Over €800</span>

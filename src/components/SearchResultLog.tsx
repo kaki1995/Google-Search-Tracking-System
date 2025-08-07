@@ -35,9 +35,12 @@ export default function SearchResultLog() {
         <h1 className="text-2xl font-bold text-foreground text-center mb-8">Your Search Results</h1>
 
         <div className="mb-6 p-4 rounded-lg border border-blue-200 bg-sky-100">
-          <p className="text-gray-700 text-sm">
-            Please fill in the details of the smartphone you chose based on your search using the study interface:<br />
-            (You may return to the previous search page using the "Previous Page" button and review your search history if needed)
+          <p className="text-gray-700 text-sm flex items-start gap-2">
+            <span className="text-blue-600 text-lg flex-shrink-0">📝</span>
+            <span>
+              Please fill in the details of the smartphone you chose based on your search using the study interface:<br />
+              (You may return to the previous search page using the "Previous Page" button and review your search history if needed)
+            </span>
           </p>
         </div>
 
@@ -50,7 +53,7 @@ export default function SearchResultLog() {
             field
           }) => <FormItem>
                   <FormLabel className="text-base font-medium text-gray-900">
-                    11. What is the brand and model of the smartphone you selected?*<br />
+                    11. What is the brand and model of the smartphone you selected? <span className="text-red-500">*</span><br />
                     <span className="text-sm font-normal text-gray-600 italic">(e.g., Samsung Galaxy S24, iPhone 16 Pro)</span>
                   </FormLabel>
                   <FormControl>
@@ -68,37 +71,32 @@ export default function SearchResultLog() {
                   </FormLabel>
                   <div className="flex flex-wrap gap-4 mt-2">
                     <label className="flex items-center gap-2">
-                      <input type="checkbox" name="storage_capacity" value="64gb" checked={field.value?.includes("64gb") || false} onChange={e => {
-                  const newValue = e.target.checked ? "64gb" : "";
-                  field.onChange(newValue);
+                      <input type="radio" name="storage_capacity" value="64gb" checked={field.value === "64gb"} onChange={e => {
+                  field.onChange(e.target.value);
                 }} className="w-4 h-4" />
                       <span className="text-sm">64 GB</span>
                     </label>
                     <label className="flex items-center gap-2">
-                      <input type="checkbox" name="storage_capacity" value="128gb" checked={field.value?.includes("128gb") || false} onChange={e => {
-                  const newValue = e.target.checked ? "128gb" : "";
-                  field.onChange(newValue);
+                      <input type="radio" name="storage_capacity" value="128gb" checked={field.value === "128gb"} onChange={e => {
+                  field.onChange(e.target.value);
                 }} className="w-4 h-4" />
                       <span className="text-sm">128 GB</span>
                     </label>
                     <label className="flex items-center gap-2">
-                      <input type="checkbox" name="storage_capacity" value="256gb" checked={field.value?.includes("256gb") || false} onChange={e => {
-                  const newValue = e.target.checked ? "256gb" : "";
-                  field.onChange(newValue);
+                      <input type="radio" name="storage_capacity" value="256gb" checked={field.value === "256gb"} onChange={e => {
+                  field.onChange(e.target.value);
                 }} className="w-4 h-4" />
                       <span className="text-sm">256 GB</span>
                     </label>
                     <label className="flex items-center gap-2">
-                      <input type="checkbox" name="storage_capacity" value="512gb" checked={field.value?.includes("512gb") || false} onChange={e => {
-                  const newValue = e.target.checked ? "512gb" : "";
-                  field.onChange(newValue);
+                      <input type="radio" name="storage_capacity" value="512gb" checked={field.value === "512gb"} onChange={e => {
+                  field.onChange(e.target.value);
                 }} className="w-4 h-4" />
                       <span className="text-sm">512 GB</span>
                     </label>
                     <label className="flex items-center gap-2">
-                      <input type="checkbox" name="storage_capacity" value="1tb" checked={field.value?.includes("1tb") || false} onChange={e => {
-                  const newValue = e.target.checked ? "1tb" : "";
-                  field.onChange(newValue);
+                      <input type="radio" name="storage_capacity" value="1tb" checked={field.value === "1tb"} onChange={e => {
+                  field.onChange(e.target.value);
                 }} className="w-4 h-4" />
                       <span className="text-sm">1 TB and above</span>
                     </label>
@@ -115,65 +113,56 @@ export default function SearchResultLog() {
                   </FormLabel>
                   <div className="flex flex-wrap gap-4 mt-2">
                     <label className="flex items-center gap-2">
-                      <input type="checkbox" name="color" value="black" checked={field.value?.includes("black") || false} onChange={e => {
-                  const newValue = e.target.checked ? "black" : "";
-                  field.onChange(newValue);
+                      <input type="radio" name="color" value="black" checked={field.value === "black"} onChange={e => {
+                  field.onChange(e.target.value);
                 }} className="w-4 h-4" />
                       <span className="text-sm">Black</span>
                     </label>
                     <label className="flex items-center gap-2">
-                      <input type="checkbox" name="color" value="white" checked={field.value?.includes("white") || false} onChange={e => {
-                  const newValue = e.target.checked ? "white" : "";
-                  field.onChange(newValue);
+                      <input type="radio" name="color" value="white" checked={field.value === "white"} onChange={e => {
+                  field.onChange(e.target.value);
                 }} className="w-4 h-4" />
                       <span className="text-sm">White</span>
                     </label>
                     <label className="flex items-center gap-2">
-                      <input type="checkbox" name="color" value="blue" checked={field.value?.includes("blue") || false} onChange={e => {
-                  const newValue = e.target.checked ? "blue" : "";
-                  field.onChange(newValue);
+                      <input type="radio" name="color" value="blue" checked={field.value === "blue"} onChange={e => {
+                  field.onChange(e.target.value);
                 }} className="w-4 h-4" />
                       <span className="text-sm">Blue</span>
                     </label>
                     <label className="flex items-center gap-2">
-                      <input type="checkbox" name="color" value="gray" checked={field.value?.includes("gray") || false} onChange={e => {
-                  const newValue = e.target.checked ? "gray" : "";
-                  field.onChange(newValue);
+                      <input type="radio" name="color" value="gray" checked={field.value === "gray"} onChange={e => {
+                  field.onChange(e.target.value);
                 }} className="w-4 h-4" />
                       <span className="text-sm">Gray / Graphite</span>
                     </label>
                     <label className="flex items-center gap-2">
-                      <input type="checkbox" name="color" value="green" checked={field.value?.includes("green") || false} onChange={e => {
-                  const newValue = e.target.checked ? "green" : "";
-                  field.onChange(newValue);
+                      <input type="radio" name="color" value="green" checked={field.value === "green"} onChange={e => {
+                  field.onChange(e.target.value);
                 }} className="w-4 h-4" />
                       <span className="text-sm">Green</span>
                     </label>
                     <label className="flex items-center gap-2">
-                      <input type="checkbox" name="color" value="silver" checked={field.value?.includes("silver") || false} onChange={e => {
-                  const newValue = e.target.checked ? "silver" : "";
-                  field.onChange(newValue);
+                      <input type="radio" name="color" value="silver" checked={field.value === "silver"} onChange={e => {
+                  field.onChange(e.target.value);
                 }} className="w-4 h-4" />
                       <span className="text-sm">Silver</span>
                     </label>
                     <label className="flex items-center gap-2">
-                      <input type="checkbox" name="color" value="gold" checked={field.value?.includes("gold") || false} onChange={e => {
-                  const newValue = e.target.checked ? "gold" : "";
-                  field.onChange(newValue);
+                      <input type="radio" name="color" value="gold" checked={field.value === "gold"} onChange={e => {
+                  field.onChange(e.target.value);
                 }} className="w-4 h-4" />
                       <span className="text-sm">Gold</span>
                     </label>
                     <label className="flex items-center gap-2">
-                      <input type="checkbox" name="color" value="red" checked={field.value?.includes("red") || false} onChange={e => {
-                  const newValue = e.target.checked ? "red" : "";
-                  field.onChange(newValue);
+                      <input type="radio" name="color" value="red" checked={field.value === "red"} onChange={e => {
+                  field.onChange(e.target.value);
                 }} className="w-4 h-4" />
                       <span className="text-sm">Red</span>
                     </label>
                     <label className="flex items-center gap-2">
-                      <input type="checkbox" name="color" value="other" checked={field.value?.includes("other") || false} onChange={e => {
-                  const newValue = e.target.checked ? "other" : "";
-                  field.onChange(newValue);
+                      <input type="radio" name="color" value="other" checked={field.value === "other"} onChange={e => {
+                  field.onChange(e.target.value);
                 }} className="w-4 h-4" />
                       <span className="text-sm">Other</span>
                     </label>
@@ -188,7 +177,7 @@ export default function SearchResultLog() {
             field
           }) => <FormItem>
                   <FormLabel className="text-base font-medium text-gray-900">
-                    14. What is the lowest price you found for this smartphone?*<br />
+                    14. What is the lowest price you found for this smartphone? <span className="text-red-500">*</span><br />
                     <span className="text-sm font-normal text-gray-600 italic">(Please indicate the price in euros, e.g., €749)</span>
                   </FormLabel>
                   <FormControl>
@@ -204,7 +193,7 @@ export default function SearchResultLog() {
             field
           }) => <FormItem>
                   <FormLabel className="text-base font-medium text-gray-900">
-                    15. Please provide a link to the website offering this price:*
+                    15. Please provide a link to the website offering this price: <span className="text-red-500">*</span>
                   </FormLabel>
                   <FormControl>
                     <Input {...field} placeholder="" className="border-b border-t-0 border-l-0 border-r-0 rounded-none bg-transparent" />

@@ -287,7 +287,18 @@ export default function BackgroundSurvey() {
                           onChange={field.onChange} 
                           className="w-4 h-4" 
                         />
-                        <span className="text-sm">Employed or self-employed</span>
+                        <span className="text-sm">Employed</span>
+                      </label>
+                      <label className="flex items-center gap-2">
+                        <input 
+                          type="radio" 
+                          name="employment" 
+                          value="self-employed" 
+                          checked={field.value === "self-employed"} 
+                          onChange={field.onChange} 
+                          className="w-4 h-4" 
+                        />
+                        <span className="text-sm">Self-employed</span>
                       </label>
                       <label className="flex items-center gap-2">
                         <input 
@@ -309,7 +320,7 @@ export default function BackgroundSurvey() {
                           onChange={field.onChange} 
                           className="w-4 h-4" 
                         />
-                        <span className="text-sm">Other: ________</span>
+                        <span className="text-sm">Other</span>
                       </label>
                     </div>
                     <FormMessage />

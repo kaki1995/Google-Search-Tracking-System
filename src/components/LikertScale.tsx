@@ -24,13 +24,13 @@ export default function LikertScale({
   return (
     <FormItem>
       <FormLabel className="text-base font-medium text-gray-900">
-        {questionNumber}. {question} {required && <span className="text-destructive">*</span>}
+        {questionNumber}. {question} {required && <span className="text-red-500">*</span>}
       </FormLabel>
       <FormControl>
         <div className="bg-gray-50 p-4 rounded-lg">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-gray-600">{leftLabel}</span>
-            <span className="text-sm text-gray-600">{rightLabel}</span>
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-sm text-gray-600">1-{leftLabel}</span>
+            <span className="text-sm text-gray-600">7-{rightLabel}</span>
           </div>
           <RadioGroup
             onValueChange={field.onChange}
@@ -42,7 +42,7 @@ export default function LikertScale({
                 <RadioGroupItem 
                   value={value.toString()} 
                   id={`${questionNumber}-${value}`}
-                  className="mb-1"
+                  className="mb-1 w-4 h-4"
                 />
                 <label 
                   htmlFor={`${questionNumber}-${value}`} 
