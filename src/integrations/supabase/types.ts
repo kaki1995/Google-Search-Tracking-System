@@ -14,97 +14,262 @@ export type Database = {
   }
   public: {
     Tables: {
-      queries: {
+      background_surveys: {
         Row: {
-          clicked_rank: number | null
-          clicked_url: string | null
-          query_duration_sec: number | null
-          query_id: string
-          query_reformulation: boolean | null
-          query_text: string
-          scroll_depth: number | null
-          search_results: Json | null
+          age_group: string | null
+          country: string | null
+          created_at: string
+          education: string | null
+          gender: string | null
+          google_search_frequency: string | null
+          id: string
+          native_language: string | null
+          product_research_familiarity: number | null
           session_id: string
-          timestamp_query: string
+          shopping_experience: number | null
+          updated_at: string
         }
         Insert: {
-          clicked_rank?: number | null
-          clicked_url?: string | null
-          query_duration_sec?: number | null
-          query_id?: string
-          query_reformulation?: boolean | null
-          query_text: string
-          scroll_depth?: number | null
-          search_results?: Json | null
+          age_group?: string | null
+          country?: string | null
+          created_at?: string
+          education?: string | null
+          gender?: string | null
+          google_search_frequency?: string | null
+          id?: string
+          native_language?: string | null
+          product_research_familiarity?: number | null
           session_id: string
-          timestamp_query?: string
+          shopping_experience?: number | null
+          updated_at?: string
         }
         Update: {
-          clicked_rank?: number | null
-          clicked_url?: string | null
-          query_duration_sec?: number | null
-          query_id?: string
-          query_reformulation?: boolean | null
-          query_text?: string
-          scroll_depth?: number | null
-          search_results?: Json | null
+          age_group?: string | null
+          country?: string | null
+          created_at?: string
+          education?: string | null
+          gender?: string | null
+          google_search_frequency?: string | null
+          id?: string
+          native_language?: string | null
+          product_research_familiarity?: number | null
           session_id?: string
-          timestamp_query?: string
+          shopping_experience?: number | null
+          updated_at?: string
         }
         Relationships: [
           {
-            foreignKeyName: "queries_session_id_fkey"
+            foreignKeyName: "background_surveys_session_id_fkey"
             columns: ["session_id"]
             isOneToOne: false
-            referencedRelation: "user_sessions"
-            referencedColumns: ["session_id"]
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
           },
         ]
       }
-      user_sessions: {
+      experiment_queries: {
         Row: {
-          background_survey: Json | null
-          completed: boolean | null
-          consent_given: boolean | null
-          consent_timestamp: string | null
+          complexity: number | null
           created_at: string
-          decision_confidence: number | null
-          device_type: string | null
-          exited_early: boolean | null
-          final_choice_url: string | null
-          search_experience_log_1: Json | null
-          search_experience_log_2: Json | null
+          id: string
+          query_text: string
+          reformulation_count: number | null
           session_id: string
+          structure_type: string | null
+          timestamp: string
+          updated_at: string
+        }
+        Insert: {
+          complexity?: number | null
+          created_at?: string
+          id?: string
+          query_text: string
+          reformulation_count?: number | null
+          session_id: string
+          structure_type?: string | null
+          timestamp?: string
+          updated_at?: string
+        }
+        Update: {
+          complexity?: number | null
+          created_at?: string
+          id?: string
+          query_text?: string
+          reformulation_count?: number | null
+          session_id?: string
+          structure_type?: string | null
+          timestamp?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "experiment_queries_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      interactions: {
+        Row: {
+          clicked_rank: number | null
+          clicked_result_count: number | null
+          clicked_url: string | null
+          created_at: string
+          follow_up_prompt: boolean | null
+          id: string
+          interaction_time: string
+          query_id: string
+          scroll_depth: number | null
+          updated_at: string
+        }
+        Insert: {
+          clicked_rank?: number | null
+          clicked_result_count?: number | null
+          clicked_url?: string | null
+          created_at?: string
+          follow_up_prompt?: boolean | null
+          id?: string
+          interaction_time?: string
+          query_id: string
+          scroll_depth?: number | null
+          updated_at?: string
+        }
+        Update: {
+          clicked_rank?: number | null
+          clicked_result_count?: number | null
+          clicked_url?: string | null
+          created_at?: string
+          follow_up_prompt?: boolean | null
+          id?: string
+          interaction_time?: string
+          query_id?: string
+          scroll_depth?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "interactions_query_id_fkey"
+            columns: ["query_id"]
+            isOneToOne: false
+            referencedRelation: "experiment_queries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      post_survey: {
+        Row: {
+          created_at: string
+          decision_factors: string | null
+          decision_support: number | null
+          id: string
+          information_efficiency: number | null
+          interface_comparison_rating: string | null
+          interface_confidence: number | null
+          interface_ease_of_use: number | null
+          interface_familiarity: number | null
+          interface_learnability: number | null
+          interface_reuse_likelihood: number | null
+          interface_usefulness: number | null
+          price_range: string | null
+          purchase_likelihood: string | null
+          purchase_platform: string | null
+          search_enjoyment: string | null
+          search_satisfaction: number | null
+          session_id: string
+          smartphone_model: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          decision_factors?: string | null
+          decision_support?: number | null
+          id?: string
+          information_efficiency?: number | null
+          interface_comparison_rating?: string | null
+          interface_confidence?: number | null
+          interface_ease_of_use?: number | null
+          interface_familiarity?: number | null
+          interface_learnability?: number | null
+          interface_reuse_likelihood?: number | null
+          interface_usefulness?: number | null
+          price_range?: string | null
+          purchase_likelihood?: string | null
+          purchase_platform?: string | null
+          search_enjoyment?: string | null
+          search_satisfaction?: number | null
+          session_id: string
+          smartphone_model?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          decision_factors?: string | null
+          decision_support?: number | null
+          id?: string
+          information_efficiency?: number | null
+          interface_comparison_rating?: string | null
+          interface_confidence?: number | null
+          interface_ease_of_use?: number | null
+          interface_familiarity?: number | null
+          interface_learnability?: number | null
+          interface_reuse_likelihood?: number | null
+          interface_usefulness?: number | null
+          price_range?: string | null
+          purchase_likelihood?: string | null
+          purchase_platform?: string | null
+          search_enjoyment?: string | null
+          search_satisfaction?: number | null
+          session_id?: string
+          smartphone_model?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_survey_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sessions: {
+        Row: {
+          browser: string | null
+          budget_range: string | null
+          created_at: string
+          device_type: string | null
+          id: string
+          location: string | null
+          platform: string
+          start_time: string
+          updated_at: string
           user_id: string
         }
         Insert: {
-          background_survey?: Json | null
-          completed?: boolean | null
-          consent_given?: boolean | null
-          consent_timestamp?: string | null
+          browser?: string | null
+          budget_range?: string | null
           created_at?: string
-          decision_confidence?: number | null
           device_type?: string | null
-          exited_early?: boolean | null
-          final_choice_url?: string | null
-          search_experience_log_1?: Json | null
-          search_experience_log_2?: Json | null
-          session_id?: string
+          id?: string
+          location?: string | null
+          platform: string
+          start_time?: string
+          updated_at?: string
           user_id: string
         }
         Update: {
-          background_survey?: Json | null
-          completed?: boolean | null
-          consent_given?: boolean | null
-          consent_timestamp?: string | null
+          browser?: string | null
+          budget_range?: string | null
           created_at?: string
-          decision_confidence?: number | null
           device_type?: string | null
-          exited_early?: boolean | null
-          final_choice_url?: string | null
-          search_experience_log_1?: Json | null
-          search_experience_log_2?: Json | null
-          session_id?: string
+          id?: string
+          location?: string | null
+          platform?: string
+          start_time?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
