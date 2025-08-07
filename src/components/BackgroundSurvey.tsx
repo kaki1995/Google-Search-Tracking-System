@@ -371,85 +371,35 @@ export default function BackgroundSurvey() {
                     <FormLabel className="text-base font-medium text-gray-900">
                       7. How familiar are you with AI chatbots such as ChatGPT? <span className="text-red-500">*</span>
                     </FormLabel>
-                    <div className="flex items-center gap-4 mt-2">
-                      <label className="flex items-center gap-2">
-                        <input 
-                          type="radio" 
-                          name="experience_scale_q7" 
-                          value="1" 
-                          checked={field.value === "1"} 
-                          onChange={field.onChange} 
-                          className="w-4 h-4" 
-                        />
-                        <span className="text-sm">1 - Not familiar at all</span>
-                      </label>
-                      <label className="flex items-center gap-2">
-                        <input 
-                          type="radio" 
-                          name="experience_scale_q7" 
-                          value="2" 
-                          checked={field.value === "2"} 
-                          onChange={field.onChange} 
-                          className="w-4 h-4" 
-                        />
-                        <span className="text-sm">2</span>
-                      </label>
-                      <label className="flex items-center gap-2">
-                        <input 
-                          type="radio" 
-                          name="experience_scale_q7" 
-                          value="3" 
-                          checked={field.value === "3"} 
-                          onChange={field.onChange} 
-                          className="w-4 h-4" 
-                        />
-                        <span className="text-sm">3</span>
-                      </label>
-                      <label className="flex items-center gap-2">
-                        <input 
-                          type="radio" 
-                          name="experience_scale_q7" 
-                          value="4" 
-                          checked={field.value === "4"} 
-                          onChange={field.onChange} 
-                          className="w-4 h-4" 
-                        />
-                        <span className="text-sm">4</span>
-                      </label>
-                      <label className="flex items-center gap-2">
-                        <input 
-                          type="radio" 
-                          name="experience_scale_q7" 
-                          value="5" 
-                          checked={field.value === "5"} 
-                          onChange={field.onChange} 
-                          className="w-4 h-4" 
-                        />
-                        <span className="text-sm">5</span>
-                      </label>
-                      <label className="flex items-center gap-2">
-                        <input 
-                          type="radio" 
-                          name="experience_scale_q7" 
-                          value="6" 
-                          checked={field.value === "6"} 
-                          onChange={field.onChange} 
-                          className="w-4 h-4" 
-                        />
-                        <span className="text-sm">6</span>
-                      </label>
-                      <label className="flex items-center gap-2">
-                        <input 
-                          type="radio" 
-                          name="experience_scale_q7" 
-                          value="7" 
-                          checked={field.value === "7"} 
-                          onChange={field.onChange} 
-                          className="w-4 h-4" 
-                        />
-                        <span className="text-sm">7 - Extremely familiar</span>
-                      </label>
-                    </div>
+                    <FormControl>
+                      <div className="bg-gray-50 p-4 rounded-lg">
+                        <div className="flex items-center justify-between mb-4">
+                          <span className="text-sm text-gray-600">1-Not familiar at all</span>
+                          <span className="text-sm text-gray-600">7-Extremely familiar</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          {[1, 2, 3, 4, 5, 6, 7].map((value) => (
+                            <div key={value} className="flex flex-col items-center">
+                              <input 
+                                type="radio" 
+                                name="experience_scale_q7" 
+                                value={value.toString()} 
+                                checked={field.value === value.toString()} 
+                                onChange={field.onChange} 
+                                className="mb-1 w-4 h-4" 
+                                id={`q7-${value}`}
+                              />
+                              <label 
+                                htmlFor={`q7-${value}`} 
+                                className="text-sm text-gray-600 cursor-pointer"
+                              >
+                                {value}
+                              </label>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </FormControl>
                     <FormMessage />
                   </FormItem>} />
 
@@ -462,85 +412,35 @@ export default function BackgroundSurvey() {
                     <FormLabel className="text-base font-medium text-gray-900">
                       8. To ensure high data quality, please select "1 – Strongly Disagree" for this question. <span className="text-red-500">*</span>
                     </FormLabel>
-                    <div className="flex items-center gap-4 mt-2">
-                      <label className="flex items-center gap-2">
-                        <input 
-                          type="radio" 
-                          name="familiarity_scale_q8" 
-                          value="1" 
-                          checked={field.value === "1"} 
-                          onChange={field.onChange} 
-                          className="w-4 h-4" 
-                        />
-                        <span className="text-sm">1 - Strongly Disagree</span>
-                      </label>
-                      <label className="flex items-center gap-2">
-                        <input 
-                          type="radio" 
-                          name="familiarity_scale_q8" 
-                          value="2" 
-                          checked={field.value === "2"} 
-                          onChange={field.onChange} 
-                          className="w-4 h-4" 
-                        />
-                        <span className="text-sm">2</span>
-                      </label>
-                      <label className="flex items-center gap-2">
-                        <input 
-                          type="radio" 
-                          name="familiarity_scale_q8" 
-                          value="3" 
-                          checked={field.value === "3"} 
-                          onChange={field.onChange} 
-                          className="w-4 h-4" 
-                        />
-                        <span className="text-sm">3</span>
-                      </label>
-                      <label className="flex items-center gap-2">
-                        <input 
-                          type="radio" 
-                          name="familiarity_scale_q8" 
-                          value="4" 
-                          checked={field.value === "4"} 
-                          onChange={field.onChange} 
-                          className="w-4 h-4" 
-                        />
-                        <span className="text-sm">4</span>
-                      </label>
-                      <label className="flex items-center gap-2">
-                        <input 
-                          type="radio" 
-                          name="familiarity_scale_q8" 
-                          value="5" 
-                          checked={field.value === "5"} 
-                          onChange={field.onChange} 
-                          className="w-4 h-4" 
-                        />
-                        <span className="text-sm">5</span>
-                      </label>
-                      <label className="flex items-center gap-2">
-                        <input 
-                          type="radio" 
-                          name="familiarity_scale_q8" 
-                          value="6" 
-                          checked={field.value === "6"} 
-                          onChange={field.onChange} 
-                          className="w-4 h-4" 
-                        />
-                        <span className="text-sm">6</span>
-                      </label>
-                      <label className="flex items-center gap-2">
-                        <input 
-                          type="radio" 
-                          name="familiarity_scale_q8" 
-                          value="7" 
-                          checked={field.value === "7"} 
-                          onChange={field.onChange} 
-                          className="w-4 h-4" 
-                        />
-                        <span className="text-sm">7 - Strongly Agree</span>
-                      </label>
-                    </div>
+                    <FormControl>
+                      <div className="bg-gray-50 p-4 rounded-lg">
+                        <div className="flex items-center justify-between mb-4">
+                          <span className="text-sm text-gray-600">1-Strongly Disagree</span>
+                          <span className="text-sm text-gray-600">7-Strongly Agree</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          {[1, 2, 3, 4, 5, 6, 7].map((value) => (
+                            <div key={value} className="flex flex-col items-center">
+                              <input 
+                                type="radio" 
+                                name="familiarity_scale_q8" 
+                                value={value.toString()} 
+                                checked={field.value === value.toString()} 
+                                onChange={field.onChange} 
+                                className="mb-1 w-4 h-4" 
+                                id={`q8-${value}`}
+                              />
+                              <label 
+                                htmlFor={`q8-${value}`} 
+                                className="text-sm text-gray-600 cursor-pointer"
+                              >
+                                {value}
+                              </label>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </FormControl>
                     <FormMessage />
                   </FormItem>} />
 
