@@ -32,7 +32,7 @@ export default function SearchInterface() {
           sessionId = crypto.randomUUID();
           sessionStorage.setItem("session_id", sessionId);
         }
-        const response = await fetch("/query", {
+        const response = await fetch("https://wbguuipoggeamyzrfvbv.supabase.co/functions/v1/query", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
@@ -75,7 +75,7 @@ export default function SearchInterface() {
       const sessionId = sessionStorage.getItem("session_id");
       const queryId = sessionStorage.getItem("current_query_id");
       if (sessionId && queryId) {
-        await fetch("/log_click", {
+        await fetch("https://wbguuipoggeamyzrfvbv.supabase.co/functions/v1/log_click", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
