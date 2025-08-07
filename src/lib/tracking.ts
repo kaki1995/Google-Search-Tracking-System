@@ -247,12 +247,11 @@ class TrackingService {
         age_group: surveyData.age,
         gender: surveyData.gender,
         education: surveyData.education,
-        employment: surveyData.employment,
-        nationality: surveyData.nationality,
         country: surveyData.country,
-        ai_chatbot_familiarity: parseInt(surveyData.experience_scale_q7) || null,
-        data_quality_check: parseInt(surveyData.familiarity_scale_q8) || null,
-        ai_chatbot_frequency: surveyData.search_frequency
+        native_language: surveyData.native_language || null,
+        google_search_frequency: surveyData.search_frequency || null,
+        product_research_familiarity: parseInt(surveyData.experience_scale_q7) || null,
+        shopping_experience: parseInt(surveyData.familiarity_scale_q8) || null
       };
       
       console.log('Inserting to background_surveys:', insertData);
@@ -292,20 +291,20 @@ class TrackingService {
     try {
       const insertData = {
         session_id: this.sessionData.sessionId,
-        search_familiarity: parseInt(surveyData.search_familiarity) || null,
-        search_confidence: parseInt(surveyData.search_confidence) || null,
+        interface_familiarity: parseInt(surveyData.search_familiarity) || null,
+        interface_confidence: parseInt(surveyData.search_confidence) || null,
         search_satisfaction: parseInt(surveyData.search_satisfaction) || null,
-        search_efficiency: parseInt(surveyData.search_efficiency) || null,
-        search_ease: parseInt(surveyData.search_ease) || null,
-        search_usefulness: parseInt(surveyData.search_usefulness) || null,
-        search_support: parseInt(surveyData.search_support) || null,
-        search_system_ease: parseInt(surveyData.search_system_ease) || null,
-        search_again: parseInt(surveyData.search_again) || null,
-        advertisement_shameful: parseInt(surveyData.advertisement_shameful) || null,
-        advertisement_hopeful: parseInt(surveyData.advertisement_hopeful) || null,
-        task_duration: surveyData.task_duration || null,
-        search_tool_type: surveyData.search_tool_type || null,
-        search_improvement: surveyData.search_improvement || null
+        information_efficiency: parseInt(surveyData.search_efficiency) || null,
+        interface_ease_of_use: parseInt(surveyData.search_ease) || null,
+        interface_usefulness: parseInt(surveyData.search_usefulness) || null,
+        decision_support: parseInt(surveyData.search_support) || null,
+        interface_learnability: parseInt(surveyData.search_system_ease) || null,
+        interface_reuse_likelihood: parseInt(surveyData.search_again) || null,
+        price_range: surveyData.task_duration || null,
+        search_enjoyment: surveyData.search_tool_type || null,
+        decision_factors: surveyData.search_improvement || null,
+        smartphone_model: surveyData.advertisement_shameful || null,
+        purchase_likelihood: surveyData.advertisement_hopeful || null
       };
       
       console.log('Inserting to post_survey:', insertData);
