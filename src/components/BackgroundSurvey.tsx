@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
@@ -21,7 +21,40 @@ interface SurveyForm {
 export default function BackgroundSurvey() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
-  const form = useForm<SurveyForm>();
+  const form = useForm<SurveyForm>({
+    defaultValues: {
+      age: "",
+      gender: "",
+      education: "",
+      employment: "",
+      nationality: "",
+      country: "",
+      experience_scale_q7: "",
+      familiarity_scale_q8: "",
+      search_frequency: ""
+    }
+  });
+
+  // Load saved form data on component mount
+  useEffect(() => {
+    const savedData = localStorage.getItem('background_survey_data');
+    if (savedData) {
+      try {
+        const parsedData = JSON.parse(savedData);
+        form.reset(parsedData);
+      } catch (error) {
+        console.error('Error parsing saved form data:', error);
+      }
+    }
+  }, [form]);
+
+  // Save form data whenever form values change
+  useEffect(() => {
+    const subscription = form.watch((value) => {
+      localStorage.setItem('background_survey_data', JSON.stringify(value));
+    });
+    return () => subscription.unsubscribe();
+  }, [form]);
   const onSubmit = async (data: SurveyForm) => {
     setIsSubmitting(true);
     try {
@@ -36,6 +69,10 @@ export default function BackgroundSurvey() {
       console.log('Submitting background survey:', data);
       await trackingService.trackBackgroundSurvey(data);
       console.log('Background survey submitted successfully');
+      
+      // Clear saved form data after successful submission
+      localStorage.removeItem('background_survey_data');
+      
       navigate('/task-instructions');
     } catch (error) {
       console.error('Error submitting survey:', error);

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
@@ -28,7 +28,45 @@ export default function PostTaskSurvey() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const navigate = useNavigate();
-  const form = useForm<PostTaskSurveyForm>();
+  const form = useForm<PostTaskSurveyForm>({
+    defaultValues: {
+      search_familiarity: "",
+      search_confidence: "",
+      search_satisfaction: "",
+      search_efficiency: "",
+      search_ease: "",
+      search_usefulness: "",
+      search_support: "",
+      search_system_ease: "",
+      search_again: "",
+      advertisement_shameful: "",
+      advertisement_hopeful: "",
+      task_duration: "",
+      search_tool_type: "",
+      search_improvement: ""
+    }
+  });
+
+  // Load saved form data on component mount
+  useEffect(() => {
+    const savedData = localStorage.getItem('post_task_survey_data');
+    if (savedData) {
+      try {
+        const parsedData = JSON.parse(savedData);
+        form.reset(parsedData);
+      } catch (error) {
+        console.error('Error parsing saved post-task survey data:', error);
+      }
+    }
+  }, [form]);
+
+  // Save form data whenever form values change
+  useEffect(() => {
+    const subscription = form.watch((value) => {
+      localStorage.setItem('post_task_survey_data', JSON.stringify(value));
+    });
+    return () => subscription.unsubscribe();
+  }, [form]);
   const handleSubmit = () => {
     setShowConfirmDialog(true);
   };
@@ -42,6 +80,10 @@ export default function PostTaskSurvey() {
       await trackingService.trackPostTaskSurvey(formData);
       
       console.log('Post-task survey submitted successfully');
+      
+      // Clear saved form data after successful submission
+      localStorage.removeItem('post_task_survey_data');
+      
       setShowConfirmDialog(false);
       navigate('/thank-you');
     } catch (error) {

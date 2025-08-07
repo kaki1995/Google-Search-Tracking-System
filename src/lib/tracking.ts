@@ -248,7 +248,7 @@ class TrackingService {
         gender: surveyData.gender,
         education: surveyData.education,
         country: surveyData.country,
-        native_language: surveyData.native_language || null,
+        native_language: surveyData.nationality || surveyData.native_language || null,
         google_search_frequency: surveyData.search_frequency || null,
         product_research_familiarity: parseInt(surveyData.experience_scale_q7) || null,
         shopping_experience: parseInt(surveyData.familiarity_scale_q8) || null
@@ -333,23 +333,27 @@ class TrackingService {
   }
 
   async trackBudgetRange(budgetRange: string): Promise<void> {
-    if (!this.sessionData) return;
+    if (!this.sessionData) {
+      console.error('No session data available for budget range tracking');
+      return;
+    }
 
-    console.log('Tracking budget range:', budgetRange);
+    console.log('Tracking budget range:', budgetRange, 'for session:', this.sessionData.sessionId);
     
     // Update session with budget range
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('sessions')
         .update({
           budget_range: budgetRange
         })
-        .eq('id', this.sessionData.sessionId);
+        .eq('id', this.sessionData.sessionId)
+        .select('budget_range');
 
       if (error) {
         console.error('Failed to update budget range:', error);
       } else {
-        console.log('Budget range updated successfully');
+        console.log('Budget range updated successfully:', data);
       }
     } catch (error) {
       console.error('Failed to update budget range:', error);
@@ -424,17 +428,32 @@ class TrackingService {
       // Get budget range from sessionStorage if available
       const budgetRange = sessionStorage.getItem('selectedBudgetRange');
       
+      // First check if session already exists
+      const { data: existingSession } = await supabase
+        .from('sessions')
+        .select('budget_range')
+        .eq('id', this.sessionData.sessionId)
+        .single();
+
+      // Prepare session data
+      const sessionData: any = {
+        id: this.sessionData.sessionId,
+        user_id: this.sessionData.userId,
+        platform: 'Google',
+        device_type: deviceType,
+        browser: browser,
+        location: 'Unknown'
+      };
+
+      // Only set budget_range if we have a value OR if there's no existing session
+      // This prevents overwriting an existing budget_range with null
+      if (budgetRange || !existingSession) {
+        sessionData.budget_range = budgetRange;
+      }
+
       const { data, error } = await supabase
         .from('sessions')
-        .upsert({
-          id: this.sessionData.sessionId, // Use the sessionId as the primary key
-          user_id: this.sessionData.userId,
-          platform: 'Google', // Since this is for Google search interface
-          device_type: deviceType,
-          browser: browser,
-          location: 'Unknown', // Could be enhanced with geolocation
-          budget_range: budgetRange // Add budget range to session
-        })
+        .upsert(sessionData)
         .select('id')
         .single();
 

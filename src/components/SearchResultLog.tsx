@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
@@ -17,12 +17,45 @@ interface SearchLogForm {
 export default function SearchResultLog() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
-  const form = useForm<SearchLogForm>();
+  const form = useForm<SearchLogForm>({
+    defaultValues: {
+      smartphone_model: "",
+      storage_capacity: "",
+      color: "",
+      lowest_price: "",
+      website_link: ""
+    }
+  });
+
+  // Load saved form data on component mount
+  useEffect(() => {
+    const savedData = localStorage.getItem('search_result_log_data');
+    if (savedData) {
+      try {
+        const parsedData = JSON.parse(savedData);
+        form.reset(parsedData);
+      } catch (error) {
+        console.error('Error parsing saved search result data:', error);
+      }
+    }
+  }, [form]);
+
+  // Save form data whenever form values change
+  useEffect(() => {
+    const subscription = form.watch((value) => {
+      localStorage.setItem('search_result_log_data', JSON.stringify(value));
+    });
+    return () => subscription.unsubscribe();
+  }, [form]);
   const onSubmit = async (data: SearchLogForm) => {
     setIsSubmitting(true);
     try {
       // Save search results data
       console.log('Search results:', data);
+      
+      // Clear saved form data after successful submission
+      localStorage.removeItem('search_result_log_data');
+      
       navigate('/post-task-survey');
     } catch (error) {
       console.error('Error submitting search log:', error);
