@@ -3,13 +3,11 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import BrowserBar from "@/components/BrowserBar";
 import StudyButton from "@/components/StudyButton";
 import { trackingService } from "@/lib/tracking";
-
 export default function Welcome() {
   const [agreed, setAgreed] = useState<boolean | null>(null);
   const [sessionInitialized, setSessionInitialized] = useState(false);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-
   useEffect(() => {
     const initializeSession = async () => {
       try {
@@ -21,10 +19,8 @@ export default function Welcome() {
         console.error('Failed to initialize session:', error);
       }
     };
-
     initializeSession();
   }, [searchParams]);
-
   const handleContinue = () => {
     if (agreed === true && sessionInitialized) {
       navigate("/background-survey");
@@ -42,20 +38,12 @@ export default function Welcome() {
             <div className="flex items-center justify-center gap-8 mb-6">
               {/* Google Logo */}
               <div className="flex items-center">
-                <img 
-                  src="/lovable-uploads/acd96fcf-765a-409c-9b4e-21f07b00c747.png" 
-                  alt="Google Logo" 
-                  className="w-16 h-16 object-contain"
-                />
+                <img src="/lovable-uploads/acd96fcf-765a-409c-9b4e-21f07b00c747.png" alt="Google Logo" className="w-16 h-16 object-contain" />
               </div>
               
               {/* TUM Logo */}
               <div className="flex items-center">
-                <img 
-                  src="/lovable-uploads/189f5203-a64b-43cb-aa46-339285dc29e0.png" 
-                  alt="TUM Logo" 
-                  className="w-20 h-16 object-contain"
-                />
+                <img src="/lovable-uploads/189f5203-a64b-43cb-aa46-339285dc29e0.png" alt="TUM Logo" className="w-20 h-16 object-contain" />
               </div>
             </div>
           </div>
@@ -77,7 +65,7 @@ export default function Welcome() {
             </p>
 
             {/* Information Box */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 my-6">
+            <div className="border border-blue-200 rounded-lg p-4 my-6 bg-sky-100">
               <div className="space-y-3">
                 <div className="flex items-start gap-3">
                   <span className="text-blue-600">🕐</span>
@@ -105,13 +93,7 @@ export default function Welcome() {
           {/* Consent */}
           <div className="flex flex-col items-start gap-6 mb-8 max-w-3xl mx-auto mt-8">
             <div className="flex items-start gap-3">
-              <input 
-                type="checkbox" 
-                id="consent" 
-                checked={agreed === true} 
-                onChange={(e) => setAgreed(e.target.checked)} 
-                className="w-4 h-4 text-blue-600 bg-white border-gray-300 rounded focus:ring-blue-500 mt-1" 
-              />
+              <input type="checkbox" id="consent" checked={agreed === true} onChange={e => setAgreed(e.target.checked)} className="w-4 h-4 text-blue-600 bg-white border-gray-300 rounded focus:ring-blue-500 mt-1" />
               <label htmlFor="consent" className="text-base text-gray-700 cursor-pointer">
                 I have read the above and voluntarily agree to participate in this study.
               </label>
@@ -120,17 +102,10 @@ export default function Welcome() {
 
           {/* Buttons */}
           <div className="flex justify-between pt-8 px-4">
-            <button 
-              onClick={handleExit} 
-              className="px-8 py-2 text-sm font-medium border-2 border-gray-300 text-gray-700 bg-white rounded-lg hover:bg-gray-50 transition-colors"
-            >
+            <button onClick={handleExit} className="px-8 py-2 text-sm font-medium border-2 border-gray-300 text-gray-700 bg-white rounded-lg hover:bg-gray-50 transition-colors">
               Exit Study
             </button>
-            <button 
-              onClick={handleContinue} 
-              disabled={agreed !== true || !sessionInitialized} 
-              className="px-8 py-2 text-sm font-medium text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed bg-blue-600 hover:bg-blue-700"
-            >
+            <button onClick={handleContinue} disabled={agreed !== true || !sessionInitialized} className="px-8 py-2 text-sm font-medium text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed bg-blue-600 hover:bg-blue-700">
               Continue to Study
             </button>
           </div>
