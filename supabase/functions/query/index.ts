@@ -110,8 +110,7 @@ Deno.serve(async (req) => {
       .from('experiment_queries')
       .insert({
         session_id,
-        query_text,
-        reformulation_count: 0
+        query_text
       })
       .select('id')
       .single();
