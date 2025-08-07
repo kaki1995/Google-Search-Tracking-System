@@ -52,7 +52,7 @@ const SearchResults = () => {
     setLoading(true);
     try {
       const searchResults = await performGoogleSearch(searchQuery);
-      setResults(searchResults);
+      setResults(Array.isArray(searchResults) ? searchResults : []);
       
       // Add to search history
       setSearchHistory(prev => {
@@ -63,7 +63,8 @@ const SearchResults = () => {
       });
       
       // Track the search query and get query ID
-      const queryId = await trackingService.trackQuery(searchQuery, searchResults.length);
+      const resultsCount = Array.isArray(searchResults) ? searchResults.length : 0;
+      const queryId = await trackingService.trackQuery(searchQuery, resultsCount);
       setCurrentQueryId(queryId);
       setSearchCount(prev => prev + 1);
     } catch (error) {

@@ -40,20 +40,22 @@ export default function Welcome() {
           {/* Header with Logos */}
           <div className="text-center mb-8">
             <div className="flex items-center justify-center gap-8 mb-6">
-              {/* Google Logo - Circular multicolor design */}
+              {/* Google Logo */}
               <div className="flex items-center">
-                <div className="relative w-12 h-12 rounded-full border-4 border-transparent bg-gradient-to-br from-[#ea4335] via-[#fbbc04] via-[#34a853] to-[#4285f4] p-0.5">
-                  <div className="w-full h-full bg-white rounded-full flex items-center justify-center">
-                    <span className="text-[#4285f4] text-lg font-bold">G</span>
-                  </div>
-                </div>
+                <img 
+                  src="/lovable-uploads/acd96fcf-765a-409c-9b4e-21f07b00c747.png" 
+                  alt="Google Logo" 
+                  className="w-16 h-16 object-contain"
+                />
               </div>
               
-              {/* TUM Logo - Blue rectangular design matching the image */}
+              {/* TUM Logo */}
               <div className="flex items-center">
-                <div className="bg-[#003366] px-4 py-2.5 rounded-sm shadow-sm">
-                  <span className="text-white text-2xl font-black tracking-tight" style={{fontFamily: 'Arial, sans-serif'}}>TUM</span>
-                </div>
+                <img 
+                  src="/lovable-uploads/189f5203-a64b-43cb-aa46-339285dc29e0.png" 
+                  alt="TUM Logo" 
+                  className="w-20 h-16 object-contain"
+                />
               </div>
             </div>
           </div>
