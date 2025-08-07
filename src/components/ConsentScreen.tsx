@@ -37,8 +37,8 @@ const ConsentScreen = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-2xl">
+    <div className="min-h-screen bg-background flex items-center justify-center p-6 md:p-8 lg:p-12">
+      <Card className="w-full max-w-6xl">
         <CardHeader>
           <CardTitle className="text-2xl font-bold">Research Study Consent</CardTitle>
           <CardDescription>
@@ -129,14 +129,14 @@ const ConsentScreen = () => {
           </div>
         </CardContent>
 
-        <CardFooter className="flex justify-between px-4 py-6">
-          <Button variant="outline" onClick={handleDecline} className="px-8 py-2 text-sm font-medium border-2">
+        <CardFooter className="flex justify-between px-4 md:px-6 lg:px-8 py-6">
+          <Button variant="outline" onClick={handleDecline} className="px-6 md:px-8 py-2 text-sm font-medium border-2">
             Decline
           </Button>
           <Button 
             onClick={handleSubmit} 
             disabled={!consent || isSubmitting}
-            className="px-8 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
+            className="px-6 md:px-8 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
           >
             {isSubmitting ? "Processing..." : "I Consent - Continue"}
           </Button>

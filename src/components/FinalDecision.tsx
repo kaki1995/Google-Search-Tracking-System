@@ -35,8 +35,8 @@ const FinalDecision = () => {
 
   if (isCompleted) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <Card className="w-full max-w-2xl">
+      <div className="min-h-screen bg-background flex items-center justify-center p-6 md:p-8 lg:p-12">
+        <Card className="w-full max-w-6xl">
           <CardHeader>
             <CardTitle className="text-2xl font-bold text-center flex items-center justify-center gap-2">
               <CheckCircle className="h-8 w-8 text-green-600" />
@@ -89,8 +89,8 @@ const FinalDecision = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-2xl">
+    <div className="min-h-screen bg-background flex items-center justify-center p-6 md:p-8 lg:p-12">
+      <Card className="w-full max-w-6xl">
         <CardHeader>
           <CardTitle className="text-2xl font-bold">Final Decision</CardTitle>
           <CardDescription>
@@ -165,10 +165,10 @@ const FinalDecision = () => {
               </Alert>
             </CardContent>
 
-            <CardFooter className="px-4 py-6">
+            <CardFooter className="px-4 md:px-6 lg:px-8 py-6">
               <Button 
                 type="submit" 
-                className="w-full px-8 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700" 
+                className="w-full px-6 md:px-8 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700" 
                 disabled={isSubmitting}
               >
                 {isSubmitting ? "Submitting..." : "Submit Final Decision"}

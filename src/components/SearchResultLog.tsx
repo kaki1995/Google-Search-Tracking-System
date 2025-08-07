@@ -30,8 +30,8 @@ export default function SearchResultLog() {
       setIsSubmitting(false);
     }
   };
-  return <div className="min-h-screen bg-background p-6">
-      <div className="max-w-4xl mx-auto bg-white rounded-lg border border-border shadow-sm p-8">
+  return <div className="min-h-screen bg-background p-6 md:p-8 lg:p-12">
+      <div className="max-w-6xl mx-auto bg-white rounded-lg border border-border shadow-sm p-8 md:p-12 lg:p-16">
         <h1 className="text-2xl font-bold text-foreground text-center mb-8">Your Search Results</h1>
 
         <div className="mb-6 p-4 rounded-lg border border-blue-200 bg-sky-100">
@@ -202,7 +202,7 @@ export default function SearchResultLog() {
                 </FormItem>} />
 
             {/* Buttons */}
-            <div className="flex justify-between pt-8 px-4">
+            <div className="flex justify-between pt-8 px-4 md:px-8 lg:px-12">
               <Button type="button" variant="outline" onClick={() => navigate('/search-interface')} className="px-8 py-2 text-sm font-medium border-2">
                 Previous Page
               </Button>

@@ -48,14 +48,14 @@ export default function BackgroundSurvey() {
   };
   
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-white border border-border p-8 shadow-sm rounded-none">
+    <div className="min-h-screen bg-background p-6 md:p-8 lg:p-12">
+      <div className="max-w-6xl mx-auto">
+        <div className="bg-white border border-border p-8 md:p-12 lg:p-16 shadow-sm rounded-none">
           <h1 className="text-2xl font-bold text-center mb-8 text-foreground">
             Your Personal Background
           </h1>
           
-          <p className="text-base text-gray-700 mb-8">
+          <p className="text-base text-gray-700 mb-8 text-justify px-4 md:px-8 lg:px-12">
             Please answer the following questions to help us better understand your background. All responses are anonymous and used for research purposes only.
           </p>
 
@@ -609,7 +609,7 @@ export default function BackgroundSurvey() {
                 } />
 
               {/* Buttons */}
-              <div className="flex justify-between pt-8 px-4">
+              <div className="flex justify-between pt-8 px-4 md:px-8 lg:px-12">
                 <Button type="button" variant="outline" onClick={() => navigate('/')} className="px-8 py-2 text-sm font-medium border-2">
                   Previous Page
                 </Button>

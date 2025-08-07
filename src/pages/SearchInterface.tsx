@@ -250,8 +250,8 @@ export default function SearchInterface() {
       handleNewSearch();
     }
   };
-  return <div className="min-h-screen bg-white p-6">
-      <div className="max-w-4xl mx-auto">
+  return <div className="min-h-screen bg-white p-6 md:p-8 lg:p-12">
+      <div className="max-w-6xl mx-auto">
         {/* Google Interface */}
         <div className="mb-8">
           {/* Google Logo and Search */}

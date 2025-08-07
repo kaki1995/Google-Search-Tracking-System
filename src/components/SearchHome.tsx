@@ -23,8 +23,8 @@ const SearchHome = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4">
-      <div className="w-full max-w-2xl space-y-8">
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4 md:px-8 lg:px-12">
+      <div className="w-full max-w-6xl space-y-8">
         {/* Google Logo */}
         <div className="text-center">
           <h1 className="text-6xl md:text-7xl font-normal">
@@ -62,7 +62,7 @@ const SearchHome = () => {
             <Button
               type="submit"
               variant="secondary"
-              className="px-6 py-2 bg-google-gray hover:bg-border text-google-text border-border"
+              className="px-4 md:px-6 py-2 bg-google-gray hover:bg-border text-google-text border-border"
             >
               Google Search
             </Button>
@@ -70,7 +70,7 @@ const SearchHome = () => {
               type="button"
               onClick={handleLuckySearch}
               variant="secondary"
-              className="px-6 py-2 bg-google-gray hover:bg-border text-google-text border-border"
+              className="px-4 md:px-6 py-2 bg-google-gray hover:bg-border text-google-text border-border"
             >
               I'm Feeling Lucky
             </Button>
@@ -107,19 +107,19 @@ const SearchHome = () => {
         </div>
 
         {/* Navigation Buttons */}
-        <div className="flex justify-between pt-8 px-4">
+        <div className="flex justify-between pt-8 px-4 md:px-8 lg:px-12">
           <Button 
             type="button" 
             variant="outline" 
             onClick={() => navigate('/task-instructions')} 
-            className="px-8 py-2 text-sm font-medium border-2"
+            className="px-6 md:px-8 py-2 text-sm font-medium border-2"
           >
             Previous Page
           </Button>
           <Button 
             type="button" 
             onClick={() => navigate('/search-result-log')} 
-            className="px-8 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
+            className="px-6 md:px-8 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
           >
             Finish Task
           </Button>

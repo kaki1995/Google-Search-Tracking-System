@@ -38,17 +38,17 @@ const TaskInstructions = () => {
   };
   
   return (
-    <div className="min-h-screen bg-background py-8 px-4">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-background py-8 px-6 md:px-8 lg:px-12">
+      <div className="max-w-6xl mx-auto">
         {/* Content */}
-        <div className="bg-white shadow-sm border p-8 rounded-none">
+        <div className="bg-white shadow-sm border p-8 md:p-12 lg:p-16 rounded-none">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-semibold text-gray-900 mb-6">
               Your Search Task
             </h1>
           </div>
 
-          <div className="space-y-6 max-w-4xl mx-auto text-left">
+          <div className="space-y-6 mx-auto text-left px-4 md:px-8 lg:px-12">
             {/* Scenario */}
             <div>
               <h3 className="font-semibold text-gray-900 mb-3">Scenario:</h3>
@@ -177,7 +177,7 @@ const TaskInstructions = () => {
           </div>
 
           {/* Buttons */}
-          <div className="flex justify-between pt-8 px-4">
+          <div className="flex justify-between pt-8 px-4 md:px-8 lg:px-12">
             <button onClick={handlePreviousPage} className="px-8 py-2 text-sm font-medium border-2 border-gray-300 text-gray-700 bg-white rounded-lg hover:bg-gray-50 transition-colors">
               Previous Page
             </button>

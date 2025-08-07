@@ -10,7 +10,7 @@ export default function GoogleSearchInterface() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+    <div className="min-h-screen flex items-center justify-center bg-background p-6 md:p-8 lg:p-12">
       <div className="w-full max-w-[905px] h-screen max-h-[680px] border-8 border-[#CAC4D0] rounded-[18px] bg-[#FEF7FF] overflow-hidden relative">
         {/* Browser Bar */}
         <div className="relative z-10">
@@ -53,10 +53,10 @@ export default function GoogleSearchInterface() {
 
               {/* Search Buttons */}
               <div className="flex gap-4 mb-8">
-                <button className="px-4 py-2 bg-[#f8f9fa] border border-[#f8f9fa] rounded text-sm text-[#3c4043] hover:shadow-sm hover:border-gray-300">
+                <button className="px-3 md:px-4 py-2 bg-[#f8f9fa] border border-[#f8f9fa] rounded text-sm text-[#3c4043] hover:shadow-sm hover:border-gray-300">
                   Google Search
                 </button>
-                <button className="px-4 py-2 bg-[#f8f9fa] border border-[#f8f9fa] rounded text-sm text-[#3c4043] hover:shadow-sm hover:border-gray-300">
+                <button className="px-3 md:px-4 py-2 bg-[#f8f9fa] border border-[#f8f9fa] rounded text-sm text-[#3c4043] hover:shadow-sm hover:border-gray-300">
                   I'm Feeling Lucky
                 </button>
               </div>
@@ -74,7 +74,7 @@ export default function GoogleSearchInterface() {
             <StudyButton
               variant="primary"
               onClick={handleTaskFinish}
-              className="flex items-center gap-2 px-6"
+              className="flex items-center gap-2 px-4 md:px-6"
             >
               <svg width="21" height="20" viewBox="0 0 21 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M13.8333 14.1666L12.6458 13L16.4791 9.16663L12.6458 5.33329L13.8333 4.16663L18.8333 9.16663L13.8333 14.1666ZM2.16663 15.8333V12.5C2.16663 11.3472 2.5694 10.368 3.37496 9.56246C4.1944 8.74301 5.18052 8.33329 6.33329 8.33329H11.4791L8.47913 5.33329L9.66663 4.16663L14.6666 9.16663L9.66663 14.1666L8.47913 13L11.4791 9.99996H6.33329C5.63885 9.99996 5.04857 10.243 4.56246 10.7291C4.07635 11.2152 3.83329 11.8055 3.83329 12.5V15.8333H2.16663Z" fill="white"/>
