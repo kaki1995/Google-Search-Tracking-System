@@ -87,7 +87,7 @@ export default function BackgroundSurvey() {
   return (
     <div className="min-h-screen relative bg-background p-6 md:p-8 lg:p-12"
       style={{
-        backgroundImage: "url('/mountain-background.jpg')",
+        backgroundImage: "url('/mountain-background.png')",
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat'
