@@ -24,7 +24,7 @@ export default function LikertScale({
   return (
     <FormItem>
       <FormLabel className="text-base font-medium text-gray-900">
-        {questionNumber}. {question} {required && <span className="text-red-500">*</span>}
+        {questionNumber}. {question} {required && <span className="text-destructive">*</span>}
       </FormLabel>
       <FormControl>
         <div className="bg-gray-50 p-4 rounded-lg">
