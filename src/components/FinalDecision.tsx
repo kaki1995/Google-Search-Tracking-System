@@ -35,8 +35,17 @@ const FinalDecision = () => {
 
   if (isCompleted) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-6 md:p-8 lg:p-12">
-        <Card className="w-full max-w-6xl">
+      <div className="min-h-screen relative bg-background flex items-center justify-center p-6 md:p-8 lg:p-12"
+        style={{
+          backgroundImage: "url('/mountain-background.jpg')",
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}>
+        {/* Background overlay for better text readability */}
+        <div className="absolute inset-0 bg-black bg-opacity-20"></div>
+        
+        <Card className="w-full max-w-6xl relative z-10 bg-white bg-opacity-95 backdrop-blur-sm">
           <CardHeader>
             <CardTitle className="text-2xl font-bold text-center flex items-center justify-center gap-2">
               <CheckCircle className="h-8 w-8 text-green-600" />
@@ -89,8 +98,17 @@ const FinalDecision = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-6 md:p-8 lg:p-12">
-      <Card className="w-full max-w-6xl">
+    <div className="min-h-screen relative bg-background flex items-center justify-center p-6 md:p-8 lg:p-12"
+      style={{
+        backgroundImage: "url('/mountain-background.jpg')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}>
+      {/* Background overlay for better text readability */}
+      <div className="absolute inset-0 bg-black bg-opacity-20"></div>
+      
+      <Card className="w-full max-w-6xl relative z-10 bg-white bg-opacity-95 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="text-2xl font-bold">Final Decision</CardTitle>
           <CardDescription>

@@ -85,9 +85,18 @@ export default function BackgroundSurvey() {
   };
   
   return (
-    <div className="min-h-screen bg-background p-6 md:p-8 lg:p-12">
-      <div className="max-w-6xl mx-auto">
-        <div className="bg-white p-8 md:p-12 lg:p-16 shadow-sm rounded-none">
+    <div className="min-h-screen relative bg-background p-6 md:p-8 lg:p-12"
+      style={{
+        backgroundImage: "url('/mountain-background.jpg')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}>
+      {/* Background overlay for better text readability */}
+      <div className="absolute inset-0 bg-black bg-opacity-20"></div>
+      
+      <div className="max-w-6xl mx-auto relative z-10">
+        <div className="bg-white bg-opacity-95 backdrop-blur-sm shadow-lg p-8 md:p-12 lg:p-16 rounded-none">
           <h1 className="text-2xl font-bold text-center mb-8 text-foreground">
             Your Personal Background
           </h1>

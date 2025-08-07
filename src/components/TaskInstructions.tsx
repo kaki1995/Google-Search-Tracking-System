@@ -38,10 +38,19 @@ const TaskInstructions = () => {
   };
   
   return (
-    <div className="min-h-screen bg-background py-8 px-6 md:px-8 lg:px-12">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen relative bg-background py-8 px-6 md:px-8 lg:px-12"
+      style={{
+        backgroundImage: "url('/mountain-background.jpg')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}>
+      {/* Background overlay for better text readability */}
+      <div className="absolute inset-0 bg-black bg-opacity-20"></div>
+      
+      <div className="max-w-6xl mx-auto relative z-10">
         {/* Content */}
-        <div className="bg-white shadow-sm p-8 md:p-12 lg:p-16 rounded-none">
+        <div className="bg-white bg-opacity-95 backdrop-blur-sm shadow-lg p-8 md:p-12 lg:p-16 rounded-none">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-semibold text-gray-900 mb-6">
               Your Search Task

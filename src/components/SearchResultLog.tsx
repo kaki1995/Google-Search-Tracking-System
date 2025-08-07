@@ -63,8 +63,17 @@ export default function SearchResultLog() {
       setIsSubmitting(false);
     }
   };
-  return <div className="min-h-screen bg-background p-6 md:p-8 lg:p-12">
-      <div className="max-w-6xl mx-auto bg-white rounded-lg shadow-sm p-8 md:p-12 lg:p-16">
+  return <div className="min-h-screen relative bg-background p-6 md:p-8 lg:p-12"
+      style={{
+        backgroundImage: "url('/mountain-background.jpg')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}>
+      {/* Background overlay for better text readability */}
+      <div className="absolute inset-0 bg-black bg-opacity-20"></div>
+      
+      <div className="max-w-6xl mx-auto relative z-10 bg-white bg-opacity-95 backdrop-blur-sm rounded-lg shadow-lg p-8 md:p-12 lg:p-16">
         <h1 className="text-2xl font-bold text-foreground text-center mb-8">Your Search Results</h1>
 
         <div className="mb-6 p-4 rounded-lg border border-blue-200 bg-sky-100">

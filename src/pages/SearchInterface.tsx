@@ -250,8 +250,17 @@ export default function SearchInterface() {
       handleNewSearch();
     }
   };
-  return <div className="min-h-screen bg-white p-6 md:p-8 lg:p-12">
-      <div className="max-w-6xl mx-auto">
+  return <div className="min-h-screen relative bg-white p-6 md:p-8 lg:p-12"
+      style={{
+        backgroundImage: "url('/mountain-background.jpg')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}>
+      {/* Background overlay for better text readability */}
+      <div className="absolute inset-0 bg-black bg-opacity-10"></div>
+      
+      <div className="max-w-6xl mx-auto relative z-10">
         {/* Google Interface */}
         <div className="mb-8">
           {/* Google Logo and Search */}
