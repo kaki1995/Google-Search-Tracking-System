@@ -129,13 +129,14 @@ const ConsentScreen = () => {
           </div>
         </CardContent>
 
-        <CardFooter className="flex justify-between">
-          <Button variant="outline" onClick={handleDecline}>
+        <CardFooter className="flex justify-between px-4 py-6">
+          <Button variant="outline" onClick={handleDecline} className="px-8 py-2 text-sm font-medium border-2">
             Decline
           </Button>
           <Button 
             onClick={handleSubmit} 
             disabled={!consent || isSubmitting}
+            className="px-8 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
           >
             {isSubmitting ? "Processing..." : "I Consent - Continue"}
           </Button>

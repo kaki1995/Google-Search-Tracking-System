@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google API Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        button { margin: 10px; padding: 10px 20px; background: #007cba; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        .success { color: green; }
+        .error { color: red; }
+        pre { background: #f5f5f5; padding: 10px; border-radius: 3px; max-height: 400px; overflow-y: auto; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        input { padding: 8px; margin: 5px; border: 1px solid #ddd; border-radius: 3px; width: 300px; }
+    </style>
+</head>
+<body>
+    <h1>🔑 Google Custom Search API Test</h1>
+    
+    <div class="section">
+        <h3>API Configuration</h3>
+        <div><strong>API Key:</strong> AIzaSyATKkbTWhLwe0RgeWoY_iiMW7w2QoPkWpw</div>
+        <div><strong>Search Engine ID:</strong> 007dc6ac33e6f436c</div>
+    </div>
+
+    <div class="section">
+        <h3>Test Direct Google API Call</h3>
+        <input type="text" id="search-query" placeholder="Enter search query" value="best smartphone 2025">
+        <button onclick="testGoogleAPI()">Test Google API Directly</button>
+        <div id="api-result"></div>
+    </div>
+
+    <div class="section">
+        <h3>Test API Quota & Permissions</h3>
+        <button onclick="testAPIQuota()">Test API Quota</button>
+        <div id="quota-result"></div>
+    </div>
+
+    <script>
+        const GOOGLE_API_KEY = "AIzaSyATKkbTWhLwe0RgeWoY_iiMW7w2QoPkWpw";
+        const GOOGLE_SEARCH_ENGINE_ID = "007dc6ac33e6f436c";
+
+        async function testGoogleAPI() {
+            const resultDiv = document.getElementById('api-result');
+            const queryText = document.getElementById('search-query').value;
+            resultDiv.innerHTML = '<div>Testing Google Custom Search API...</div>';
+            
+            try {
+                const url = `https://www.googleapis.com/customsearch/v1?key=${GOOGLE_API_KEY}&cx=${GOOGLE_SEARCH_ENGINE_ID}&q=${encodeURIComponent(queryText)}`;
+                
+                console.log('Making request to:', url);
+                
+                const response = await fetch(url);
+                console.log('Response status:', response.status);
+                console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+
+                const responseText = await response.text();
+                console.log('Raw response:', responseText);
+
+                if (!response.ok) {
+                    let errorData;
+                    try {
+                        errorData = JSON.parse(responseText);
+                    } catch (e) {
+                        errorData = { message: responseText };
+                    }
+
+                    let errorMessage = `HTTP ${response.status}`;
+                    if (errorData.error) {
+                        errorMessage += `: ${errorData.error.message || errorData.error}`;
+                        if (errorData.error.code === 403) {
+                            errorMessage += ' (API Key issue or quota exceeded)';
+                        }
+                    }
+
+                    resultDiv.innerHTML = `
+                        <div class="error">❌ Google API Error: ${errorMessage}</div>
+                        <pre>${JSON.stringify(errorData, null, 2)}</pre>
+                    `;
+                    return;
+                }
+
+                const data = JSON.parse(responseText);
+                console.log('Parsed response:', data);
+
+                const resultCount = data.items ? data.items.length : 0;
+                const totalResults = data.searchInformation ? data.searchInformation.totalResults : 'Unknown';
+
+                resultDiv.innerHTML = `
+                    <div class="success">✅ Google API Success!</div>
+                    <div><strong>Query:</strong> "${queryText}"</div>
+                    <div><strong>Results returned:</strong> ${resultCount}</div>
+                    <div><strong>Total results available:</strong> ${totalResults}</div>
+                    <div><strong>Search time:</strong> ${data.searchInformation?.searchTime || 'N/A'} seconds</div>
+                    <h4>Sample Results:</h4>
+                    <pre>${JSON.stringify(data.items?.slice(0, 3), null, 2) || 'No items'}</pre>
+                `;
+            } catch (err) {
+                resultDiv.innerHTML = `<div class="error">❌ Exception: ${err.message}</div>`;
+                console.error('Exception:', err);
+            }
+        }
+
+        async function testAPIQuota() {
+            const resultDiv = document.getElementById('quota-result');
+            resultDiv.innerHTML = '<div>Testing API quota with multiple requests...</div>';
+            
+            try {
+                const testQueries = ['test1', 'test2', 'test3'];
+                const results = [];
+
+                for (let i = 0; i < testQueries.length; i++) {
+                    const query = testQueries[i];
+                    const url = `https://www.googleapis.com/customsearch/v1?key=${GOOGLE_API_KEY}&cx=${GOOGLE_SEARCH_ENGINE_ID}&q=${encodeURIComponent(query)}`;
+                    
+                    try {
+                        const response = await fetch(url);
+                        const success = response.ok;
+                        const status = response.status;
+                        
+                        results.push({
+                            query,
+                            success,
+                            status,
+                            message: success ? 'OK' : `Error ${status}`
+                        });
+
+                        // Small delay between requests
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                    } catch (error) {
+                        results.push({
+                            query,
+                            success: false,
+                            status: 'ERROR',
+                            message: error.message
+                        });
+                    }
+                }
+
+                const successCount = results.filter(r => r.success).length;
+                const failCount = results.length - successCount;
+
+                let resultHTML = `
+                    <div class="${successCount > 0 ? 'success' : 'error'}">
+                        ✅ Successful requests: ${successCount}/${results.length}
+                    </div>
+                `;
+
+                if (failCount > 0) {
+                    resultHTML += `<div class="error">❌ Failed requests: ${failCount}</div>`;
+                }
+
+                resultHTML += '<h4>Request Details:</h4><pre>';
+                results.forEach(result => {
+                    resultHTML += `${result.query}: ${result.message}\n`;
+                });
+                resultHTML += '</pre>';
+
+                resultDiv.innerHTML = resultHTML;
+            } catch (err) {
+                resultDiv.innerHTML = `<div class="error">❌ Exception: ${err.message}</div>`;
+                console.error('Exception:', err);
+            }
+        }
+
+        // Auto-run basic test on load
+        window.onload = () => {
+            testGoogleAPI();
+        };
+    </script>
+</body>
+</html>

@@ -7,17 +7,20 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage, Form } from "@/components/ui/form";
 import { ArrowLeft } from "lucide-react";
+
 interface SearchLogForm {
   smartphone_model: string;
-  price_range: string;
-  where_to_buy: string;
-  purchase_decision: string;
-  decision_reasoning: string;
+  storage_capacity: string;
+  color: string;
+  lowest_price: string;
+  website_link: string;
 }
+
 export default function SearchResultLog() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
   const form = useForm<SearchLogForm>();
+
   const onSubmit = async (data: SearchLogForm) => {
     setIsSubmitting(true);
     try {
@@ -30,16 +33,15 @@ export default function SearchResultLog() {
       setIsSubmitting(false);
     }
   };
+
   return <div className="min-h-screen bg-background p-6">
       <div className="max-w-4xl mx-auto bg-white rounded-lg border border-border shadow-sm p-8">
-        <div className="flex items-center gap-4 mb-6">
-          
-          <h1 className="text-2xl font-bold text-foreground text-center">Search Results</h1>
-        </div>
+        <h1 className="text-2xl font-bold text-foreground text-center mb-8">Your Search Results</h1>
 
-        <div className="mb-6 p-4 rounded-lg border border-blue-200 bg-sky-100">
-          <p className="text-blue-800 text-sm">
-            Based on your search activity, please provide the following information about your smartphone research:
+        <div className="mb-6 p-4 rounded-lg border border-blue-200 bg-sky-50">
+          <p className="text-gray-700 text-sm">
+            Please fill in the details of the smartphone you chose based on your search using the study interface:<br />
+            (You may return to the previous search page using the "Previous Page" button and review your search history if needed)
           </p>
         </div>
 
@@ -52,102 +54,273 @@ export default function SearchResultLog() {
             field
           }) => <FormItem>
                   <FormLabel className="text-base font-medium text-gray-900">
-                    11. Based on your search, which smartphone model are you most interested in? <span className="text-red-500">*</span>
+                    11. What is the brand and model of the smartphone you selected?*<br />
+                    <span className="text-sm font-normal text-gray-600 italic">(e.g., Samsung Galaxy S24, iPhone 16 Pro)</span>
                   </FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="Enter the smartphone model" />
+                    <Input {...field} placeholder="" className="border-b border-t-0 border-l-0 border-r-0 rounded-none bg-transparent" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>} />
 
-            {/* Question 12: Price Range */}
-            <FormField control={form.control} name="price_range" render={({
+            {/* Question 12: Storage Capacity */}
+            <FormField control={form.control} name="storage_capacity" render={({
             field
           }) => <FormItem>
                   <FormLabel className="text-base font-medium text-gray-900">
-                    12. What price range are you considering? (Optional)
+                    12. What is its storage capacity? <span className="text-sm font-normal text-gray-600 italic">(Optional)</span>
                   </FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select price range" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="under-200">Under $200</SelectItem>
-                      <SelectItem value="200-400">$200 - $400</SelectItem>
-                      <SelectItem value="400-600">$400 - $600</SelectItem>
-                      <SelectItem value="600-800">$600 - $800</SelectItem>
-                      <SelectItem value="800-1000">$800 - $1000</SelectItem>
-                      <SelectItem value="over-1000">Over $1000</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <div className="flex flex-wrap gap-4 mt-2">
+                    <label className="flex items-center gap-2">
+                      <input 
+                        type="checkbox" 
+                        name="storage_capacity" 
+                        value="64gb" 
+                        checked={field.value?.includes("64gb") || false} 
+                        onChange={(e) => {
+                          const newValue = e.target.checked ? "64gb" : "";
+                          field.onChange(newValue);
+                        }} 
+                        className="w-4 h-4" 
+                      />
+                      <span className="text-sm">64 GB</span>
+                    </label>
+                    <label className="flex items-center gap-2">
+                      <input 
+                        type="checkbox" 
+                        name="storage_capacity" 
+                        value="128gb" 
+                        checked={field.value?.includes("128gb") || false} 
+                        onChange={(e) => {
+                          const newValue = e.target.checked ? "128gb" : "";
+                          field.onChange(newValue);
+                        }} 
+                        className="w-4 h-4" 
+                      />
+                      <span className="text-sm">128 GB</span>
+                    </label>
+                    <label className="flex items-center gap-2">
+                      <input 
+                        type="checkbox" 
+                        name="storage_capacity" 
+                        value="256gb" 
+                        checked={field.value?.includes("256gb") || false} 
+                        onChange={(e) => {
+                          const newValue = e.target.checked ? "256gb" : "";
+                          field.onChange(newValue);
+                        }} 
+                        className="w-4 h-4" 
+                      />
+                      <span className="text-sm">256 GB</span>
+                    </label>
+                    <label className="flex items-center gap-2">
+                      <input 
+                        type="checkbox" 
+                        name="storage_capacity" 
+                        value="512gb" 
+                        checked={field.value?.includes("512gb") || false} 
+                        onChange={(e) => {
+                          const newValue = e.target.checked ? "512gb" : "";
+                          field.onChange(newValue);
+                        }} 
+                        className="w-4 h-4" 
+                      />
+                      <span className="text-sm">512 GB</span>
+                    </label>
+                    <label className="flex items-center gap-2">
+                      <input 
+                        type="checkbox" 
+                        name="storage_capacity" 
+                        value="1tb" 
+                        checked={field.value?.includes("1tb") || false} 
+                        onChange={(e) => {
+                          const newValue = e.target.checked ? "1tb" : "";
+                          field.onChange(newValue);
+                        }} 
+                        className="w-4 h-4" 
+                      />
+                      <span className="text-sm">1 TB and above</span>
+                    </label>
+                  </div>
                   <FormMessage />
                 </FormItem>} />
 
-            {/* Question 13: Where to Buy */}
-            <FormField control={form.control} name="where_to_buy" render={({
+            {/* Question 13: Color */}
+            <FormField control={form.control} name="color" render={({
             field
           }) => <FormItem>
                   <FormLabel className="text-base font-medium text-gray-900">
-                    13. Where do you plan to purchase this smartphone? (Optional)
+                    13. What is its color? <span className="text-sm font-normal text-gray-600 italic">(Optional)</span>
                   </FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select where to buy" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="online-retailer">Online retailer (Amazon, etc.)</SelectItem>
-                      <SelectItem value="manufacturer">Directly from manufacturer</SelectItem>
-                      <SelectItem value="physical-store">Physical store</SelectItem>
-                      <SelectItem value="carrier-store">Mobile carrier store</SelectItem>
-                      <SelectItem value="undecided">Still undecided</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <div className="flex flex-wrap gap-4 mt-2">
+                    <label className="flex items-center gap-2">
+                      <input 
+                        type="checkbox" 
+                        name="color" 
+                        value="black" 
+                        checked={field.value?.includes("black") || false} 
+                        onChange={(e) => {
+                          const newValue = e.target.checked ? "black" : "";
+                          field.onChange(newValue);
+                        }} 
+                        className="w-4 h-4" 
+                      />
+                      <span className="text-sm">Black</span>
+                    </label>
+                    <label className="flex items-center gap-2">
+                      <input 
+                        type="checkbox" 
+                        name="color" 
+                        value="white" 
+                        checked={field.value?.includes("white") || false} 
+                        onChange={(e) => {
+                          const newValue = e.target.checked ? "white" : "";
+                          field.onChange(newValue);
+                        }} 
+                        className="w-4 h-4" 
+                      />
+                      <span className="text-sm">White</span>
+                    </label>
+                    <label className="flex items-center gap-2">
+                      <input 
+                        type="checkbox" 
+                        name="color" 
+                        value="blue" 
+                        checked={field.value?.includes("blue") || false} 
+                        onChange={(e) => {
+                          const newValue = e.target.checked ? "blue" : "";
+                          field.onChange(newValue);
+                        }} 
+                        className="w-4 h-4" 
+                      />
+                      <span className="text-sm">Blue</span>
+                    </label>
+                    <label className="flex items-center gap-2">
+                      <input 
+                        type="checkbox" 
+                        name="color" 
+                        value="gray" 
+                        checked={field.value?.includes("gray") || false} 
+                        onChange={(e) => {
+                          const newValue = e.target.checked ? "gray" : "";
+                          field.onChange(newValue);
+                        }} 
+                        className="w-4 h-4" 
+                      />
+                      <span className="text-sm">Gray / Graphite</span>
+                    </label>
+                    <label className="flex items-center gap-2">
+                      <input 
+                        type="checkbox" 
+                        name="color" 
+                        value="green" 
+                        checked={field.value?.includes("green") || false} 
+                        onChange={(e) => {
+                          const newValue = e.target.checked ? "green" : "";
+                          field.onChange(newValue);
+                        }} 
+                        className="w-4 h-4" 
+                      />
+                      <span className="text-sm">Green</span>
+                    </label>
+                    <label className="flex items-center gap-2">
+                      <input 
+                        type="checkbox" 
+                        name="color" 
+                        value="silver" 
+                        checked={field.value?.includes("silver") || false} 
+                        onChange={(e) => {
+                          const newValue = e.target.checked ? "silver" : "";
+                          field.onChange(newValue);
+                        }} 
+                        className="w-4 h-4" 
+                      />
+                      <span className="text-sm">Silver</span>
+                    </label>
+                    <label className="flex items-center gap-2">
+                      <input 
+                        type="checkbox" 
+                        name="color" 
+                        value="gold" 
+                        checked={field.value?.includes("gold") || false} 
+                        onChange={(e) => {
+                          const newValue = e.target.checked ? "gold" : "";
+                          field.onChange(newValue);
+                        }} 
+                        className="w-4 h-4" 
+                      />
+                      <span className="text-sm">Gold</span>
+                    </label>
+                    <label className="flex items-center gap-2">
+                      <input 
+                        type="checkbox" 
+                        name="color" 
+                        value="red" 
+                        checked={field.value?.includes("red") || false} 
+                        onChange={(e) => {
+                          const newValue = e.target.checked ? "red" : "";
+                          field.onChange(newValue);
+                        }} 
+                        className="w-4 h-4" 
+                      />
+                      <span className="text-sm">Red</span>
+                    </label>
+                    <label className="flex items-center gap-2">
+                      <input 
+                        type="checkbox" 
+                        name="color" 
+                        value="other" 
+                        checked={field.value?.includes("other") || false} 
+                        onChange={(e) => {
+                          const newValue = e.target.checked ? "other" : "";
+                          field.onChange(newValue);
+                        }} 
+                        className="w-4 h-4" 
+                      />
+                      <span className="text-sm">Other</span>
+                    </label>
+                  </div>
                   <FormMessage />
                 </FormItem>} />
 
-            {/* Question 14: Purchase Decision */}
-            <FormField control={form.control} name="purchase_decision" rules={{
+            {/* Question 14: Lowest Price */}
+            <FormField control={form.control} name="lowest_price" rules={{
             required: "This field is required"
           }} render={({
             field
           }) => <FormItem>
                   <FormLabel className="text-base font-medium text-gray-900">
-                    14. How likely are you to purchase this smartphone within the next month? <span className="text-red-500">*</span>
+                    14. What is the lowest price you found for this smartphone?*<br />
+                    <span className="text-sm font-normal text-gray-600 italic">(Please indicate the price in euros, e.g., €749)</span>
                   </FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="Enter your likelihood (e.g., Very likely, Somewhat likely, etc.)" />
+                    <Input {...field} placeholder="" className="border-b border-t-0 border-l-0 border-r-0 rounded-none bg-transparent" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>} />
 
-            {/* Question 15: Decision Reasoning */}
-            <FormField control={form.control} name="decision_reasoning" rules={{
+            {/* Question 15: Website Link */}
+            <FormField control={form.control} name="website_link" rules={{
             required: "This field is required"
           }} render={({
             field
           }) => <FormItem>
                   <FormLabel className="text-base font-medium text-gray-900">
-                    15. Please explain the main factors that influenced your decision about this smartphone. <span className="text-red-500">*</span>
+                    15. Please provide a link to the website offering this price:*
                   </FormLabel>
                   <FormControl>
-                    <Textarea {...field} placeholder="Describe the key factors that influenced your choice..." className="min-h-[120px]" />
+                    <Input {...field} placeholder="" className="border-b border-t-0 border-l-0 border-r-0 rounded-none bg-transparent" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>} />
 
             {/* Buttons */}
-            <div className="flex justify-between pt-6">
-              <Button type="button" variant="outline" onClick={() => navigate('/search-interface')} className="px-6 flex items-center gap-2">
-                <ArrowLeft className="w-4 h-4" />
-                Back to Search
+            <div className="flex justify-between pt-8 px-4">
+              <Button type="button" variant="outline" onClick={() => navigate('/search-interface')} className="px-8 py-2 text-sm font-medium border-2">
+                Previous Page
               </Button>
-              <Button type="submit" disabled={isSubmitting} className="px-8 bg-sky-600 hover:bg-sky-500">
-                {isSubmitting ? "Loading..." : "Next Page"}
+              <Button type="submit" disabled={isSubmitting} className="px-8 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
+                {isSubmitting ? "Loading..." : "Submit Survey"}
               </Button>
             </div>
           </form>

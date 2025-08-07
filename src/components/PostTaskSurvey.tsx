@@ -18,8 +18,8 @@ interface PostTaskSurveyForm {
   search_support: string;
   search_system_ease: string;
   search_again: string;
-  search_enjoyable: string;
-  search_preference: string;
+  task_duration: string;
+  search_tool_type: string;
   search_improvement: string;
 }
 export default function PostTaskSurvey() {
@@ -34,18 +34,19 @@ export default function PostTaskSurvey() {
     setIsSubmitting(true);
     try {
       const formData = form.getValues();
-      await trackingService.trackEvent({
-        type: 'survey',
-        timestamp: Date.now(),
-        data: {
-          type: 'post_task_survey_completed',
-          formData
-        }
-      });
+      console.log('Submitting post-task survey:', formData);
+      
+      // Call the correct tracking function for post-task survey
+      await trackingService.trackPostTaskSurvey(formData);
+      
+      console.log('Post-task survey submitted successfully');
       setShowConfirmDialog(false);
       navigate('/thank-you');
     } catch (error) {
       console.error('Error submitting survey:', error);
+      // Still allow navigation even if tracking fails
+      setShowConfirmDialog(false);
+      navigate('/thank-you');
     } finally {
       setIsSubmitting(false);
     }
@@ -123,71 +124,67 @@ export default function PostTaskSurvey() {
                 field
               }) => <LikertScale field={field} question="How likely would you be to use this search interface again for similar tasks?" leftLabel="Very unlikely" rightLabel="Very likely" questionNumber="24" />} />
 
-                {/* Question 25: Search Enjoyable - Dropdown */}
-                <FormField control={form.control} name="search_enjoyable" rules={{
+                {/* Question 25: Task Duration */}
+                <FormField control={form.control} name="task_duration" rules={{
                 required: "This field is required"
               }} render={({
                 field
               }) => <FormItem>
                       <FormLabel className="text-base font-medium text-gray-900">
-                        25. How enjoyable was your search experience? <span className="text-red-500">*</span>
-                      </FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select your answer" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="very-unenjoyable">Very unenjoyable</SelectItem>
-                          <SelectItem value="unenjoyable">Unenjoyable</SelectItem>
-                          <SelectItem value="neutral">Neutral</SelectItem>
-                          <SelectItem value="enjoyable">Enjoyable</SelectItem>
-                          <SelectItem value="very-enjoyable">Very enjoyable</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>} />
-
-                {/* Question 26: Search Preference - Radio buttons */}
-                <FormField control={form.control} name="search_preference" rules={{
-                required: "This field is required"
-              }} render={({
-                field
-              }) => <FormItem>
-                      <FormLabel className="text-base font-medium text-gray-900">
-                        26. Compared to other search methods you typically use, how would you rate this interface? <span className="text-red-500">*</span>
+                        25. Approximately how long did it take you to complete the task? <span className="text-red-500">*</span>
                       </FormLabel>
                       <FormControl>
                         <RadioGroup onValueChange={field.onChange} value={field.value} className="flex flex-col space-y-2">
                           <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="much-worse" id="much-worse" />
-                            <label htmlFor="much-worse" className="text-sm text-gray-700 cursor-pointer">
-                              Much worse than usual
+                            <RadioGroupItem value="less-than-2" id="less-than-2" />
+                            <label htmlFor="less-than-2" className="text-sm text-gray-700 cursor-pointer">
+                              Less than 2 minutes
                             </label>
                           </div>
                           <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="worse" id="worse" />
-                            <label htmlFor="worse" className="text-sm text-gray-700 cursor-pointer">
-                              Worse than usual
+                            <RadioGroupItem value="3-5" id="3-5" />
+                            <label htmlFor="3-5" className="text-sm text-gray-700 cursor-pointer">
+                              3-5 minutes
                             </label>
                           </div>
                           <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="about-same" id="about-same" />
-                            <label htmlFor="about-same" className="text-sm text-gray-700 cursor-pointer">
-                              About the same as usual
+                            <RadioGroupItem value="6-10" id="6-10" />
+                            <label htmlFor="6-10" className="text-sm text-gray-700 cursor-pointer">
+                              6-10 minutes
                             </label>
                           </div>
                           <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="better" id="better" />
-                            <label htmlFor="better" className="text-sm text-gray-700 cursor-pointer">
-                              Better than usual
+                            <RadioGroupItem value="more-than-10" id="more-than-10" />
+                            <label htmlFor="more-than-10" className="text-sm text-gray-700 cursor-pointer">
+                              More than 10 minutes
+                            </label>
+                          </div>
+                        </RadioGroup>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>} />
+
+                {/* Question 26: Search Tool Type */}
+                <FormField control={form.control} name="search_tool_type" rules={{
+                required: "This field is required"
+              }} render={({
+                field
+              }) => <FormItem>
+                      <FormLabel className="text-base font-medium text-gray-900">
+                        26. Which type of search tool did you use during the task? <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <RadioGroup onValueChange={field.onChange} value={field.value} className="flex flex-col space-y-2">
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="traditional-search" id="traditional-search" />
+                            <label htmlFor="traditional-search" className="text-sm text-gray-700 cursor-pointer">
+                              A traditional search engine showing a list of clickable links (e.g., Google)
                             </label>
                           </div>
                           <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="much-better" id="much-better" />
-                            <label htmlFor="much-better" className="text-sm text-gray-700 cursor-pointer">
-                              Much better than usual
+                            <RadioGroupItem value="conversational-ai" id="conversational-ai" />
+                            <label htmlFor="conversational-ai" className="text-sm text-gray-700 cursor-pointer">
+                              A conversational AI that provided direct answers in a chat format (e.g., ChatGPT)
                             </label>
                           </div>
                         </RadioGroup>
@@ -196,11 +193,11 @@ export default function PostTaskSurvey() {
                     </FormItem>} />
 
                 {/* Buttons */}
-                <div className="flex justify-between pt-6">
-                  <Button type="button" variant="outline" onClick={() => navigate('/search-result-log')} className="px-6">
+                <div className="flex justify-between pt-8 px-4">
+                  <Button type="button" variant="outline" onClick={() => navigate('/search-result-log')} className="px-8 py-2 text-sm font-medium border-2">
                     Previous Page
                   </Button>
-                  <Button type="button" onClick={form.handleSubmit(handleSubmit)} className="px-8 bg-sky-600 hover:bg-sky-500">
+                  <Button type="button" onClick={form.handleSubmit(handleSubmit)} className="px-8 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
                     Submit Survey
                   </Button>
                 </div>

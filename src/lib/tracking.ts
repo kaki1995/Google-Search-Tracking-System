@@ -134,6 +134,12 @@ class TrackingService {
 
     // Log to experiment_queries table
     try {
+      console.log('Inserting query to experiment_queries:', {
+        session_id: this.sessionData.sessionId,
+        query_text: query,
+        reformulation_count: this.isQueryReformulation(query) ? 1 : 0
+      });
+
       const { data, error } = await supabase
         .from('experiment_queries')
         .insert({
@@ -149,6 +155,7 @@ class TrackingService {
         return null;
       }
 
+      console.log('Query logged successfully with ID:', data.id);
       return data.id;
     } catch (error) {
       console.error('Failed to log query to Supabase:', error);
@@ -177,21 +184,34 @@ class TrackingService {
     // Log to interactions table if queryId provided
     if (queryId) {
       try {
-        const { error } = await supabase
+        console.log('Inserting click to interactions:', {
+          query_id: queryId,
+          clicked_url: url,
+          clicked_rank: position,
+          clicked_result_count: 1
+        });
+
+        const { data, error } = await supabase
           .from('interactions')
           .insert({
             query_id: queryId,
             clicked_url: url,
             clicked_rank: position,
             clicked_result_count: 1
-          });
+          })
+          .select('id')
+          .single();
 
         if (error) {
           console.error('Failed to log click to Supabase:', error);
+        } else {
+          console.log('Click logged successfully with ID:', data.id);
         }
       } catch (error) {
         console.error('Failed to log click to Supabase:', error);
       }
+    } else {
+      console.warn('No queryId provided for click tracking');
     }
   }
 
@@ -217,24 +237,35 @@ class TrackingService {
 
     this.sessionData.backgroundSurvey = surveyData;
     
+    console.log('Tracking background survey for session:', this.sessionData.sessionId);
+    console.log('Survey data:', surveyData);
+    
     // Save directly to background_surveys table
     try {
-      const { error } = await supabase
+      const insertData = {
+        session_id: this.sessionData.sessionId,
+        age_group: surveyData.age,
+        gender: surveyData.gender,
+        education: surveyData.education,
+        country: surveyData.country,
+        native_language: surveyData.language,
+        shopping_experience: parseInt(surveyData.experience_scale_q7),
+        product_research_familiarity: parseInt(surveyData.familiarity_scale_q8),
+        google_search_frequency: surveyData.search_frequency
+      };
+      
+      console.log('Inserting to background_surveys:', insertData);
+      
+      const { data, error } = await supabase
         .from('background_surveys')
-        .insert({
-          session_id: this.sessionData.sessionId,
-          age_group: surveyData.age,
-          gender: surveyData.gender,
-          education: surveyData.education,
-          country: surveyData.country,
-          native_language: surveyData.language,
-          shopping_experience: parseInt(surveyData.experience_scale_q7),
-          product_research_familiarity: parseInt(surveyData.familiarity_scale_q8),
-          google_search_frequency: surveyData.search_frequency
-        });
+        .insert(insertData)
+        .select('id')
+        .single();
 
       if (error) {
         console.error('Failed to save background survey:', error);
+      } else {
+        console.log('Background survey saved successfully:', data);
       }
     } catch (error) {
       console.error('Failed to save background survey:', error);
@@ -252,21 +283,44 @@ class TrackingService {
 
     this.sessionData.postTaskSurvey = surveyData;
     
+    console.log('Tracking post-task survey for session:', this.sessionData.sessionId);
+    console.log('Post-task survey data:', surveyData);
+    
     // Save directly to post_survey table
     try {
-      const { error } = await supabase
+      const insertData = {
+        session_id: this.sessionData.sessionId,
+        interface_familiarity: parseInt(surveyData.search_familiarity) || null,
+        interface_confidence: parseInt(surveyData.search_confidence) || null,
+        search_satisfaction: parseInt(surveyData.search_satisfaction) || null,
+        information_efficiency: parseInt(surveyData.search_efficiency) || null,
+        interface_ease_of_use: parseInt(surveyData.search_ease) || null,
+        interface_usefulness: parseInt(surveyData.search_usefulness) || null,
+        decision_support: parseInt(surveyData.search_support) || null,
+        interface_learnability: parseInt(surveyData.search_system_ease) || null,
+        interface_reuse_likelihood: parseInt(surveyData.search_again) || null,
+        search_enjoyment: surveyData.search_enjoyable,
+        interface_comparison_rating: surveyData.search_preference,
+        // Additional fields that might be in the form
+        smartphone_model: surveyData.smartphone_model || null,
+        price_range: surveyData.price_range || null,
+        purchase_platform: surveyData.where_to_buy || null,
+        purchase_likelihood: surveyData.purchase_decision || null,
+        decision_factors: surveyData.decision_reasoning || surveyData.search_improvement || null
+      };
+      
+      console.log('Inserting to post_survey:', insertData);
+      
+      const { data, error } = await supabase
         .from('post_survey')
-        .insert({
-          session_id: this.sessionData.sessionId,
-          smartphone_model: surveyData.smartphone_model,
-          price_range: surveyData.price_range,
-          where_to_buy: surveyData.where_to_buy,
-          purchase_decision: surveyData.purchase_decision,
-          decision_reasoning: surveyData.decision_reasoning
-        });
+        .insert(insertData)
+        .select('id')
+        .single();
 
       if (error) {
         console.error('Failed to save post survey:', error);
+      } else {
+        console.log('Post survey saved successfully:', data);
       }
     } catch (error) {
       console.error('Failed to save post survey:', error);
@@ -277,6 +331,30 @@ class TrackingService {
       timestamp: Date.now(),
       data: { type: 'post_task', ...surveyData }
     });
+  }
+
+  async trackBudgetRange(budgetRange: string): Promise<void> {
+    if (!this.sessionData) return;
+
+    console.log('Tracking budget range:', budgetRange);
+    
+    // Update session with budget range
+    try {
+      const { error } = await supabase
+        .from('sessions')
+        .update({
+          budget_range: budgetRange
+        })
+        .eq('id', this.sessionData.sessionId);
+
+      if (error) {
+        console.error('Failed to update budget range:', error);
+      } else {
+        console.log('Budget range updated successfully');
+      }
+    } catch (error) {
+      console.error('Failed to update budget range:', error);
+    }
   }
 
   async trackFinalDecision(decision: any): Promise<void> {
@@ -344,18 +422,27 @@ class TrackingService {
       const deviceType = this.sessionData.deviceInfo.isMobile ? 'mobile' : 'desktop';
       const browser = navigator.userAgent.match(/(Chrome|Firefox|Safari|Edge)/)?.[1] || 'Unknown';
       
-      const { error } = await supabase
+      // Get budget range from sessionStorage if available
+      const budgetRange = sessionStorage.getItem('selectedBudgetRange');
+      
+      const { data, error } = await supabase
         .from('sessions')
         .upsert({
+          id: this.sessionData.sessionId, // Use the sessionId as the primary key
           user_id: this.sessionData.userId,
           platform: 'Google', // Since this is for Google search interface
           device_type: deviceType,
           browser: browser,
-          location: 'Unknown' // Could be enhanced with geolocation
-        });
+          location: 'Unknown', // Could be enhanced with geolocation
+          budget_range: budgetRange // Add budget range to session
+        })
+        .select('id')
+        .single();
 
       if (error) {
         console.error('Failed to save session data to Supabase:', error);
+      } else {
+        console.log('Session saved successfully:', data);
       }
     } catch (error) {
       console.error('Failed to save session data to Supabase:', error);

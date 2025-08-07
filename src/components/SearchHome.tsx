@@ -105,6 +105,25 @@ const SearchHome = () => {
             한국어
           </a>
         </div>
+
+        {/* Navigation Buttons */}
+        <div className="flex justify-between pt-8 px-4">
+          <Button 
+            type="button" 
+            variant="outline" 
+            onClick={() => navigate('/task-instructions')} 
+            className="px-8 py-2 text-sm font-medium border-2"
+          >
+            Previous Page
+          </Button>
+          <Button 
+            type="button" 
+            onClick={() => navigate('/search-result-log')} 
+            className="px-8 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
+          >
+            Finish Task
+          </Button>
+        </div>
       </div>
     </div>
   );

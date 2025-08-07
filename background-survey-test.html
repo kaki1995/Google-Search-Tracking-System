@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Background Survey Test</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        button { margin: 10px; padding: 10px 20px; background: #007cba; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        .success { color: green; }
+        .error { color: red; }
+        pre { background: #f5f5f5; padding: 10px; border-radius: 3px; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Background Survey Database Test</h1>
+    
+    <div class="section">
+        <h3>Step 1: Create Test Session</h3>
+        <button onclick="createTestSession()">Create Test Session</button>
+        <div id="session-result"></div>
+    </div>
+
+    <div class="section">
+        <h3>Step 2: Test Background Survey Insert</h3>
+        <button onclick="testBackgroundSurvey()">Test Background Survey</button>
+        <div id="survey-result"></div>
+    </div>
+
+    <div class="section">
+        <h3>Step 3: Check Results</h3>
+        <button onclick="checkResults()">Check Database</button>
+        <div id="check-result"></div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = "https://wbguuipoggeamyzrfvbv.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndiZ3V1aXBvZ2dlYW15enJmdmJ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3Nzc2OTksImV4cCI6MjA2OTM1MzY5OX0.ddgmJnxg6hipRZ8_r9WyQpvsM-pkhBlRoybPdtGPEtY";
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        let testSessionId = null;
+
+        function generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        async function createTestSession() {
+            const resultDiv = document.getElementById('session-result');
+            resultDiv.innerHTML = '<div>Creating test session...</div>';
+            
+            try {
+                testSessionId = generateUUID();
+                console.log('Creating session with ID:', testSessionId);
+                
+                const { data, error } = await supabase
+                    .from('sessions')
+                    .insert({
+                        id: testSessionId,
+                        user_id: 'test-user-' + Date.now(),
+                        platform: 'Google',
+                        device_type: 'desktop',
+                        browser: 'Chrome',
+                        location: 'Test Location'
+                    })
+                    .select('id')
+                    .single();
+
+                if (error) {
+                    resultDiv.innerHTML = `<div class="error">❌ Session creation failed: ${error.message}</div>`;
+                    console.error('Session creation error:', error);
+                } else {
+                    resultDiv.innerHTML = `<div class="success">✅ Session created: ${data.id}</div>`;
+                    console.log('Session created successfully:', data);
+                }
+            } catch (err) {
+                resultDiv.innerHTML = `<div class="error">❌ Exception: ${err.message}</div>`;
+                console.error('Exception:', err);
+            }
+        }
+
+        async function testBackgroundSurvey() {
+            if (!testSessionId) {
+                document.getElementById('survey-result').innerHTML = '<div class="error">❌ Please create a test session first</div>';
+                return;
+            }
+
+            const resultDiv = document.getElementById('survey-result');
+            resultDiv.innerHTML = '<div>Testing background survey insert...</div>';
+            
+            try {
+                const surveyData = {
+                    session_id: testSessionId,
+                    age_group: '25-34',
+                    gender: 'male',
+                    education: 'bachelor',
+                    country: 'Germany',
+                    native_language: 'English',
+                    shopping_experience: 5,
+                    product_research_familiarity: 4,
+                    google_search_frequency: 'daily'
+                };
+
+                console.log('Inserting survey data:', surveyData);
+
+                const { data, error } = await supabase
+                    .from('background_surveys')
+                    .insert(surveyData)
+                    .select('id')
+                    .single();
+
+                if (error) {
+                    resultDiv.innerHTML = `<div class="error">❌ Survey insert failed: ${error.message}</div>`;
+                    console.error('Survey insert error:', error);
+                } else {
+                    resultDiv.innerHTML = `<div class="success">✅ Background survey inserted: ${data.id}</div>`;
+                    console.log('Survey inserted successfully:', data);
+                }
+            } catch (err) {
+                resultDiv.innerHTML = `<div class="error">❌ Exception: ${err.message}</div>`;
+                console.error('Exception:', err);
+            }
+        }
+
+        async function checkResults() {
+            const resultDiv = document.getElementById('check-result');
+            resultDiv.innerHTML = '<div>Checking database...</div>';
+            
+            try {
+                // Check sessions
+                const { data: sessions, error: sessionError } = await supabase
+                    .from('sessions')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(5);
+
+                // Check background surveys
+                const { data: surveys, error: surveyError } = await supabase
+                    .from('background_surveys')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(5);
+
+                let result = '<h4>Recent Sessions:</h4>';
+                if (sessionError) {
+                    result += `<div class="error">Session error: ${sessionError.message}</div>`;
+                } else {
+                    result += `<pre>${JSON.stringify(sessions, null, 2)}</pre>`;
+                }
+
+                result += '<h4>Recent Background Surveys:</h4>';
+                if (surveyError) {
+                    result += `<div class="error">Survey error: ${surveyError.message}</div>`;
+                } else {
+                    result += `<pre>${JSON.stringify(surveys, null, 2)}</pre>`;
+                }
+
+                resultDiv.innerHTML = result;
+            } catch (err) {
+                resultDiv.innerHTML = `<div class="error">❌ Exception: ${err.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>

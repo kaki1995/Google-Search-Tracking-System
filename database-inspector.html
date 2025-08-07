@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Database Inspector</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .table-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        .success { color: green; }
+        .error { color: red; }
+        pre { background: #f5f5f5; padding: 10px; border-radius: 3px; overflow-x: auto; }
+        button { margin: 5px; padding: 8px 16px; background: #007cba; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        button:hover { background: #005a87; }
+        .loading { color: #666; font-style: italic; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Complete Database Inspector</h1>
+    <div id="status" class="loading">Connecting to database...</div>
+    
+    <div class="table-section">
+        <h2>📊 Sessions Table</h2>
+        <button onclick="checkSessions()">Check Sessions</button>
+        <div id="sessions-results"></div>
+    </div>
+
+    <div class="table-section">
+        <h2>📋 Background Surveys Table</h2>
+        <button onclick="checkBackgroundSurveys()">Check Background Surveys</button>
+        <div id="background-surveys-results"></div>
+    </div>
+
+    <div class="table-section">
+        <h2>🔍 Experiment Queries Table</h2>
+        <button onclick="checkQueries()">Check Queries</button>
+        <div id="queries-results"></div>
+    </div>
+
+    <div class="table-section">
+        <h2>🖱️ Interactions Table</h2>
+        <button onclick="checkInteractions()">Check Interactions</button>
+        <div id="interactions-results"></div>
+    </div>
+
+    <div class="table-section">
+        <h2>📝 Post Survey Table</h2>
+        <button onclick="checkPostSurvey()">Check Post Survey</button>
+        <div id="post-survey-results"></div>
+    </div>
+
+    <div class="table-section">
+        <h2>📊 Table Counts Summary</h2>
+        <button onclick="getAllCounts()">Get All Table Counts</button>
+        <div id="counts-results"></div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = "https://wbguuipoggeamyzrfvbv.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndiZ3V1aXBvZ2dlYW15enJmdmJ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3Nzc2OTksImV4cCI6MjA2OTM1MzY5OX0.ddgmJnxg6hipRZ8_r9WyQpvsM-pkhBlRoybPdtGPEtY";
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Test connection on load
+        window.onload = async () => {
+            try {
+                const { data, error } = await supabase.from('sessions').select('count', { count: 'exact', head: true });
+                if (error) {
+                    document.getElementById('status').innerHTML = `<span class="error">❌ Connection failed: ${error.message}</span>`;
+                } else {
+                    document.getElementById('status').innerHTML = `<span class="success">✅ Connected to Supabase successfully!</span>`;
+                    getAllCounts(); // Auto-load summary
+                }
+            } catch (err) {
+                document.getElementById('status').innerHTML = `<span class="error">❌ Connection error: ${err.message}</span>`;
+            }
+        };
+
+        async function checkSessions() {
+            const resultDiv = document.getElementById('sessions-results');
+            resultDiv.innerHTML = '<div class="loading">Loading sessions...</div>';
+            
+            try {
+                const { data, error } = await supabase
+                    .from('sessions')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(10);
+
+                if (error) {
+                    resultDiv.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="success">Found ${data.length} sessions</div>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                }
+            } catch (err) {
+                resultDiv.innerHTML = `<div class="error">Exception: ${err.message}</div>`;
+            }
+        }
+
+        async function checkBackgroundSurveys() {
+            const resultDiv = document.getElementById('background-surveys-results');
+            resultDiv.innerHTML = '<div class="loading">Loading background surveys...</div>';
+            
+            try {
+                const { data, error } = await supabase
+                    .from('background_surveys')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(10);
+
+                if (error) {
+                    resultDiv.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="success">Found ${data.length} background surveys</div>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                }
+            } catch (err) {
+                resultDiv.innerHTML = `<div class="error">Exception: ${err.message}</div>`;
+            }
+        }
+
+        async function checkQueries() {
+            const resultDiv = document.getElementById('queries-results');
+            resultDiv.innerHTML = '<div class="loading">Loading queries...</div>';
+            
+            try {
+                const { data, error } = await supabase
+                    .from('experiment_queries')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(10);
+
+                if (error) {
+                    resultDiv.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="success">Found ${data.length} queries</div>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                }
+            } catch (err) {
+                resultDiv.innerHTML = `<div class="error">Exception: ${err.message}</div>`;
+            }
+        }
+
+        async function checkInteractions() {
+            const resultDiv = document.getElementById('interactions-results');
+            resultDiv.innerHTML = '<div class="loading">Loading interactions...</div>';
+            
+            try {
+                const { data, error } = await supabase
+                    .from('interactions')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(10);
+
+                if (error) {
+                    resultDiv.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="success">Found ${data.length} interactions</div>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                }
+            } catch (err) {
+                resultDiv.innerHTML = `<div class="error">Exception: ${err.message}</div>`;
+            }
+        }
+
+        async function checkPostSurvey() {
+            const resultDiv = document.getElementById('post-survey-results');
+            resultDiv.innerHTML = '<div class="loading">Loading post surveys...</div>';
+            
+            try {
+                const { data, error } = await supabase
+                    .from('post_survey')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(10);
+
+                if (error) {
+                    resultDiv.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="success">Found ${data.length} post surveys</div>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                }
+            } catch (err) {
+                resultDiv.innerHTML = `<div class="error">Exception: ${err.message}</div>`;
+            }
+        }
+
+        async function getAllCounts() {
+            const resultDiv = document.getElementById('counts-results');
+            resultDiv.innerHTML = '<div class="loading">Counting records in all tables...</div>';
+            
+            try {
+                const tables = ['sessions', 'background_surveys', 'experiment_queries', 'interactions', 'post_survey'];
+                const counts = {};
+                
+                for (const table of tables) {
+                    const { count, error } = await supabase
+                        .from(table)
+                        .select('*', { count: 'exact', head: true });
+                    
+                    if (error) {
+                        counts[table] = `Error: ${error.message}`;
+                    } else {
+                        counts[table] = count;
+                    }
+                }
+                
+                let summary = '<div class="success">📊 Table Record Counts:</div><pre>';
+                for (const [table, count] of Object.entries(counts)) {
+                    summary += `${table.padEnd(20)}: ${count}\n`;
+                }
+                summary += '</pre>';
+                
+                resultDiv.innerHTML = summary;
+            } catch (err) {
+                resultDiv.innerHTML = `<div class="error">Exception: ${err.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>

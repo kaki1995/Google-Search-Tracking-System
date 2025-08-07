@@ -11,9 +11,9 @@ interface SurveyForm {
   age: string;
   gender: string;
   education: string;
-  other_education?: string;
+  employment: string;
+  nationality: string;
   country: string;
-  language: string;
   experience_scale_q7: string;
   familiarity_scale_q8: string;
   search_frequency: string;
@@ -25,20 +25,39 @@ export default function BackgroundSurvey() {
   const onSubmit = async (data: SurveyForm) => {
     setIsSubmitting(true);
     try {
+      // Check if session exists, if not initialize one
+      let session = trackingService.loadSession();
+      if (!session) {
+        console.log('No session found, initializing new session');
+        await trackingService.initSession();
+        session = trackingService.loadSession();
+      }
+      
+      console.log('Submitting background survey:', data);
       await trackingService.trackBackgroundSurvey(data);
+      console.log('Background survey submitted successfully');
       navigate('/task-instructions');
     } catch (error) {
       console.error('Error submitting survey:', error);
+      // Show error to user but still allow navigation
+      alert('There was an issue saving your survey data, but you can continue with the study.');
+      navigate('/task-instructions');
     } finally {
       setIsSubmitting(false);
     }
   };
-  return <div className="min-h-screen bg-background p-6">
+  
+  return (
+    <div className="min-h-screen bg-background p-6">
       <div className="max-w-4xl mx-auto">
         <div className="bg-white border border-border p-8 shadow-sm rounded-none">
           <h1 className="text-2xl font-bold text-center mb-8 text-foreground">
-            Background Survey
+            Your Personal Background
           </h1>
+          
+          <p className="text-base text-gray-700 mb-8">
+            Please answer the following questions to help us better understand your background. All responses are anonymous and used for research purposes only.
+          </p>
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -49,23 +68,76 @@ export default function BackgroundSurvey() {
               field
             }) => <FormItem>
                     <FormLabel className="text-base font-medium text-gray-900">
-                      1. What is your age? <span className="text-red-500">*</span>
+                      1. What is your age group? <span className="text-red-500">*</span>
                     </FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select your age group" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="18-24">18-24</SelectItem>
-                        <SelectItem value="25-34">25-34</SelectItem>
-                        <SelectItem value="35-44">35-44</SelectItem>
-                        <SelectItem value="45-54">45-54</SelectItem>
-                        <SelectItem value="55-64">55-64</SelectItem>
-                        <SelectItem value="65+">65+</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <div className="flex flex-wrap gap-4 mt-2">
+                      <label className="flex items-center gap-2">
+                        <input 
+                          type="radio" 
+                          name="age" 
+                          value="under-18" 
+                          checked={field.value === "under-18"} 
+                          onChange={field.onChange} 
+                          className="w-4 h-4" 
+                        />
+                        <span className="text-sm">Under 18</span>
+                      </label>
+                      <label className="flex items-center gap-2">
+                        <input 
+                          type="radio" 
+                          name="age" 
+                          value="18-24" 
+                          checked={field.value === "18-24"} 
+                          onChange={field.onChange} 
+                          className="w-4 h-4" 
+                        />
+                        <span className="text-sm">18-24</span>
+                      </label>
+                      <label className="flex items-center gap-2">
+                        <input 
+                          type="radio" 
+                          name="age" 
+                          value="25-34" 
+                          checked={field.value === "25-34"} 
+                          onChange={field.onChange} 
+                          className="w-4 h-4" 
+                        />
+                        <span className="text-sm">25-34</span>
+                      </label>
+                      <label className="flex items-center gap-2">
+                        <input 
+                          type="radio" 
+                          name="age" 
+                          value="35-44" 
+                          checked={field.value === "35-44"} 
+                          onChange={field.onChange} 
+                          className="w-4 h-4" 
+                        />
+                        <span className="text-sm">35-44</span>
+                      </label>
+                      <label className="flex items-center gap-2">
+                        <input 
+                          type="radio" 
+                          name="age" 
+                          value="45-54" 
+                          checked={field.value === "45-54"} 
+                          onChange={field.onChange} 
+                          className="w-4 h-4" 
+                        />
+                        <span className="text-sm">45-54</span>
+                      </label>
+                      <label className="flex items-center gap-2">
+                        <input 
+                          type="radio" 
+                          name="age" 
+                          value="55-and-above" 
+                          checked={field.value === "55-and-above"} 
+                          onChange={field.onChange} 
+                          className="w-4 h-4" 
+                        />
+                        <span className="text-sm">55 and above</span>
+                      </label>
+                    </div>
                     <FormMessage />
                   </FormItem>} />
 
@@ -78,20 +150,52 @@ export default function BackgroundSurvey() {
                     <FormLabel className="text-base font-medium text-gray-900">
                       2. What is your gender? <span className="text-red-500">*</span>
                     </FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select your gender" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="male">Male</SelectItem>
-                        <SelectItem value="female">Female</SelectItem>
-                        <SelectItem value="non-binary">Non-binary</SelectItem>
-                        <SelectItem value="prefer-not-to-say">Prefer not to say</SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <div className="flex flex-wrap gap-4 mt-2">
+                      <label className="flex items-center gap-2">
+                        <input 
+                          type="radio" 
+                          name="gender" 
+                          value="female" 
+                          checked={field.value === "female"} 
+                          onChange={field.onChange} 
+                          className="w-4 h-4" 
+                        />
+                        <span className="text-sm">Female</span>
+                      </label>
+                      <label className="flex items-center gap-2">
+                        <input 
+                          type="radio" 
+                          name="gender" 
+                          value="male" 
+                          checked={field.value === "male"} 
+                          onChange={field.onChange} 
+                          className="w-4 h-4" 
+                        />
+                        <span className="text-sm">Male</span>
+                      </label>
+                      <label className="flex items-center gap-2">
+                        <input 
+                          type="radio" 
+                          name="gender" 
+                          value="non-binary" 
+                          checked={field.value === "non-binary"} 
+                          onChange={field.onChange} 
+                          className="w-4 h-4" 
+                        />
+                        <span className="text-sm">Non-binary / Diverse</span>
+                      </label>
+                      <label className="flex items-center gap-2">
+                        <input 
+                          type="radio" 
+                          name="gender" 
+                          value="prefer-not-to-say" 
+                          checked={field.value === "prefer-not-to-say"} 
+                          onChange={field.onChange} 
+                          className="w-4 h-4" 
+                        />
+                        <span className="text-sm">Prefer not to say</span>
+                      </label>
+                    </div>
                     <FormMessage />
                   </FormItem>} />
 
@@ -104,114 +208,401 @@ export default function BackgroundSurvey() {
                     <FormLabel className="text-base font-medium text-gray-900">
                       3. What is your highest level of education? <span className="text-red-500">*</span>
                     </FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select your education level" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="high-school">High school or equivalent</SelectItem>
-                        <SelectItem value="associate">Associate degree</SelectItem>
-                        <SelectItem value="bachelor">Bachelor's degree</SelectItem>
-                        <SelectItem value="master">Master's degree</SelectItem>
-                        <SelectItem value="doctoral">Doctoral degree</SelectItem>
-                        <SelectItem value="professional">Professional training school/college</SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <div className="flex flex-wrap gap-4 mt-2">
+                      <label className="flex items-center gap-2">
+                        <input 
+                          type="radio" 
+                          name="education" 
+                          value="high-school" 
+                          checked={field.value === "high-school"} 
+                          onChange={field.onChange} 
+                          className="w-4 h-4" 
+                        />
+                        <span className="text-sm">High school or below</span>
+                      </label>
+                      <label className="flex items-center gap-2">
+                        <input 
+                          type="radio" 
+                          name="education" 
+                          value="bachelor" 
+                          checked={field.value === "bachelor"} 
+                          onChange={field.onChange} 
+                          className="w-4 h-4" 
+                        />
+                        <span className="text-sm">Bachelor's degree</span>
+                      </label>
+                      <label className="flex items-center gap-2">
+                        <input 
+                          type="radio" 
+                          name="education" 
+                          value="master" 
+                          checked={field.value === "master"} 
+                          onChange={field.onChange} 
+                          className="w-4 h-4" 
+                        />
+                        <span className="text-sm">Master's degree</span>
+                      </label>
+                      <label className="flex items-center gap-2">
+                        <input 
+                          type="radio" 
+                          name="education" 
+                          value="doctorate" 
+                          checked={field.value === "doctorate"} 
+                          onChange={field.onChange} 
+                          className="w-4 h-4" 
+                        />
+                        <span className="text-sm">Doctorate / PhD</span>
+                      </label>
+                    </div>
                     <FormMessage />
                   </FormItem>} />
 
-              {/* Question 4: Other Education Field */}
-              {form.watch("education") === "other" && <FormField control={form.control} name="other_education" render={({
+              {/* Question 4: Employment Status */}
+              <FormField control={form.control} name="employment" rules={{
+              required: "This field is required"
+            }} render={({
               field
             }) => <FormItem>
-                      <FormLabel className="text-base font-medium text-gray-900">
-                        4. Please specify: <span className="text-red-500">*</span>
-                      </FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder="Please specify your education" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>} />}
+                    <FormLabel className="text-base font-medium text-gray-900">
+                      4. What is your current employment status? <span className="text-red-500">*</span>
+                    </FormLabel>
+                    <div className="flex flex-wrap gap-4 mt-2">
+                      <label className="flex items-center gap-2">
+                        <input 
+                          type="radio" 
+                          name="employment" 
+                          value="student" 
+                          checked={field.value === "student"} 
+                          onChange={field.onChange} 
+                          className="w-4 h-4" 
+                        />
+                        <span className="text-sm">Student</span>
+                      </label>
+                      <label className="flex items-center gap-2">
+                        <input 
+                          type="radio" 
+                          name="employment" 
+                          value="employed" 
+                          checked={field.value === "employed"} 
+                          onChange={field.onChange} 
+                          className="w-4 h-4" 
+                        />
+                        <span className="text-sm">Employed or self-employed</span>
+                      </label>
+                      <label className="flex items-center gap-2">
+                        <input 
+                          type="radio" 
+                          name="employment" 
+                          value="unemployed" 
+                          checked={field.value === "unemployed"} 
+                          onChange={field.onChange} 
+                          className="w-4 h-4" 
+                        />
+                        <span className="text-sm">Unemployed</span>
+                      </label>
+                      <label className="flex items-center gap-2">
+                        <input 
+                          type="radio" 
+                          name="employment" 
+                          value="other" 
+                          checked={field.value === "other"} 
+                          onChange={field.onChange} 
+                          className="w-4 h-4" 
+                        />
+                        <span className="text-sm">Other: ________</span>
+                      </label>
+                    </div>
+                    <FormMessage />
+                  </FormItem>} />
 
-              {/* Question 5: Country */}
+              {/* Question 5: Nationality */}
+              <FormField control={form.control} name="nationality" rules={{
+              required: "This field is required"
+            }} render={({
+              field
+            }) => <FormItem>
+                    <FormLabel className="text-base font-medium text-gray-900">
+                      5. What is your nationality? <span className="text-red-500">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="" className="border-b border-t-0 border-l-0 border-r-0 rounded-none" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>} />
+
+              {/* Question 6: Country */}
               <FormField control={form.control} name="country" rules={{
               required: "This field is required"
             }} render={({
               field
             }) => <FormItem>
                     <FormLabel className="text-base font-medium text-gray-900">
-                      5. What country are you currently living in? <span className="text-red-500">*</span>
+                      6. What is your current country of residence? <span className="text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Enter your country" />
+                      <Input {...field} placeholder="" className="border-b border-t-0 border-l-0 border-r-0 rounded-none" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>} />
 
-              {/* Question 6: Language */}
-              <FormField control={form.control} name="language" rules={{
+              {/* Question 7: AI Chatbots Familiarity */}
+              <FormField control={form.control} name="experience_scale_q7" rules={{
               required: "This field is required"
             }} render={({
               field
             }) => <FormItem>
                     <FormLabel className="text-base font-medium text-gray-900">
-                      6. What is your native language? <span className="text-red-500">*</span>
+                      7. How familiar are you with AI chatbots such as ChatGPT? <span className="text-red-500">*</span>
                     </FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Enter your native language" />
-                    </FormControl>
+                    <div className="flex items-center gap-4 mt-2">
+                      <label className="flex items-center gap-2">
+                        <input 
+                          type="radio" 
+                          name="experience_scale_q7" 
+                          value="1" 
+                          checked={field.value === "1"} 
+                          onChange={field.onChange} 
+                          className="w-4 h-4" 
+                        />
+                        <span className="text-sm">1 - Not familiar at all</span>
+                      </label>
+                      <label className="flex items-center gap-2">
+                        <input 
+                          type="radio" 
+                          name="experience_scale_q7" 
+                          value="2" 
+                          checked={field.value === "2"} 
+                          onChange={field.onChange} 
+                          className="w-4 h-4" 
+                        />
+                        <span className="text-sm">2</span>
+                      </label>
+                      <label className="flex items-center gap-2">
+                        <input 
+                          type="radio" 
+                          name="experience_scale_q7" 
+                          value="3" 
+                          checked={field.value === "3"} 
+                          onChange={field.onChange} 
+                          className="w-4 h-4" 
+                        />
+                        <span className="text-sm">3</span>
+                      </label>
+                      <label className="flex items-center gap-2">
+                        <input 
+                          type="radio" 
+                          name="experience_scale_q7" 
+                          value="4" 
+                          checked={field.value === "4"} 
+                          onChange={field.onChange} 
+                          className="w-4 h-4" 
+                        />
+                        <span className="text-sm">4</span>
+                      </label>
+                      <label className="flex items-center gap-2">
+                        <input 
+                          type="radio" 
+                          name="experience_scale_q7" 
+                          value="5" 
+                          checked={field.value === "5"} 
+                          onChange={field.onChange} 
+                          className="w-4 h-4" 
+                        />
+                        <span className="text-sm">5</span>
+                      </label>
+                      <label className="flex items-center gap-2">
+                        <input 
+                          type="radio" 
+                          name="experience_scale_q7" 
+                          value="6" 
+                          checked={field.value === "6"} 
+                          onChange={field.onChange} 
+                          className="w-4 h-4" 
+                        />
+                        <span className="text-sm">6</span>
+                      </label>
+                      <label className="flex items-center gap-2">
+                        <input 
+                          type="radio" 
+                          name="experience_scale_q7" 
+                          value="7" 
+                          checked={field.value === "7"} 
+                          onChange={field.onChange} 
+                          className="w-4 h-4" 
+                        />
+                        <span className="text-sm">7 - Extremely familiar</span>
+                      </label>
+                    </div>
                     <FormMessage />
                   </FormItem>} />
 
-              {/* Question 7: Likert Scale */}
-              <FormField control={form.control} name="experience_scale_q7" rules={{
-              required: "This field is required"
-            }} render={({
-              field
-            }) => <LikertScale field={field} question="How would you rate your overall experience with online shopping?" leftLabel="Very poor" rightLabel="Excellent" questionNumber="7" />} />
-
-              {/* Question 8: Likert Scale */}
+              {/* Question 8: Data Quality Note */}
               <FormField control={form.control} name="familiarity_scale_q8" rules={{
               required: "This field is required"
             }} render={({
               field
-            }) => <LikertScale field={field} question="How familiar are you with researching products online before making a purchase?" leftLabel="Not familiar at all" rightLabel="Extremely familiar" questionNumber="8" />} />
+            }) => <FormItem>
+                    <FormLabel className="text-base font-medium text-gray-900">
+                      8. To ensure high data quality, please select "1 – Strongly Disagree" for this question. <span className="text-red-500">*</span>
+                    </FormLabel>
+                    <div className="flex items-center gap-4 mt-2">
+                      <label className="flex items-center gap-2">
+                        <input 
+                          type="radio" 
+                          name="familiarity_scale_q8" 
+                          value="1" 
+                          checked={field.value === "1"} 
+                          onChange={field.onChange} 
+                          className="w-4 h-4" 
+                        />
+                        <span className="text-sm">1 - Strongly Disagree</span>
+                      </label>
+                      <label className="flex items-center gap-2">
+                        <input 
+                          type="radio" 
+                          name="familiarity_scale_q8" 
+                          value="2" 
+                          checked={field.value === "2"} 
+                          onChange={field.onChange} 
+                          className="w-4 h-4" 
+                        />
+                        <span className="text-sm">2</span>
+                      </label>
+                      <label className="flex items-center gap-2">
+                        <input 
+                          type="radio" 
+                          name="familiarity_scale_q8" 
+                          value="3" 
+                          checked={field.value === "3"} 
+                          onChange={field.onChange} 
+                          className="w-4 h-4" 
+                        />
+                        <span className="text-sm">3</span>
+                      </label>
+                      <label className="flex items-center gap-2">
+                        <input 
+                          type="radio" 
+                          name="familiarity_scale_q8" 
+                          value="4" 
+                          checked={field.value === "4"} 
+                          onChange={field.onChange} 
+                          className="w-4 h-4" 
+                        />
+                        <span className="text-sm">4</span>
+                      </label>
+                      <label className="flex items-center gap-2">
+                        <input 
+                          type="radio" 
+                          name="familiarity_scale_q8" 
+                          value="5" 
+                          checked={field.value === "5"} 
+                          onChange={field.onChange} 
+                          className="w-4 h-4" 
+                        />
+                        <span className="text-sm">5</span>
+                      </label>
+                      <label className="flex items-center gap-2">
+                        <input 
+                          type="radio" 
+                          name="familiarity_scale_q8" 
+                          value="6" 
+                          checked={field.value === "6"} 
+                          onChange={field.onChange} 
+                          className="w-4 h-4" 
+                        />
+                        <span className="text-sm">6</span>
+                      </label>
+                      <label className="flex items-center gap-2">
+                        <input 
+                          type="radio" 
+                          name="familiarity_scale_q8" 
+                          value="7" 
+                          checked={field.value === "7"} 
+                          onChange={field.onChange} 
+                          className="w-4 h-4" 
+                        />
+                        <span className="text-sm">7 - Strongly Agree</span>
+                      </label>
+                    </div>
+                    <FormMessage />
+                  </FormItem>} />
 
-              {/* Question 9: Search Frequency */}
+              {/* Question 9: AI Chatbot Usage Frequency */}
               <FormField control={form.control} name="search_frequency" rules={{
               required: "This field is required"
             }} render={({
               field
             }) => <FormItem>
                     <FormLabel className="text-base font-medium text-gray-900">
-                      9. How often do you use Google to search for products? <span className="text-red-500">*</span>
+                      9. On average, how often do you use AI chatbots per week? <span className="text-red-500">*</span>
                     </FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select frequency" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="daily">Daily</SelectItem>
-                        <SelectItem value="weekly">Weekly</SelectItem>
-                        <SelectItem value="monthly">Monthly</SelectItem>
-                        <SelectItem value="rarely">Rarely</SelectItem>
-                        <SelectItem value="never">Never</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <div className="flex flex-wrap gap-4 mt-2">
+                      <label className="flex items-center gap-2">
+                        <input 
+                          type="radio" 
+                          name="search_frequency" 
+                          value="0-times" 
+                          checked={field.value === "0-times"} 
+                          onChange={field.onChange} 
+                          className="w-4 h-4" 
+                        />
+                        <span className="text-sm">0 times</span>
+                      </label>
+                      <label className="flex items-center gap-2">
+                        <input 
+                          type="radio" 
+                          name="search_frequency" 
+                          value="1-2-times" 
+                          checked={field.value === "1-2-times"} 
+                          onChange={field.onChange} 
+                          className="w-4 h-4" 
+                        />
+                        <span className="text-sm">1-2 times</span>
+                      </label>
+                      <label className="flex items-center gap-2">
+                        <input 
+                          type="radio" 
+                          name="search_frequency" 
+                          value="3-5-times" 
+                          checked={field.value === "3-5-times"} 
+                          onChange={field.onChange} 
+                          className="w-4 h-4" 
+                        />
+                        <span className="text-sm">3-5 times</span>
+                      </label>
+                      <label className="flex items-center gap-2">
+                        <input 
+                          type="radio" 
+                          name="search_frequency" 
+                          value="6-10-times" 
+                          checked={field.value === "6-10-times"} 
+                          onChange={field.onChange} 
+                          className="w-4 h-4" 
+                        />
+                        <span className="text-sm">6-10 times</span>
+                      </label>
+                      <label className="flex items-center gap-2">
+                        <input 
+                          type="radio" 
+                          name="search_frequency" 
+                          value="more-than-10" 
+                          checked={field.value === "more-than-10"} 
+                          onChange={field.onChange} 
+                          className="w-4 h-4" 
+                        />
+                        <span className="text-sm">More than 10 times</span>
+                      </label>
+                    </div>
                     <FormMessage />
-                  </FormItem>} />
+                  </FormItem>
+                } />
 
               {/* Buttons */}
-              <div className="flex justify-between pt-6">
-                <Button type="button" variant="outline" onClick={() => navigate('/')} className="px-6">
+              <div className="flex justify-between pt-8 px-4">
+                <Button type="button" variant="outline" onClick={() => navigate('/')} className="px-8 py-2 text-sm font-medium border-2">
                   Previous Page
                 </Button>
-                <Button type="submit" disabled={isSubmitting} className="px-8 text-white bg-sky-600 hover:bg-sky-500">
+                <Button type="submit" disabled={isSubmitting} className="px-8 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
                   {isSubmitting ? "Loading..." : "Next Page"}
                 </Button>
               </div>
@@ -219,5 +610,6 @@ export default function BackgroundSurvey() {
           </Form>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 }

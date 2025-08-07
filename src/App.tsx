@@ -24,6 +24,7 @@ const App = () => <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Welcome />} />
+          <Route path="/consent" element={<ConsentScreen />} />
           <Route path="/exit-study" element={<ExitStudy />} />
           <Route path="/background-survey" element={<BackgroundSurvey />} />
           <Route path="/task-instructions" element={<TaskInstructions />} />

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Connection Test</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <h1>Database Connection Test</h1>
+    <div id="status">Testing connection...</div>
+    <div id="results"></div>
+    <button onclick="testInsert()">Test Insert</button>
+    <button onclick="testRead()">Test Read</button>
+
+    <script>
+        const SUPABASE_URL = "https://wbguuipoggeamyzrfvbv.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndiZ3V1aXBvZ2dlYW15enJmdmJ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3Nzc2OTksImV4cCI6MjA2OTM1MzY5OX0.ddgmJnxg6hipRZ8_r9WyQpvsM-pkhBlRoybPdtGPEtY";
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        document.getElementById('status').innerHTML = "Connected to Supabase!";
+
+        async function testInsert() {
+            try {
+                const { data, error } = await supabase
+                    .from('sessions')
+                    .insert({
+                        user_id: 'test-user-' + Date.now(),
+                        platform: 'Google',
+                        device_type: 'desktop',
+                        browser: 'Chrome',
+                        location: 'Test Location'
+                    })
+                    .select();
+
+                if (error) {
+                    document.getElementById('results').innerHTML = `<div style="color: red;">Insert Error: ${error.message}</div>`;
+                } else {
+                    document.getElementById('results').innerHTML = `<div style="color: green;">Insert Success: ${JSON.stringify(data, null, 2)}</div>`;
+                }
+            } catch (err) {
+                document.getElementById('results').innerHTML = `<div style="color: red;">Insert Exception: ${err.message}</div>`;
+            }
+        }
+
+        async function testRead() {
+            try {
+                const { data, error } = await supabase
+                    .from('sessions')
+                    .select('*')
+                    .limit(5);
+
+                if (error) {
+                    document.getElementById('results').innerHTML = `<div style="color: red;">Read Error: ${error.message}</div>`;
+                } else {
+                    document.getElementById('results').innerHTML = `<div style="color: green;">Read Success: <pre>${JSON.stringify(data, null, 2)}</pre></div>`;
+                }
+            } catch (err) {
+                document.getElementById('results').innerHTML = `<div style="color: red;">Read Exception: ${err.message}</div>`;
+            }
+        }
+
+        // Auto-test read on load
+        testRead();
+    </script>
+</body>
+</html>

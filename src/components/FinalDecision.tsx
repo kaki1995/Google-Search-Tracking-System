@@ -165,12 +165,11 @@ const FinalDecision = () => {
               </Alert>
             </CardContent>
 
-            <CardFooter>
+            <CardFooter className="px-4 py-6">
               <Button 
                 type="submit" 
-                className="w-full" 
+                className="w-full px-8 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700" 
                 disabled={isSubmitting}
-                size="lg"
               >
                 {isSubmitting ? "Submitting..." : "Submit Final Decision"}
               </Button>
