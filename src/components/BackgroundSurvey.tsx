@@ -55,9 +55,15 @@ export default function BackgroundSurvey() {
             Your Personal Background
           </h1>
           
-          <p className="text-base text-gray-700 mb-8 text-justify px-4 md:px-8 lg:px-12">
-            Please answer the following questions to help us better understand your background. All responses are anonymous and used for research purposes only.
-          </p>
+          {/* Information Box with Person Emoji */}
+          <div className="border border-blue-200 rounded-lg p-4 mb-8 bg-sky-100">
+            <div className="flex items-start gap-3">
+              <span className="text-blue-600 text-lg">👤</span>
+              <span className="text-base text-gray-700">
+                Please answer the following questions to help us better understand your background. All responses are anonymous and used for research purposes only.
+              </span>
+            </div>
+          </div>
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
