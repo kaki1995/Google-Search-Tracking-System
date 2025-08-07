@@ -132,17 +132,16 @@ class TrackingService {
       data: queryData
     });
 
-    // Log to queries table
+    // Log to experiment_queries table
     try {
       const { data, error } = await supabase
-        .from('queries')
+        .from('experiment_queries')
         .insert({
           session_id: this.sessionData.sessionId,
           query_text: query,
-          search_results: [],
-          query_reformulation: this.isQueryReformulation(query)
+          reformulation_count: this.isQueryReformulation(query) ? 1 : 0
         })
-        .select('query_id')
+        .select('id')
         .single();
 
       if (error) {
@@ -150,7 +149,7 @@ class TrackingService {
         return null;
       }
 
-      return data.query_id;
+      return data.id;
     } catch (error) {
       console.error('Failed to log query to Supabase:', error);
       return null;
@@ -175,16 +174,17 @@ class TrackingService {
       data: clickData
     });
 
-    // Update queries table if queryId provided
+    // Log to interactions table if queryId provided
     if (queryId) {
       try {
         const { error } = await supabase
-          .from('queries')
-          .update({
+          .from('interactions')
+          .insert({
+            query_id: queryId,
             clicked_url: url,
-            clicked_rank: position
-          })
-          .eq('query_id', queryId);
+            clicked_rank: position,
+            clicked_result_count: 1
+          });
 
         if (error) {
           console.error('Failed to log click to Supabase:', error);
@@ -250,79 +250,27 @@ class TrackingService {
   }
 
   async updateSearchExperience1(data: any): Promise<void> {
-    if (!this.sessionData) return;
-    
-    try {
-      const { error } = await supabase
-        .from('user_sessions')
-        .update({
-          search_experience_log_1: data
-        })
-        .eq('session_id', this.sessionData.sessionId);
-
-      if (error) {
-        console.error('Failed to update search experience log 1:', error);
-      }
-    } catch (error) {
-      console.error('Failed to update search experience log 1:', error);
-    }
+    // This method is kept for compatibility but doesn't update database
+    // since the new schema doesn't have these fields
+    console.log('Search experience 1 data:', data);
   }
 
   async updateSearchExperience2(data: any): Promise<void> {
-    if (!this.sessionData) return;
-    
-    try {
-      const { error } = await supabase
-        .from('user_sessions')
-        .update({
-          search_experience_log_2: data
-        })
-        .eq('session_id', this.sessionData.sessionId);
-
-      if (error) {
-        console.error('Failed to update search experience log 2:', error);
-      }
-    } catch (error) {
-      console.error('Failed to update search experience log 2:', error);
-    }
+    // This method is kept for compatibility but doesn't update database
+    // since the new schema doesn't have these fields
+    console.log('Search experience 2 data:', data);
   }
 
   async markCompleted(): Promise<void> {
-    if (!this.sessionData) return;
-    
-    try {
-      const { error } = await supabase
-        .from('user_sessions')
-        .update({
-          completed: true
-        })
-        .eq('session_id', this.sessionData.sessionId);
-
-      if (error) {
-        console.error('Failed to mark session as completed:', error);
-      }
-    } catch (error) {
-      console.error('Failed to mark session as completed:', error);
-    }
+    // This method is kept for compatibility but doesn't update database
+    // since the new schema doesn't have a completed field
+    console.log('Session marked as completed');
   }
 
   async markExitedEarly(): Promise<void> {
-    if (!this.sessionData) return;
-    
-    try {
-      const { error } = await supabase
-        .from('user_sessions')
-        .update({
-          exited_early: true
-        })
-        .eq('session_id', this.sessionData.sessionId);
-
-      if (error) {
-        console.error('Failed to mark session as exited early:', error);
-      }
-    } catch (error) {
-      console.error('Failed to mark session as exited early:', error);
-    }
+    // This method is kept for compatibility but doesn't update database
+    // since the new schema doesn't have an exited_early field
+    console.log('Session marked as exited early');
   }
 
   startScrollTracking(): void {
@@ -351,22 +299,16 @@ class TrackingService {
 
     try {
       const deviceType = this.sessionData.deviceInfo.isMobile ? 'mobile' : 'desktop';
+      const browser = navigator.userAgent.match(/(Chrome|Firefox|Safari|Edge)/)?.[1] || 'Unknown';
       
       const { error } = await supabase
-        .from('user_sessions')
+        .from('sessions')
         .upsert({
-          session_id: this.sessionData.sessionId,
           user_id: this.sessionData.userId,
+          platform: 'Google', // Since this is for Google search interface
           device_type: deviceType,
-          consent_given: this.sessionData.consentGiven,
-          consent_timestamp: this.sessionData.consentGiven ? new Date().toISOString() : null,
-          background_survey: this.sessionData.backgroundSurvey,
-          search_experience_log_1: null,
-          search_experience_log_2: this.sessionData.postTaskSurvey,
-          final_choice_url: this.sessionData.finalDecision?.url,
-          decision_confidence: this.sessionData.finalDecision?.confidence,
-          completed: false,
-          exited_early: false
+          browser: browser,
+          location: 'Unknown' // Could be enhanced with geolocation
         });
 
       if (error) {

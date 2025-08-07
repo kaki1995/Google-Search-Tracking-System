@@ -68,17 +68,16 @@ Deno.serve(async (req) => {
     const queryId = crypto.randomUUID();
     const timestamp = new Date().toISOString();
 
-    // Log to Supabase queries table
-    const { error: insertError } = await supabase
-      .from('queries')
+    // Log to Supabase experiment_queries table
+    const { data: insertData, error: insertError } = await supabase
+      .from('experiment_queries')
       .insert({
-        query_id: queryId,
         session_id,
         query_text,
-        timestamp_query: timestamp,
-        search_results: googleData,
-        query_reformulation: false
-      });
+        reformulation_count: 0
+      })
+      .select('id')
+      .single();
 
     if (insertError) {
       console.error('Supabase insert error:', insertError);
@@ -88,12 +87,13 @@ Deno.serve(async (req) => {
       );
     }
 
-    console.log(`Query logged successfully with ID: ${queryId}`);
+    const actualQueryId = insertData?.id || queryId;
+    console.log(`Query logged successfully with ID: ${actualQueryId}`);
 
     // Return formatted results with required structure
     return new Response(
       JSON.stringify({
-        query_id: queryId,
+        query_id: actualQueryId,
         query_text,
         timestamp_query: timestamp,
         total_results: googleData.searchInformation?.totalResults || "0",
