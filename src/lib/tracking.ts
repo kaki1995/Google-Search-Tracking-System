@@ -272,8 +272,6 @@ class TrackingService {
     } catch (error) {
       console.error('Failed to save background survey:', error);
     }
-      console.error('Failed to save background survey:', error);
-    }
     
     await this.trackEvent({
       type: 'survey',
