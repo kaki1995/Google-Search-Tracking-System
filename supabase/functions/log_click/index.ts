@@ -36,24 +36,26 @@ Deno.serve(async (req) => {
 
     console.log(`Logging click: query_id=${query_id}, url=${clicked_url}, rank=${clicked_rank}`);
 
-    // Update the queries table with click information
-    const { error: updateError } = await supabase
-      .from('queries')
-      .update({
+    // Log to interactions table
+    const { data: insertData, error: insertError } = await supabase
+      .from('interactions')
+      .insert({
+        query_id,
         clicked_url,
         clicked_rank
       })
-      .eq('query_id', query_id);
+      .select('id')
+      .single();
 
-    if (updateError) {
-      console.error('Supabase update error:', updateError);
+    if (insertError) {
+      console.error('Supabase insert error:', insertError);
       return new Response(
         JSON.stringify({ error: 'Failed to log click' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    console.log(`Click logged successfully for query: ${query_id}`);
+    console.log(`Click logged successfully with ID: ${insertData?.id}`);
 
     // Return success response
     return new Response(

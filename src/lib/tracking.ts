@@ -217,6 +217,29 @@ class TrackingService {
 
     this.sessionData.backgroundSurvey = surveyData;
     
+    // Save directly to background_surveys table
+    try {
+      const { error } = await supabase
+        .from('background_surveys')
+        .insert({
+          session_id: this.sessionData.sessionId,
+          age_group: surveyData.age,
+          gender: surveyData.gender,
+          education: surveyData.education,
+          country: surveyData.country,
+          native_language: surveyData.language,
+          shopping_experience: parseInt(surveyData.experience_scale_q7),
+          product_research_familiarity: parseInt(surveyData.familiarity_scale_q8),
+          google_search_frequency: surveyData.search_frequency
+        });
+
+      if (error) {
+        console.error('Failed to save background survey:', error);
+      }
+    } catch (error) {
+      console.error('Failed to save background survey:', error);
+    }
+    
     await this.trackEvent({
       type: 'survey',
       timestamp: Date.now(),
@@ -228,6 +251,26 @@ class TrackingService {
     if (!this.sessionData) return;
 
     this.sessionData.postTaskSurvey = surveyData;
+    
+    // Save directly to post_survey table
+    try {
+      const { error } = await supabase
+        .from('post_survey')
+        .insert({
+          session_id: this.sessionData.sessionId,
+          smartphone_model: surveyData.smartphone_model,
+          price_range: surveyData.price_range,
+          where_to_buy: surveyData.where_to_buy,
+          purchase_decision: surveyData.purchase_decision,
+          decision_reasoning: surveyData.decision_reasoning
+        });
+
+      if (error) {
+        console.error('Failed to save post survey:', error);
+      }
+    } catch (error) {
+      console.error('Failed to save post survey:', error);
+    }
     
     await this.trackEvent({
       type: 'survey',

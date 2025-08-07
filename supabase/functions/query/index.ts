@@ -104,6 +104,42 @@ Deno.serve(async (req) => {
     const queryId = crypto.randomUUID();
     const timestamp = new Date().toISOString();
 
+    // First, ensure session exists or create it
+    console.log('Checking/creating session...');
+    const { data: existingSession, error: sessionCheckError } = await supabase
+      .from('sessions')
+      .select('id')
+      .eq('id', session_id)
+      .single();
+
+    if (sessionCheckError && sessionCheckError.code === 'PGRST116') {
+      // Session doesn't exist, create it
+      const { error: sessionCreateError } = await supabase
+        .from('sessions')
+        .insert({
+          id: session_id,
+          user_id: session_id, // Using session_id as user_id for now
+          platform: 'web',
+          device_type: 'unknown',
+          browser: 'unknown'
+        });
+
+      if (sessionCreateError) {
+        console.error('Failed to create session:', sessionCreateError);
+        return new Response(
+          JSON.stringify({ error: 'Failed to create session' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      console.log('Session created successfully');
+    } else if (sessionCheckError) {
+      console.error('Session check error:', sessionCheckError);
+      return new Response(
+        JSON.stringify({ error: 'Session validation failed' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     // Log to Supabase experiment_queries table
     console.log('Logging query to Supabase...');
     const { data: insertData, error: insertError } = await supabase
