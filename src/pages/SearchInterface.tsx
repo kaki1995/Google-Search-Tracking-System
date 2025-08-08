@@ -265,8 +265,8 @@ export default function SearchInterface() {
             </div>
 
             {/* Search Box */}
-            <div className="relative mb-8 w-full max-w-[584px]">
-              <div className="flex items-center h-[44px] border border-[#dfe1e5] rounded-full px-4 hover:shadow-md transition-shadow bg-white">
+            <div className="relative mb-8 w-full max-w-[720px]">
+              <div className="flex items-center h-[56px] border border-[#dfe1e5] rounded-full px-6 hover:shadow-md transition-shadow bg-white">
                 <Search className="w-4 h-4 text-[#9aa0a6] mr-3" />
                 <Input 
                   type="text" 
