@@ -39,7 +39,7 @@ export default function Welcome() {
       {/* Background overlay for better text readability */}
       <div className="absolute inset-0 bg-black bg-opacity-20"></div>
       
-      <div className="max-w-6xl mx-auto relative z-10">
+      <div className="max-w-4xl mx-auto relative z-10">
         {/* Content */}
         <div className="bg-white bg-opacity-95 backdrop-blur-sm rounded-lg shadow-lg p-8 md:p-12 lg:p-16">
           {/* Header with Logos */}

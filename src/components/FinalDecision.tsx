@@ -45,7 +45,7 @@ const FinalDecision = () => {
         {/* Background overlay for better text readability */}
         <div className="absolute inset-0 bg-black bg-opacity-20"></div>
         
-        <Card className="w-full max-w-6xl relative z-10 bg-white bg-opacity-95 backdrop-blur-sm">
+        <Card className="w-full max-w-4xl relative z-10 bg-white bg-opacity-95 backdrop-blur-sm">
           <CardHeader>
             <CardTitle className="text-2xl font-bold text-center flex items-center justify-center gap-2">
               <CheckCircle className="h-8 w-8 text-green-600" />
@@ -108,7 +108,7 @@ const FinalDecision = () => {
       {/* Background overlay for better text readability */}
       <div className="absolute inset-0 bg-black bg-opacity-20"></div>
       
-      <div className="max-w-6xl mx-auto relative z-10">
+      <div className="max-w-4xl mx-auto relative z-10">
         <div className="bg-white bg-opacity-95 backdrop-blur-sm rounded-lg shadow-lg p-8 md:p-12 lg:p-16">
           <div className="text-center mb-8">
             <h1 className="text-2xl font-bold mb-4">Final Decision</h1>

@@ -22,7 +22,7 @@ const NotFound = () => {
       {/* Background overlay for better text readability */}
       <div className="absolute inset-0 bg-black bg-opacity-20"></div>
       
-      <div className="max-w-6xl mx-auto relative z-10 flex items-center justify-center min-h-[calc(100vh-4rem)]">
+      <div className="max-w-4xl mx-auto relative z-10 flex items-center justify-center min-h-[calc(100vh-4rem)]">
         <div className="text-center bg-white bg-opacity-95 backdrop-blur-sm rounded-lg p-8 md:p-12 lg:p-16">
           <h1 className="text-4xl font-bold mb-4">404</h1>
           <p className="text-xl text-gray-600 mb-4">Oops! Page not found</p>
