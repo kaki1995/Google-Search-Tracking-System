@@ -257,14 +257,11 @@ export default function SearchInterface() {
           {/* Google Logo and Search */}
           <div className="flex flex-col items-center pt-16 pb-8">
             <div className="mb-8">
-              <span className="text-8xl font-light">
-                <span className="text-[#4285f4]">G</span>
-                <span className="text-[#ea4335]">o</span>
-                <span className="text-[#fbbc04]">o</span>
-                <span className="text-[#4285f4]">g</span>
-                <span className="text-[#34a853]">l</span>
-                <span className="text-[#ea4335]">e</span>
-              </span>
+              <img 
+                src="/lovable-uploads/35f40ea1-5551-4fc9-a6b3-d7ef526bef72.png" 
+                alt="Google" 
+                className="w-[272px] h-[92px] object-contain"
+              />
             </div>
 
             {/* Search Box */}
