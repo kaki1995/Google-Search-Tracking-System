@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.log_click]
 verify_jwt = false
+
+[functions.secure-google-search]
+verify_jwt = false

@@ -25,35 +25,28 @@ interface SearchResultsWithPagination {
   nextStartIndex?: number;
 }
 
-const GOOGLE_API_KEY = "AIzaSyATKkbTWhLwe0RgeWoY_iiMW7w2QoPkWpw";
-const GOOGLE_SEARCH_ENGINE_ID = "007dc6ac33e6f436c";
-const RESULTS_PER_PAGE = 10; // Google Custom Search API returns 10 results per page
-const MAX_RESULTS = 100; // Google Custom Search API limits to 100 results total
+// SECURITY: API credentials moved to secure Supabase edge function
+// No longer exposing sensitive credentials in client-side code
 
+// Updated to use secure Supabase edge function instead of exposed API keys
 export async function performGoogleSearch(query: string, startIndex: number = 1): Promise<SearchResultsWithPagination> {
   try {
-    const url = `https://www.googleapis.com/customsearch/v1?key=${GOOGLE_API_KEY}&cx=${GOOGLE_SEARCH_ENGINE_ID}&q=${encodeURIComponent(query)}&start=${startIndex}`;
+    const { supabase } = await import('@/integrations/supabase/client');
     
-    const response = await fetch(url);
+    const { data, error } = await supabase.functions.invoke('secure-google-search', {
+      body: { query, startIndex }
+    });
     
-    if (!response.ok) {
-      throw new Error(`Google Search API error: ${response.status}`);
+    if (error) {
+      console.error('Error calling secure search function:', error);
+      return {
+        results: [],
+        totalResults: 0,
+        hasNextPage: false
+      };
     }
     
-    const data: GoogleSearchResponse = await response.json();
-    
-    const results = data.items || [];
-    const totalResults = parseInt(data.searchInformation?.totalResults || '0');
-    const hasNextPage = (data.queries?.nextPage && data.queries.nextPage.length > 0) && 
-                       startIndex + RESULTS_PER_PAGE <= MAX_RESULTS;
-    const nextStartIndex = hasNextPage ? data.queries?.nextPage?.[0]?.startIndex : undefined;
-    
-    return {
-      results,
-      totalResults,
-      hasNextPage,
-      nextStartIndex
-    };
+    return data;
   } catch (error) {
     console.error('Error performing Google search:', error);
     return {
