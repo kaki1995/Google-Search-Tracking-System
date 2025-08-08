@@ -118,9 +118,10 @@ class TrackingService {
   async trackQuery(query: string, resultsCount: number): Promise<string | null> {
     if (!this.sessionData) return null;
 
+    const searchStartTime = Date.now();
     const queryData = {
       query,
-      timestamp: Date.now(),
+      timestamp: searchStartTime,
       resultsCount
     };
 
@@ -128,7 +129,7 @@ class TrackingService {
     
     await this.trackEvent({
       type: 'query',
-      timestamp: Date.now(),
+      timestamp: searchStartTime,
       data: queryData
     });
 
@@ -156,6 +157,23 @@ class TrackingService {
       }
 
       console.log('Query logged successfully with ID:', data.id);
+
+      // Track initial query timing metrics through real-time edge function
+      try {
+        await supabase.functions.invoke('realtime-streams/track-query-timing', {
+          body: {
+            query_id: data.id,
+            search_duration_ms: Date.now() - searchStartTime,
+            results_loaded_count: resultsCount,
+            user_clicked: false,
+            user_scrolled: false,
+            query_abandoned: false
+          }
+        });
+      } catch (edgeError) {
+        console.error('Failed to track initial query timing:', edgeError);
+      }
+
       return data.id;
     } catch (error) {
       console.error('Failed to log query to Supabase:', error);
@@ -191,7 +209,7 @@ class TrackingService {
           clicked_result_count: 1
         });
 
-        const { data, error } = await supabase
+        const { data: interaction, error } = await supabase
           .from('interactions')
           .insert({
             query_id: queryId,
@@ -204,8 +222,33 @@ class TrackingService {
 
         if (error) {
           console.error('Failed to log click to Supabase:', error);
-        } else {
-          console.log('Click logged successfully with ID:', data.id);
+          return;
+        }
+
+        console.log('Click logged successfully with ID:', interaction.id);
+
+        // Track detailed interaction through real-time edge function
+        try {
+          await supabase.functions.invoke('realtime-streams/track-interaction-detail', {
+            body: {
+              interaction_id: interaction.id,
+              interaction_type: 'search_result_click',
+              element_id: `search_result_${position}`,
+              value: url
+            }
+          });
+
+          // Track query timing metrics for this click
+          const queryStartTime = this.sessionData?.events.find(e => e.type === 'query')?.timestamp;
+          await supabase.functions.invoke('realtime-streams/track-query-timing', {
+            body: {
+              query_id: queryId,
+              user_clicked: true,
+              time_to_first_click_ms: queryStartTime ? Date.now() - queryStartTime : null
+            }
+          });
+        } catch (edgeError) {
+          console.error('Failed to track real-time data:', edgeError);
         }
       } catch (error) {
         console.error('Failed to log click to Supabase:', error);
