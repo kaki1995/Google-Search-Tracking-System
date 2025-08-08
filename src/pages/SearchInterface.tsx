@@ -260,7 +260,7 @@ export default function SearchInterface() {
               <img 
                 src="/lovable-uploads/35f40ea1-5551-4fc9-a6b3-d7ef526bef72.png" 
                 alt="Google" 
-                className="w-[340px] h-[115px] object-contain"
+                className="w-[420px] h-[142px] object-contain"
               />
             </div>
 
