@@ -47,24 +47,53 @@ const SearchResults = () => {
   }, []);
 
   const performSearch = async (searchQuery: string) => {
-    if (!searchQuery.trim()) return;
+    // Input validation and sanitization
+    const sanitizedQuery = searchQuery.trim();
+    if (!sanitizedQuery) {
+      toast({
+        title: "Invalid query",
+        description: "Please enter a search query",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Basic XSS protection - reject queries with script tags or suspicious patterns
+    if (/<script|javascript:|data:|vbscript:/i.test(sanitizedQuery)) {
+      toast({
+        title: "Invalid query",
+        description: "Search query contains invalid characters",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Limit query length for security
+    if (sanitizedQuery.length > 500) {
+      toast({
+        title: "Query too long",
+        description: "Please limit your search to 500 characters",
+        variant: "destructive",
+      });
+      return;
+    }
 
     setLoading(true);
     try {
-      const searchResults = await performGoogleSearch(searchQuery);
+      const searchResults = await performGoogleSearch(sanitizedQuery);
       setResults(Array.isArray(searchResults) ? searchResults : []);
       
       // Add to search history
       setSearchHistory(prev => {
-        if (!prev.includes(searchQuery)) {
-          return [...prev, searchQuery];
+        if (!prev.includes(sanitizedQuery)) {
+          return [...prev, sanitizedQuery];
         }
         return prev;
       });
       
       // Track the search query and get query ID
       const resultsCount = Array.isArray(searchResults) ? searchResults.length : 0;
-      const queryId = await trackingService.trackQuery(searchQuery, resultsCount);
+      const queryId = await trackingService.trackQuery(sanitizedQuery, resultsCount);
       setCurrentQueryId(queryId);
       setSearchCount(prev => prev + 1);
     } catch (error) {
@@ -88,11 +117,38 @@ const SearchResults = () => {
   };
 
   const handleResultClick = async (result: SearchResult, index: number) => {
-    // Track the click
-    await trackingService.trackClick(result.link, result.title, index + 1, currentQueryId || undefined);
-    
-    // Open in new tab to allow continued searching
-    window.open(result.link, '_blank', 'noopener,noreferrer');
+    try {
+      // Validate URL before opening
+      const url = new URL(result.link);
+      if (!['http:', 'https:'].includes(url.protocol)) {
+        toast({
+          title: "Invalid URL",
+          description: "This URL is not safe to open",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      // Track the click
+      await trackingService.trackClick(result.link, result.title, index + 1, currentQueryId || undefined);
+      
+      // Open in new tab with security attributes
+      const newWindow = window.open(result.link, '_blank', 'noopener,noreferrer');
+      if (!newWindow) {
+        toast({
+          title: "Pop-up blocked",
+          description: "Please allow pop-ups for this site",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('Invalid URL:', error);
+      toast({
+        title: "Invalid URL",
+        description: "This URL is not valid",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleFinishTask = () => {
@@ -100,11 +156,33 @@ const SearchResults = () => {
   };
 
   const copyLink = (link: string) => {
-    navigator.clipboard.writeText(link);
-    toast({
-      title: "Link copied",
-      description: "The link has been copied to your clipboard",
-    });
+    try {
+      // Validate URL before copying (unless it's a search URL)
+      if (!link.startsWith('/search?q=')) {
+        const url = new URL(link);
+        if (!['http:', 'https:'].includes(url.protocol)) {
+          toast({
+            title: "Invalid URL",
+            description: "This URL is not safe to copy",
+            variant: "destructive",
+          });
+          return;
+        }
+      }
+      
+      navigator.clipboard.writeText(link);
+      toast({
+        title: "Link copied",
+        description: "The link has been copied to your clipboard",
+      });
+    } catch (error) {
+      console.error('Error copying link:', error);
+      toast({
+        title: "Copy failed",
+        description: "Failed to copy link to clipboard",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
