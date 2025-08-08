@@ -10,7 +10,7 @@ import SearchResults from "./components/SearchResults";
 import SearchResultLog from "./components/SearchResultLog";
 import GoogleSearchInterface from "./pages/GoogleSearchInterface";
 import SearchInterface from "./pages/SearchInterface";
-import ConsentScreen from "./components/ConsentScreen";
+
 import BackgroundSurvey from "./components/BackgroundSurvey";
 import TaskInstructions from "./components/TaskInstructions";
 import PostTaskSurvey from "./components/PostTaskSurvey";
@@ -24,7 +24,7 @@ const App = () => <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Welcome />} />
-          <Route path="/consent" element={<ConsentScreen />} />
+          
           <Route path="/exit-study" element={<ExitStudy />} />
           <Route path="/background-survey" element={<BackgroundSurvey />} />
           <Route path="/task-instructions" element={<TaskInstructions />} />

@@ -13,14 +13,10 @@ const Index = () => {
       
       // Check if returning user with existing session
       const existingSession = trackingService.loadSession();
-      if (existingSession && existingSession.consentGiven) {
-        if (existingSession.backgroundSurvey) {
-          navigate('/search-task');
-        } else {
-          navigate('/background-survey');
-        }
+      if (existingSession && existingSession.backgroundSurvey) {
+        navigate('/search-task');
       } else {
-        navigate('/consent');
+        navigate('/background-survey');
       }
     };
 
