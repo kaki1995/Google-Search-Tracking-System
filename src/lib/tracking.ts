@@ -287,24 +287,19 @@ class TrackingService {
     console.log('Tracking post-task survey for session:', this.sessionData.sessionId);
     console.log('Post-task survey data:', surveyData);
     
-    // Save directly to post_survey table with all fields
+    // Save directly to post_survey table with new Google-focused fields
     try {
       const insertData = {
         session_id: this.sessionData.sessionId,
-        interface_familiarity: parseInt(surveyData.search_familiarity) || null,
-        interface_confidence: parseInt(surveyData.search_confidence) || null,
-        search_satisfaction: parseInt(surveyData.search_satisfaction) || null,
-        information_efficiency: parseInt(surveyData.search_efficiency) || null,
-        interface_ease_of_use: parseInt(surveyData.search_ease) || null,
-        interface_usefulness: parseInt(surveyData.search_usefulness) || null,
-        decision_support: parseInt(surveyData.search_support) || null,
-        interface_learnability: parseInt(surveyData.search_system_ease) || null,
-        interface_reuse_likelihood: parseInt(surveyData.search_again) || null,
-        price_range: surveyData.task_duration || null,
-        search_enjoyment: surveyData.search_tool_type || null,
-        decision_factors: surveyData.search_improvement || null,
-        smartphone_model: surveyData.advertisement_shameful || null,
-        purchase_likelihood: surveyData.advertisement_hopeful || null
+        google_satisfaction: parseInt(surveyData.google_satisfaction) || null,
+        google_ease: parseInt(surveyData.google_ease) || null,
+        google_relevance: parseInt(surveyData.google_relevance) || null,
+        google_trust: parseInt(surveyData.google_trust) || null,
+        google_query_modifications: surveyData.google_query_modifications || null,
+        attention_check: parseInt(surveyData.attention_check) || null,
+        google_open_feedback: surveyData.google_open_feedback || null,
+        task_duration: surveyData.task_duration || null,
+        search_tool_type: surveyData.search_tool_type || null
       };
       
       console.log('Inserting to post_survey:', insertData);

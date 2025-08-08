@@ -160,69 +160,48 @@ export type Database = {
       }
       post_survey: {
         Row: {
+          attention_check: number | null
           created_at: string
-          decision_factors: string | null
-          decision_support: number | null
+          google_ease: number | null
+          google_open_feedback: string | null
+          google_query_modifications: string | null
+          google_relevance: number | null
+          google_satisfaction: number | null
+          google_trust: number | null
           id: string
-          information_efficiency: number | null
-          interface_comparison_rating: string | null
-          interface_confidence: number | null
-          interface_ease_of_use: number | null
-          interface_familiarity: number | null
-          interface_learnability: number | null
-          interface_reuse_likelihood: number | null
-          interface_usefulness: number | null
-          price_range: string | null
-          purchase_likelihood: string | null
-          purchase_platform: string | null
-          search_enjoyment: string | null
-          search_satisfaction: number | null
+          search_tool_type: string | null
           session_id: string
-          smartphone_model: string | null
+          task_duration: string | null
           updated_at: string
         }
         Insert: {
+          attention_check?: number | null
           created_at?: string
-          decision_factors?: string | null
-          decision_support?: number | null
+          google_ease?: number | null
+          google_open_feedback?: string | null
+          google_query_modifications?: string | null
+          google_relevance?: number | null
+          google_satisfaction?: number | null
+          google_trust?: number | null
           id?: string
-          information_efficiency?: number | null
-          interface_comparison_rating?: string | null
-          interface_confidence?: number | null
-          interface_ease_of_use?: number | null
-          interface_familiarity?: number | null
-          interface_learnability?: number | null
-          interface_reuse_likelihood?: number | null
-          interface_usefulness?: number | null
-          price_range?: string | null
-          purchase_likelihood?: string | null
-          purchase_platform?: string | null
-          search_enjoyment?: string | null
-          search_satisfaction?: number | null
+          search_tool_type?: string | null
           session_id: string
-          smartphone_model?: string | null
+          task_duration?: string | null
           updated_at?: string
         }
         Update: {
+          attention_check?: number | null
           created_at?: string
-          decision_factors?: string | null
-          decision_support?: number | null
+          google_ease?: number | null
+          google_open_feedback?: string | null
+          google_query_modifications?: string | null
+          google_relevance?: number | null
+          google_satisfaction?: number | null
+          google_trust?: number | null
           id?: string
-          information_efficiency?: number | null
-          interface_comparison_rating?: string | null
-          interface_confidence?: number | null
-          interface_ease_of_use?: number | null
-          interface_familiarity?: number | null
-          interface_learnability?: number | null
-          interface_reuse_likelihood?: number | null
-          interface_usefulness?: number | null
-          price_range?: string | null
-          purchase_likelihood?: string | null
-          purchase_platform?: string | null
-          search_enjoyment?: string | null
-          search_satisfaction?: number | null
+          search_tool_type?: string | null
           session_id?: string
-          smartphone_model?: string | null
+          task_duration?: string | null
           updated_at?: string
         }
         Relationships: [
