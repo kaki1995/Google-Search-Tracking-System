@@ -85,7 +85,7 @@ export default function BackgroundSurvey() {
   };
   
   return (
-    <div className="min-h-screen relative bg-background p-6 md:p-8 lg:p-12"
+    <div className="min-h-screen relative bg-background py-8 px-6 md:px-8 lg:px-12"
       style={{
         backgroundImage: "url('/mountain-background.jpg')",
         backgroundSize: 'cover',
@@ -456,7 +456,7 @@ export default function BackgroundSurvey() {
               field
             }) => <FormItem>
                     <FormLabel className="text-base font-medium text-gray-900">
-                      8. To ensure high data quality, please select "1 – Strongly Disagree" for this question. <span className="text-red-500">*</span>
+                      8. Please choose 1 – Strongly Disagree as your answer to this question. <span className="text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
                       <div className="bg-gray-50 p-4 rounded-lg">

@@ -50,14 +50,14 @@ const TaskInstructions = () => {
       
       <div className="max-w-6xl mx-auto relative z-10">
         {/* Content */}
-        <div className="bg-white bg-opacity-95 backdrop-blur-sm shadow-lg p-8 md:p-12 lg:p-16 rounded-none">
+        <div className="bg-white bg-opacity-95 backdrop-blur-sm shadow-lg p-8 md:p-12 lg:p-16 rounded-lg">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-semibold text-gray-900 mb-6">
               Your Search Task
             </h1>
           </div>
 
-          <div className="space-y-6 mx-auto text-left px-4 md:px-8 lg:px-12">
+          <div className="space-y-6 mx-auto text-left">
             {/* Scenario */}
             <div>
               <h3 className="font-semibold text-gray-900 mb-3">Scenario:</h3>
@@ -180,13 +180,24 @@ const TaskInstructions = () => {
                     />
                     <span className="text-sm">Over €800</span>
                   </label>
+                  <label className="flex items-center gap-2">
+                    <input 
+                      type="radio" 
+                      name="budget" 
+                      value="not-sure" 
+                      checked={budgetRange === "not-sure"} 
+                      onChange={(e) => setBudgetRange(e.target.checked ? e.target.value : "")} 
+                      className="w-4 h-4" 
+                    />
+                    <span className="text-sm">Not Sure</span>
+                  </label>
                 </div>
               </div>
             </form>
           </div>
 
           {/* Buttons */}
-          <div className="flex justify-between pt-8 px-4 md:px-8 lg:px-12">
+          <div className="flex justify-between pt-8">
             <button onClick={handlePreviousPage} className="px-8 py-2 text-sm font-medium border-2 border-gray-300 text-gray-700 bg-white rounded-lg hover:bg-gray-50 transition-colors">
               Previous Page
             </button>

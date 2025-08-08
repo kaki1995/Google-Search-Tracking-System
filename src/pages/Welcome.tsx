@@ -65,7 +65,7 @@ export default function Welcome() {
           </div>
 
           {/* Content */}
-          <div className="text-base leading-7 text-gray-700 space-y-4 mx-auto px-4 md:px-8 lg:px-12 text-justify">
+          <div className="text-base leading-7 text-gray-700 space-y-4 mx-auto text-justify">
             <p>
               Thank you for your interest in participating! 🙋
             </p>
@@ -100,7 +100,7 @@ export default function Welcome() {
           </div>
 
           {/* Consent */}
-          <div className="flex flex-col items-start gap-6 mb-8 mx-auto mt-8 px-4 md:px-8 lg:px-12">
+          <div className="flex flex-col items-start gap-6 mb-8 mx-auto mt-8">
             <div className="flex items-start gap-3">
               <input type="checkbox" id="consent" checked={agreed === true} onChange={e => setAgreed(e.target.checked)} className="w-4 h-4 text-blue-600 bg-white border-gray-300 rounded focus:ring-blue-500 mt-1" />
               <label htmlFor="consent" className="text-base text-gray-700 cursor-pointer">
@@ -110,7 +110,7 @@ export default function Welcome() {
           </div>
 
           {/* Buttons */}
-          <div className="flex justify-between pt-8 px-4 md:px-8 lg:px-12">
+          <div className="flex justify-between pt-8">
             <button onClick={handleExit} className="px-8 py-2 text-sm font-medium border-2 border-gray-300 text-gray-700 bg-white rounded-lg hover:bg-gray-50 transition-colors">
               Exit Study
             </button>

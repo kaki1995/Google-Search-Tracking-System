@@ -98,7 +98,7 @@ const FinalDecision = () => {
   }
 
   return (
-    <div className="min-h-screen relative bg-background flex items-center justify-center p-6 md:p-8 lg:p-12"
+    <div className="min-h-screen relative bg-background py-8 px-6 md:px-8 lg:px-12"
       style={{
         backgroundImage: "url('/mountain-background.jpg')",
         backgroundSize: 'cover',
@@ -108,17 +108,18 @@ const FinalDecision = () => {
       {/* Background overlay for better text readability */}
       <div className="absolute inset-0 bg-black bg-opacity-20"></div>
       
-      <Card className="w-full max-w-6xl relative z-10 bg-white bg-opacity-95 backdrop-blur-sm">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold">Final Decision</CardTitle>
-          <CardDescription>
-            Please tell us about your final restaurant choice and the reasoning behind your decision.
-          </CardDescription>
-        </CardHeader>
+      <div className="max-w-6xl mx-auto relative z-10">
+        <div className="bg-white bg-opacity-95 backdrop-blur-sm rounded-lg shadow-lg p-8 md:p-12 lg:p-16">
+          <div className="text-center mb-8">
+            <h1 className="text-2xl font-bold mb-4">Final Decision</h1>
+            <p className="text-gray-600">
+              Please tell us about your final restaurant choice and the reasoning behind your decision.
+            </p>
+          </div>
         
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            <CardContent className="space-y-6">
+            <div className="space-y-6">
               <FormField
                 control={form.control}
                 name="restaurantName"
@@ -181,9 +182,9 @@ const FinalDecision = () => {
                   the study will be complete.
                 </AlertDescription>
               </Alert>
-            </CardContent>
+            </div>
 
-            <CardFooter className="px-4 md:px-6 lg:px-8 py-6">
+            <div className="pt-6">
               <Button 
                 type="submit" 
                 className="w-full px-6 md:px-8 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700" 
@@ -191,10 +192,11 @@ const FinalDecision = () => {
               >
                 {isSubmitting ? "Submitting..." : "Submit Final Decision"}
               </Button>
-            </CardFooter>
+            </div>
           </form>
         </Form>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 };

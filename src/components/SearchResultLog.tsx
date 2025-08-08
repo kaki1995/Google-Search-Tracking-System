@@ -63,7 +63,7 @@ export default function SearchResultLog() {
       setIsSubmitting(false);
     }
   };
-  return <div className="min-h-screen relative bg-background p-6 md:p-8 lg:p-12"
+  return <div className="min-h-screen relative bg-background py-8 px-6 md:px-8 lg:px-12"
       style={{
         backgroundImage: "url('/mountain-background.jpg')",
         backgroundSize: 'cover',
@@ -73,8 +73,9 @@ export default function SearchResultLog() {
       {/* Background overlay for better text readability */}
       <div className="absolute inset-0 bg-black bg-opacity-20"></div>
       
-      <div className="max-w-6xl mx-auto relative z-10 bg-white bg-opacity-95 backdrop-blur-sm rounded-lg shadow-lg p-8 md:p-12 lg:p-16">
-        <h1 className="text-2xl font-bold text-foreground text-center mb-8">Your Search Results</h1>
+      <div className="max-w-6xl mx-auto relative z-10">
+        <div className="bg-white bg-opacity-95 backdrop-blur-sm rounded-lg shadow-lg p-8 md:p-12 lg:p-16">
+          <h1 className="text-2xl font-bold text-foreground text-center mb-8">Your Search Results</h1>
 
         <div className="mb-6 p-4 rounded-lg border border-blue-200 bg-sky-100">
           <p className="text-gray-700 text-sm flex items-start gap-2">
@@ -244,7 +245,7 @@ export default function SearchResultLog() {
                 </FormItem>} />
 
             {/* Buttons */}
-            <div className="flex justify-between pt-8 px-4 md:px-8 lg:px-12">
+            <div className="flex justify-between pt-8">
               <Button type="button" variant="outline" onClick={() => navigate('/search-interface')} className="px-8 py-2 text-sm font-medium border-2">
                 Previous Page
               </Button>
@@ -254,6 +255,7 @@ export default function SearchResultLog() {
             </div>
           </form>
         </Form>
+        </div>
       </div>
     </div>;
 }
