@@ -5,24 +5,20 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage, Form } from "@/components/ui/form";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import LikertScale from "./LikertScale";
 import { trackingService } from "@/lib/tracking";
 interface PostTaskSurveyForm {
-  search_familiarity: string;
-  search_confidence: string;
-  search_satisfaction: string;
-  search_efficiency: string;
-  search_ease: string;
-  search_usefulness: string;
-  search_support: string;
-  search_system_ease: string;
-  search_again: string;
-  advertisement_shameful: string;
-  advertisement_hopeful: string;
+  google_satisfaction: string;
+  google_ease: string;
+  google_relevance: string;
+  google_trust: string;
+  google_query_modifications: string;
+  attention_check: string;
+  google_open_feedback: string;
   task_duration: string;
   search_tool_type: string;
-  search_improvement: string;
 }
 export default function PostTaskSurvey() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -30,20 +26,15 @@ export default function PostTaskSurvey() {
   const navigate = useNavigate();
   const form = useForm<PostTaskSurveyForm>({
     defaultValues: {
-      search_familiarity: "",
-      search_confidence: "",
-      search_satisfaction: "",
-      search_efficiency: "",
-      search_ease: "",
-      search_usefulness: "",
-      search_support: "",
-      search_system_ease: "",
-      search_again: "",
-      advertisement_shameful: "",
-      advertisement_hopeful: "",
+      google_satisfaction: "",
+      google_ease: "",
+      google_relevance: "",
+      google_trust: "",
+      google_query_modifications: "",
+      attention_check: "",
+      google_open_feedback: "",
       task_duration: "",
-      search_tool_type: "",
-      search_improvement: ""
+      search_tool_type: ""
     }
   });
 
@@ -114,82 +105,109 @@ export default function PostTaskSurvey() {
 
             <Form {...form}>
               <form className="space-y-8">
-                {/* Question 16: Search Familiarity */}
-                <FormField control={form.control} name="search_familiarity" rules={{
+                {/* Question 16: Google Search Satisfaction */}
+                <FormField control={form.control} name="google_satisfaction" rules={{
                 required: "This field is required"
               }} render={({
                 field
-              }) => <LikertScale field={field} question="How familiar are you with using search interfaces for product research?" leftLabel="Not familiar at all" rightLabel="Extremely familiar" questionNumber="16" />} />
+              }) => <LikertScale field={field} question="How satisfied were you with your Google search experience?" leftLabel="Not satisfied at all" rightLabel="Very satisfied" questionNumber="16" />} />
 
-                {/* Question 17: Search Confidence */}
-                <FormField control={form.control} name="search_confidence" rules={{
+                {/* Question 17: Google Search Ease */}
+                <FormField control={form.control} name="google_ease" rules={{
                 required: "This field is required"
               }} render={({
                 field
-              }) => <LikertScale field={field} question="How confident did you feel while using the search interface?" leftLabel="Not confident at all" rightLabel="Extremely confident" questionNumber="17" />} />
+              }) => <LikertScale field={field} question="How easy was it to use Google's search interface?" leftLabel="Not easy at all" rightLabel="Very easy" questionNumber="17" />} />
 
-                {/* Question 18: Search Satisfaction */}
-                <FormField control={form.control} name="search_satisfaction" rules={{
+                {/* Question 18: Google Search Relevance */}
+                <FormField control={form.control} name="google_relevance" rules={{
                 required: "This field is required"
               }} render={({
                 field
-              }) => <LikertScale field={field} question="How satisfied are you with your search experience?" leftLabel="Very dissatisfied" rightLabel="Very satisfied" questionNumber="18" />} />
+              }) => <LikertScale field={field} question="How relevant were the Google search results to your query?" leftLabel="Not relevant at all" rightLabel="Very relevant" questionNumber="18" />} />
 
-                {/* Question 19: Search Efficiency */}
-                <FormField control={form.control} name="search_efficiency" rules={{
+                {/* Question 19: Google Search Trust */}
+                <FormField control={form.control} name="google_trust" rules={{
                 required: "This field is required"
               }} render={({
                 field
-              }) => <LikertScale field={field} question="How efficiently were you able to find the information you needed?" leftLabel="Very inefficiently" rightLabel="Very efficiently" questionNumber="19" />} />
+              }) => <LikertScale field={field} question="How much did you trust the Google search results?" leftLabel="Do not trust at all" rightLabel="Trust completely" questionNumber="19" />} />
 
-                {/* Question 20: Search Ease */}
-                <FormField control={form.control} name="search_ease" rules={{
+                {/* Question 20: Google Query Modifications */}
+                <FormField control={form.control} name="google_query_modifications" rules={{
                 required: "This field is required"
               }} render={({
                 field
-              }) => <LikertScale field={field} question="How easy was it to use the search interface?" leftLabel="Very difficult" rightLabel="Very easy" questionNumber="20" />} />
+              }) => <FormItem>
+                      <FormLabel className="text-base font-medium text-gray-900">
+                        20. How many times did you modify your search query on Google? <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <RadioGroup onValueChange={field.onChange} value={field.value} className="flex flex-row flex-wrap gap-4">
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="0" id="mod-0" />
+                            <label htmlFor="mod-0" className="text-sm text-gray-700 cursor-pointer">
+                              0
+                            </label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="1" id="mod-1" />
+                            <label htmlFor="mod-1" className="text-sm text-gray-700 cursor-pointer">
+                              1
+                            </label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="2" id="mod-2" />
+                            <label htmlFor="mod-2" className="text-sm text-gray-700 cursor-pointer">
+                              2
+                            </label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="3" id="mod-3" />
+                            <label htmlFor="mod-3" className="text-sm text-gray-700 cursor-pointer">
+                              3
+                            </label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="4" id="mod-4" />
+                            <label htmlFor="mod-4" className="text-sm text-gray-700 cursor-pointer">
+                              4
+                            </label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="5+" id="mod-5plus" />
+                            <label htmlFor="mod-5plus" className="text-sm text-gray-700 cursor-pointer">
+                              5+
+                            </label>
+                          </div>
+                        </RadioGroup>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>} />
 
-                {/* Question 21: Search Usefulness */}
-                <FormField control={form.control} name="search_usefulness" rules={{
+                {/* Question 21: Attention Check */}
+                <FormField control={form.control} name="attention_check" rules={{
                 required: "This field is required"
               }} render={({
                 field
-              }) => <LikertScale field={field} question="How useful was the search interface for your task?" leftLabel="Not useful at all" rightLabel="Extremely useful" questionNumber="21" />} />
+              }) => <LikertScale field={field} question="Please select '3' for this question." leftLabel="Strongly disagree" rightLabel="Strongly agree" questionNumber="21" />} />
 
-                {/* Question 22: Search Support */}
-                <FormField control={form.control} name="search_support" rules={{
-                required: "This field is required"
-              }} render={({
+                {/* Question 22: Google Open Feedback */}
+                <FormField control={form.control} name="google_open_feedback" render={({
                 field
-              }) => <LikertScale field={field} question="How well did the search interface support your decision-making process?" leftLabel="Very poorly" rightLabel="Very well" questionNumber="22" />} />
-
-                {/* Question 23: System Ease */}
-                <FormField control={form.control} name="search_system_ease" rules={{
-                required: "This field is required"
-              }} render={({
-                field
-              }) => <LikertScale field={field} question="How easy was it to learn to use the search system?" leftLabel="Very difficult" rightLabel="Very easy" questionNumber="23" />} />
-
-                {/* Question 24: Search Again */}
-                <FormField control={form.control} name="search_again" rules={{
-                required: "This field is required"
-              }} render={({
-                field
-              }) => <LikertScale field={field} question="How likely would you be to use this search interface again for similar tasks?" leftLabel="Very unlikely" rightLabel="Very likely" questionNumber="24" />} />
-
-                {/* Question 25: Advertisement Shameful */}
-                <FormField control={form.control} name="advertisement_shameful" rules={{
-                required: "This field is required"
-              }} render={({
-                field
-              }) => <LikertScale field={field} question="The advertisement made me feel" leftLabel="Not Shameful" rightLabel="Shameful" questionNumber="25" />} />
-
-                {/* Question 26: Advertisement Hopeful */}
-                <FormField control={form.control} name="advertisement_hopeful" rules={{
-                required: "This field is required"
-              }} render={({
-                field
-              }) => <LikertScale field={field} question="The advertisement made me feel" leftLabel="Not hopeful" rightLabel="Hopeful" questionNumber="26" />} />
+              }) => <FormItem>
+                      <FormLabel className="text-base font-medium text-gray-900">
+                        22. Is there anything else you would like to add about your Google search experience? (Optional)
+                      </FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="Please share any additional thoughts about your Google search experience..."
+                          className="min-h-[100px] resize-y"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>} />
 
                 {/* Question 27: Task Duration */}
                 <FormField control={form.control} name="task_duration" rules={{
