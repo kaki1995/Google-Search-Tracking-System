@@ -80,7 +80,7 @@ export default function SearchResultLog() {
         <div className="mb-6 p-4 rounded-lg border border-blue-200 bg-sky-100">
           <p className="text-gray-700 text-sm flex items-start gap-2">
             <span className="text-blue-600 text-lg flex-shrink-0">📝</span>
-            <span>
+            <span className="text-justify">
               Please fill in the details of the smartphone you chose based on your search using the study interface:<br />
               (You may return to the previous search page using the "Previous Page" button and review your search history if needed)
             </span>

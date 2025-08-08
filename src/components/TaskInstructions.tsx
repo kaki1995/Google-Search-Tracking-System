@@ -57,7 +57,7 @@ const TaskInstructions = () => {
             </h1>
           </div>
 
-          <div className="space-y-6 mx-auto text-left">
+          <div className="space-y-6 mx-auto text-justify">
             {/* Scenario */}
             <div>
               <h3 className="font-semibold text-gray-900 mb-3">Scenario:</h3>

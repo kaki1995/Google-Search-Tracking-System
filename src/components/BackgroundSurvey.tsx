@@ -105,7 +105,7 @@ export default function BackgroundSurvey() {
           <div className="border border-blue-200 rounded-lg p-4 mb-8 bg-sky-100">
             <div className="flex items-start gap-3">
               <span className="text-blue-600 text-lg">👤</span>
-              <span className="text-base text-gray-700">
+              <span className="text-base text-gray-700 text-justify">
                 Please answer the following questions to help us better understand your background. All responses are anonymous and used for research purposes only.
               </span>
             </div>
