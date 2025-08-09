@@ -42,12 +42,17 @@ export default function Welcome() {
       navigate("/background-survey");
     }
   };
+<<<<<<< HEAD
   
   const handleExit = async () => {
     // Track exit button click specifically
     await trackingService.trackExitButtonClick();
     // Also mark as final exit action
     await trackingService.trackWelcomePageAction('exited');
+=======
+  const handleExit = async () => {
+    await trackingService.trackExitStudy('user_clicked_exit_study');
+>>>>>>> f9f040b (Commit all unstaged changes before rebase and push)
     navigate("/exit-study");
   };
 

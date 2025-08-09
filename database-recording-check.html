@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Recording Verification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 10px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        .test-button:hover { background: #2563eb; }
+        .result {
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            padding: 12px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .success { background: #dcfce7; border-color: #16a34a; color: #166534; }
+        .error { background: #fef2f2; border-color: #dc2626; color: #991b1b; }
+        .warning { background: #fefce8; border-color: #ca8a04; color: #92400e; }
+        .info { background: #dbeafe; border-color: #2563eb; color: #1e40af; }
+        .live-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: #16a34a;
+            border-radius: 50%;
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Database Recording Verification</h1>
+    <p>Let's check if the enhanced metrics are actually being saved to Supabase!</p>
+
+    <div class="test-card">
+        <h3>📊 Current Database State</h3>
+        <button class="test-button" onclick="checkCurrentDatabase()">Check Database Records</button>
+        <div id="dbState" class="result" style="display: none;"></div>
+    </div>
+
+    <div class="test-card">
+        <h3>🧪 Live Test - Create & Verify Records</h3>
+        <button class="test-button" onclick="createTestRecords()">Create Test Records</button>
+        <div id="testResult" class="result" style="display: none;"></div>
+    </div>
+
+    <div class="test-card">
+        <h3>🔄 Real-time Monitoring</h3>
+        <button class="test-button" onclick="startMonitoring()">Start Live Monitoring</button>
+        <button class="test-button" onclick="stopMonitoring()">Stop Monitoring</button>
+        <div id="monitoringStatus" class="result info">Click "Start Live Monitoring" to begin...</div>
+    </div>
+
+    <div class="test-card">
+        <h3>📈 Enhanced Fields Check</h3>
+        <button class="test-button" onclick="checkEnhancedFields()">Check Enhanced Fields</button>
+        <div id="fieldsResult" class="result" style="display: none;"></div>
+    </div>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.skypack.dev/@supabase/supabase-js@2';
+        import { TrackingService } from './src/lib/tracking.js';
+
+        const supabaseUrl = 'https://wbguuipoggeamyzrfvbv.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndnZ3d1aXBvZ2dlYW15enJmdmJ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQxMDk1NjgsImV4cCI6MjA0OTY4NTU2OH0.Jl2nXPPKMCdVzaGTzBfnolr0vNDsYpk2dCRPCWYm7vU';
+        
+        window.supabase = createClient(supabaseUrl, supabaseKey);
+        window.trackingService = new TrackingService();
+        window.monitoringInterval = null;
+
+        // Initialize tracking
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                await window.trackingService.initSession();
+                console.log('✅ Tracking service initialized');
+            } catch (error) {
+                console.error('❌ Tracking service initialization failed:', error);
+            }
+        });
+
+        window.checkCurrentDatabase = async function() {
+            const resultDiv = document.getElementById('dbState');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Checking database state...';
+            resultDiv.className = 'result info';
+
+            try {
+                let report = '📊 DATABASE STATE REPORT\n';
+                report += '=' * 50 + '\n\n';
+
+                // Check each table
+                const tables = [
+                    'sessions',
+                    'experiment_queries', 
+                    'interactions',
+                    'interaction_details',
+                    'query_timing_metrics'
+                ];
+
+                for (const table of tables) {
+                    try {
+                        const { data, error, count } = await window.supabase
+                            .from(table)
+                            .select('*', { count: 'exact' })
+                            .order('created_at', { ascending: false })
+                            .limit(3);
+
+                        if (error) {
+                            report += `❌ ${table}: Error - ${error.message}\n`;
+                        } else {
+                            report += `✅ ${table}: ${count || 0} total records\n`;
+                            if (data && data.length > 0) {
+                                report += `   Latest: ${JSON.stringify(data[0], null, 2).slice(0, 200)}...\n`;
+                            }
+                        }
+                    } catch (err) {
+                        report += `❌ ${table}: Exception - ${err.message}\n`;
+                    }
+                    report += '\n';
+                }
+
+                // Check for today's records
+                const today = new Date().toISOString().split('T')[0];
+                const { data: todayInteractions } = await window.supabase
+                    .from('interactions')
+                    .select('*')
+                    .gte('created_at', today);
+
+                report += `📅 Today's interactions: ${todayInteractions?.length || 0}\n`;
+
+                resultDiv.textContent = report;
+                resultDiv.className = todayInteractions && todayInteractions.length > 0 ? 'result success' : 'result warning';
+            } catch (error) {
+                resultDiv.textContent = `❌ Database check failed:\n${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        };
+
+        window.createTestRecords = async function() {
+            const resultDiv = document.getElementById('testResult');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Creating test records...';
+            resultDiv.className = 'result info';
+
+            try {
+                let report = '🧪 CREATING TEST RECORDS\n';
+                report += '=' * 30 + '\n\n';
+
+                // Step 1: Create a query
+                report += '1. Creating test query...\n';
+                const queryId = await window.trackingService.trackQuery('database verification test', 5);
+                if (!queryId) {
+                    throw new Error('Failed to create query');
+                }
+                report += `   ✅ Query created: ${queryId}\n\n`;
+
+                // Step 2: Create interactions
+                report += '2. Creating test interaction...\n';
+                const { data: interaction, error: intError } = await window.supabase
+                    .from('interactions')
+                    .insert({
+                        query_id: queryId,
+                        clicked_url: 'https://example.com/test-' + Date.now(),
+                        clicked_rank: 1,
+                        clicked_result_count: 1,
+                        interaction_type: 'click'
+                    })
+                    .select('*')
+                    .single();
+
+                if (intError) {
+                    throw new Error(`Interaction creation failed: ${intError.message}`);
+                }
+                report += `   ✅ Interaction created: ${interaction.id}\n\n`;
+
+                // Step 3: Create interaction details
+                report += '3. Creating interaction details...\n';
+                const { data: detail, error: detError } = await window.supabase
+                    .from('interaction_details')
+                    .insert({
+                        interaction_id: interaction.id,
+                        interaction_type: 'click',
+                        element_id: 'test-element',
+                        value: 'test-value',
+                        metadata: {
+                            action_type: 'result_click',
+                            page_scroll_y: 100,
+                            viewport_height: 800,
+                            timestamp_action: Date.now()
+                        }
+                    })
+                    .select('*')
+                    .single();
+
+                if (detError) {
+                    throw new Error(`Detail creation failed: ${detError.message}`);
+                }
+                report += `   ✅ Detail created: ${detail.id}\n\n`;
+
+                // Step 4: Create timing metrics
+                report += '4. Creating timing metrics...\n';
+                const { data: timing, error: timError } = await window.supabase
+                    .from('query_timing_metrics')
+                    .insert({
+                        query_id: queryId,
+                        time_to_first_click_ms: 1500,
+                        time_to_first_result: 500,
+                        user_clicked: true,
+                        user_scrolled: true
+                    })
+                    .select('*')
+                    .single();
+
+                if (timError) {
+                    throw new Error(`Timing creation failed: ${timError.message}`);
+                }
+                report += `   ✅ Timing created: ${timing.id}\n\n`;
+
+                report += '🎉 ALL TEST RECORDS CREATED SUCCESSFULLY!\n';
+                report += `\n📊 Test Summary:\n`;
+                report += `   Query ID: ${queryId}\n`;
+                report += `   Interaction ID: ${interaction.id}\n`;
+                report += `   Detail ID: ${detail.id}\n`;
+                report += `   Timing ID: ${timing.id}\n`;
+
+                resultDiv.textContent = report;
+                resultDiv.className = 'result success';
+            } catch (error) {
+                resultDiv.textContent = `❌ Test record creation failed:\n${error.message}\n\nStack: ${error.stack}`;
+                resultDiv.className = 'result error';
+            }
+        };
+
+        window.startMonitoring = function() {
+            const statusDiv = document.getElementById('monitoringStatus');
+            statusDiv.innerHTML = '<span class="live-indicator"></span> Live monitoring active...\n\n';
+            statusDiv.className = 'result info';
+
+            let checkCount = 0;
+            window.monitoringInterval = setInterval(async () => {
+                checkCount++;
+                const timestamp = new Date().toLocaleTimeString();
+                
+                try {
+                    // Check for new records in last 30 seconds
+                    const thirtySecondsAgo = new Date(Date.now() - 30000).toISOString();
+                    
+                    const [interactions, details, timing] = await Promise.all([
+                        window.supabase
+                            .from('interactions')
+                            .select('*')
+                            .gte('created_at', thirtySecondsAgo)
+                            .order('created_at', { ascending: false }),
+                        window.supabase
+                            .from('interaction_details')
+                            .select('*')
+                            .gte('created_at', thirtySecondsAgo)
+                            .order('created_at', { ascending: false }),
+                        window.supabase
+                            .from('query_timing_metrics')
+                            .select('*')
+                            .gte('created_at', thirtySecondsAgo)
+                            .order('created_at', { ascending: false })
+                    ]);
+
+                    let update = `[${timestamp}] Check #${checkCount}:\n`;
+                    update += `  New interactions: ${interactions.data?.length || 0}\n`;
+                    update += `  New details: ${details.data?.length || 0}\n`;
+                    update += `  New timing: ${timing.data?.length || 0}\n`;
+
+                    if (interactions.data && interactions.data.length > 0) {
+                        update += `  Latest interaction: ${interactions.data[0].interaction_type} - ${interactions.data[0].clicked_url}\n`;
+                    }
+
+                    update += '\n';
+                    statusDiv.textContent += update;
+                    statusDiv.scrollTop = statusDiv.scrollHeight;
+
+                    // Change color based on activity
+                    if (interactions.data?.length > 0 || details.data?.length > 0 || timing.data?.length > 0) {
+                        statusDiv.className = 'result success';
+                    }
+                } catch (error) {
+                    statusDiv.textContent += `[${timestamp}] ❌ Monitor error: ${error.message}\n`;
+                }
+            }, 5000); // Check every 5 seconds
+        };
+
+        window.stopMonitoring = function() {
+            if (window.monitoringInterval) {
+                clearInterval(window.monitoringInterval);
+                window.monitoringInterval = null;
+                
+                const statusDiv = document.getElementById('monitoringStatus');
+                statusDiv.textContent += '\n⏹️ Monitoring stopped.\n';
+                statusDiv.className = 'result info';
+            }
+        };
+
+        window.checkEnhancedFields = async function() {
+            const resultDiv = document.getElementById('fieldsResult');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Checking enhanced fields...';
+            resultDiv.className = 'result info';
+
+            try {
+                let report = '🔍 ENHANCED FIELDS VERIFICATION\n';
+                report += '=' * 40 + '\n\n';
+
+                // Check interactions table enhanced fields
+                const { data: interactions } = await window.supabase
+                    .from('interactions')
+                    .select('interaction_type, element_id, interaction_metadata, viewport_coordinates, session_time_ms')
+                    .limit(5);
+
+                report += '1. Interactions Table Enhanced Fields:\n';
+                if (interactions && interactions.length > 0) {
+                    interactions.forEach((int, idx) => {
+                        report += `   Record ${idx + 1}:\n`;
+                        report += `     - interaction_type: ${int.interaction_type || 'null'}\n`;
+                        report += `     - element_id: ${int.element_id || 'null'}\n`;
+                        report += `     - has metadata: ${int.interaction_metadata ? 'yes' : 'no'}\n`;
+                        report += `     - viewport_coordinates: ${int.viewport_coordinates || 'null'}\n`;
+                        report += `     - session_time_ms: ${int.session_time_ms || 'null'}\n`;
+                    });
+                } else {
+                    report += '   ⚠️ No interaction records found\n';
+                }
+
+                // Check interaction_details table
+                const { data: details } = await window.supabase
+                    .from('interaction_details')
+                    .select('interaction_type, element_id, metadata')
+                    .limit(5);
+
+                report += '\n2. Interaction Details Table:\n';
+                if (details && details.length > 0) {
+                    details.forEach((det, idx) => {
+                        report += `   Record ${idx + 1}:\n`;
+                        report += `     - interaction_type: ${det.interaction_type}\n`;
+                        report += `     - element_id: ${det.element_id || 'null'}\n`;
+                        report += `     - has metadata: ${det.metadata ? 'yes' : 'no'}\n`;
+                        if (det.metadata) {
+                            report += `     - metadata keys: ${Object.keys(det.metadata).join(', ')}\n`;
+                        }
+                    });
+                } else {
+                    report += '   ⚠️ No detail records found\n';
+                }
+
+                // Check query_timing_metrics
+                const { data: timing } = await window.supabase
+                    .from('query_timing_metrics')
+                    .select('time_to_first_result, time_to_first_click_ms, user_clicked, user_scrolled')
+                    .limit(5);
+
+                report += '\n3. Query Timing Metrics:\n';
+                if (timing && timing.length > 0) {
+                    timing.forEach((tim, idx) => {
+                        report += `   Record ${idx + 1}:\n`;
+                        report += `     - time_to_first_result: ${tim.time_to_first_result || 'null'}\n`;
+                        report += `     - time_to_first_click_ms: ${tim.time_to_first_click_ms || 'null'}\n`;
+                        report += `     - user_clicked: ${tim.user_clicked}\n`;
+                        report += `     - user_scrolled: ${tim.user_scrolled}\n`;
+                    });
+                } else {
+                    report += '   ⚠️ No timing records found\n';
+                }
+
+                resultDiv.textContent = report;
+                resultDiv.className = 'result success';
+            } catch (error) {
+                resultDiv.textContent = `❌ Enhanced fields check failed:\n${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        };
+    </script>
+</body>
+</html>

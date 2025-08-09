@@ -30,6 +30,8 @@ const SearchResults = () => {
     // Initialize tracking if not already done
     if (!trackingInitialized.current) {
       trackingService.startScrollTracking();
+      // Initialize enhanced event listeners
+      trackingService.setupEnhancedEventListeners();
       trackingInitialized.current = true;
     }
     
@@ -95,6 +97,12 @@ const SearchResults = () => {
       const resultsCount = Array.isArray(searchResults) ? searchResults.length : 0;
       const queryId = await trackingService.trackQuery(sanitizedQuery, resultsCount);
       setCurrentQueryId(queryId);
+      
+      // Track time to first result now that results are loaded
+      if (queryId) {
+        await trackingService.trackTimeToFirstResult(queryId);
+      }
+      
       setSearchCount(prev => prev + 1);
     } catch (error) {
       console.error("Search error:", error);
@@ -187,6 +195,13 @@ const SearchResults = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      {/* Hidden element to track current query ID for enhanced event listeners */}
+      <div 
+        data-current-query-id={currentQueryId || ''} 
+        style={{ display: 'none' }}
+        aria-hidden="true"
+      />
+      
       <div className="w-full max-w-[905px] h-screen max-h-[680px] border-8 border-[#CAC4D0] rounded-[18px] bg-[#FEF7FF] overflow-hidden relative">
         {/* Browser Bar */}
         <div className="relative z-10">
@@ -281,7 +296,14 @@ const SearchResults = () => {
                 </p>
                 
                 {results.map((result, index) => (
-                  <div key={index} className="space-y-1">
+                  <div 
+                    key={index} 
+                    className="space-y-1"
+                    data-result-rank={index + 1}
+                    data-result-url={result.link}
+                    data-result-title={result.title}
+                    data-query-id={currentQueryId || ''}
+                  >
                     <div className="text-sm text-green-700">
                       {result.displayLink}
                       <button
@@ -295,6 +317,10 @@ const SearchResults = () => {
                     <button
                       onClick={() => handleResultClick(result, index)}
                       className="block text-left w-full"
+                      data-result-rank={index + 1}
+                      data-result-url={result.link}
+                      data-result-title={result.title}
+                      data-query-id={currentQueryId || ''}
                     >
                       <h3 className="text-xl text-blue-600 hover:underline cursor-pointer">
                         {result.title}

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Flow Debug</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 10px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        .test-button:hover { background: #2563eb; }
+        .test-button:disabled { background: #94a3b8; cursor: not-allowed; }
+        .result {
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            padding: 12px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+        }
+        .success { background: #dcfce7; border-color: #16a34a; color: #166534; }
+        .error { background: #fef2f2; border-color: #dc2626; color: #991b1b; }
+        .warning { background: #fefce8; border-color: #ca8a04; color: #92400e; }
+        .info { background: #dbeafe; border-color: #2563eb; color: #1e40af; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Search Flow Debug</h1>
+    <p>Test the actual search flow to see where currentQueryId might be failing.</p>
+
+    <div class="test-section">
+        <h3>🎯 Manual Search Test</h3>
+        <p>Test if performing a search creates a queryId that can be used for clicks:</p>
+        <input type="text" id="searchInput" placeholder="Enter search query" value="test search" style="padding: 8px; width: 200px; margin: 5px;">
+        <button class="test-button" onclick="testManualSearch()">Perform Search</button>
+        <div id="searchResult" class="result" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>🖱️ Test Click with Generated QueryId</h3>
+        <p>Test clicking after a search to see if interactions are created:</p>
+        <button class="test-button" onclick="testClickAfterSearch()">Test Click with QueryId</button>
+        <div id="clickResult" class="result" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>❌ Test Click without QueryId</h3>
+        <p>This should demonstrate the issue - no interaction record:</p>
+        <button class="test-button" onclick="testClickWithoutQueryId()">Test Click without QueryId</button>
+        <div id="noQueryResult" class="result" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>📊 Check Results</h3>
+        <button class="test-button" onclick="checkInteractionCount()">Check Interaction Count</button>
+        <div id="countResult" class="result" style="display: none;"></div>
+    </div>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.skypack.dev/@supabase/supabase-js@2';
+        import { TrackingService } from './src/lib/tracking.js';
+
+        const supabaseUrl = 'https://wbguuipoggeamyzrfvbv.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndnZ3d1aXBvZ2dlYW15enJmdmJ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQxMDk1NjgsImV4cCI6MjA0OTY4NTU2OH0.Jl2nXPPKMCdVzaGTzBfnolr0vNDsYpk2dCRPCWYm7vU';
+        
+        window.supabase = createClient(supabaseUrl, supabaseKey);
+        window.trackingService = new TrackingService();
+        window.currentQueryId = null;
+
+        // Initialize tracking
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('Initializing search flow debug...');
+            try {
+                await window.trackingService.initSession();
+                console.log('Session initialized:', window.trackingService.sessionData?.sessionId);
+            } catch (error) {
+                console.error('Session initialization failed:', error);
+            }
+        });
+
+        window.testManualSearch = async function() {
+            const resultDiv = document.getElementById('searchResult');
+            const searchQuery = document.getElementById('searchInput').value;
+            
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Performing search...';
+            resultDiv.className = 'result info';
+
+            try {
+                console.log('🔍 Testing search for:', searchQuery);
+                
+                // This mimics what SearchResults.tsx does
+                const queryId = await window.trackingService.trackQuery(searchQuery, 10);
+                window.currentQueryId = queryId;
+                
+                console.log('✅ Search completed, queryId:', queryId);
+                
+                resultDiv.textContent = `✅ Search successful!\n\nQuery: "${searchQuery}"\nGenerated QueryId: ${queryId}\n\nThis queryId should now be available for click tracking.`;
+                resultDiv.className = 'result success';
+                
+            } catch (error) {
+                console.error('Search failed:', error);
+                resultDiv.textContent = `❌ Search failed:\n${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        };
+
+        window.testClickAfterSearch = async function() {
+            const resultDiv = document.getElementById('clickResult');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Testing click with queryId...';
+            resultDiv.className = 'result info';
+
+            try {
+                if (!window.currentQueryId) {
+                    throw new Error('No queryId available. Please perform a search first.');
+                }
+
+                console.log('🖱️ Testing click with queryId:', window.currentQueryId);
+                
+                // This exactly matches SearchResults.tsx click handler
+                await window.trackingService.trackClick(
+                    'https://example.com/test-with-queryid',
+                    'Test Result With QueryId',
+                    1,
+                    window.currentQueryId  // This should work!
+                );
+                
+                resultDiv.textContent = `✅ Click with queryId completed!\n\nUsed QueryId: ${window.currentQueryId}\nURL: https://example.com/test-with-queryid\nRank: 1\n\nThis SHOULD create an interaction record.`;
+                resultDiv.className = 'result success';
+                
+            } catch (error) {
+                console.error('Click with queryId failed:', error);
+                resultDiv.textContent = `❌ Click with queryId failed:\n${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        };
+
+        window.testClickWithoutQueryId = async function() {
+            const resultDiv = document.getElementById('noQueryResult');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Testing click without queryId...';
+            resultDiv.className = 'result info';
+
+            try {
+                console.log('🖱️ Testing click WITHOUT queryId...');
+                
+                // This mimics when currentQueryId is null/undefined
+                await window.trackingService.trackClick(
+                    'https://example.com/test-without-queryid',
+                    'Test Result Without QueryId',
+                    1,
+                    undefined  // This demonstrates the problem!
+                );
+                
+                resultDiv.textContent = `⚠️ Click without queryId completed!\n\nUsed QueryId: undefined\nURL: https://example.com/test-without-queryid\nRank: 1\n\nThis should NOT create an interaction record (demonstrating the issue).`;
+                resultDiv.className = 'result warning';
+                
+            } catch (error) {
+                console.error('Click without queryId failed:', error);
+                resultDiv.textContent = `❌ Click without queryId failed:\n${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        };
+
+        window.checkInteractionCount = async function() {
+            const resultDiv = document.getElementById('countResult');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Checking interaction count...';
+            resultDiv.className = 'result info';
+
+            try {
+                const { data: interactions, error } = await window.supabase
+                    .from('interactions')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(10);
+
+                if (error) throw error;
+
+                if (interactions.length === 0) {
+                    resultDiv.textContent = '⚠️ NO interactions found.\n\nIf you tested "Click with QueryId" above and this shows 0,\nthere might be a database issue or permissions problem.';
+                    resultDiv.className = 'result warning';
+                } else {
+                    const recent = interactions.slice(0, 3);
+                    resultDiv.textContent = `✅ Found ${interactions.length} interactions!\n\nMost recent:\n${JSON.stringify(recent, null, 2)}`;
+                    resultDiv.className = 'result success';
+                }
+            } catch (error) {
+                resultDiv.textContent = `❌ Failed to check interactions:\n${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        };
+    </script>
+</body>
+</html>

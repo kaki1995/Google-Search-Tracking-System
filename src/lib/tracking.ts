@@ -375,7 +375,12 @@ class TrackingService {
         console.error('Failed to log click to Supabase:', error);
       }
     } else {
-      console.warn('No queryId provided for click tracking');
+      console.warn('⚠️ trackClick called without queryId - interaction will NOT be saved to database');
+      console.warn('📊 Click details:', { url, title, position });
+      console.warn('💡 This usually means:');
+      console.warn('   1. User clicked before performing a search');
+      console.warn('   2. currentQueryId is null/undefined in SearchResults component');
+      console.warn('   3. Search query tracking failed');
     }
   }
 
@@ -665,6 +670,7 @@ class TrackingService {
     return lastQuery.query !== queryText;
   }
 
+<<<<<<< HEAD
   private calculateQueryComplexity(query: string): number {
     // Calculate complexity score (1-10) based on various factors
     let score = 1;
@@ -743,10 +749,195 @@ class TrackingService {
 
     try {
       await supabase
+=======
+  // Enhanced Interaction Metrics - Missing implementations
+
+  /**
+   * Track time to first result when search results are loaded
+   */
+  async trackTimeToFirstResult(queryId: string): Promise<void> {
+    if (!this.sessionData) return;
+
+    const queryStartTime = this.sessionData.events.find(e => 
+      e.type === 'query' && e.data.queryId === queryId
+    )?.timestamp;
+
+    if (queryStartTime) {
+      const timeToFirstResult = Date.now() - queryStartTime;
+      
+      try {
+        await supabase
+          .from('query_timing_metrics')
+          .update({
+            time_to_first_result: timeToFirstResult
+          })
+          .eq('query_id', queryId);
+
+        console.log(`Time to first result: ${timeToFirstResult}ms for query ${queryId}`);
+      } catch (error) {
+        console.error('Failed to update time to first result:', error);
+      }
+    }
+  }
+
+  /**
+   * Track viewport dimensions and window metrics
+   */
+  async trackViewportMetrics(): Promise<void> {
+    if (!this.sessionData) return;
+
+    const viewportMetrics = {
+      viewport_height: window.innerHeight,
+      viewport_width: window.innerWidth,
+      screen_height: window.screen.height,
+      screen_width: window.screen.width,
+      device_pixel_ratio: window.devicePixelRatio || 1,
+      timestamp: Date.now()
+    };
+
+    // Update session with viewport data
+    try {
+      await supabase
+        .from('sessions')
+        .update({
+          session_metadata: {
+            ...this.sessionData.deviceInfo,
+            viewport_metrics: viewportMetrics
+          }
+        })
+        .eq('id', this.sessionData.sessionId);
+
+      console.log('Viewport metrics tracked:', viewportMetrics);
+    } catch (error) {
+      console.error('Failed to track viewport metrics:', error);
+    }
+  }
+
+  /**
+   * Enhanced click tracking with DOM element details and viewport info
+   */
+  async trackEnhancedClick(
+    element: HTMLElement, 
+    url: string, 
+    title: string, 
+    position: number, 
+    queryId?: string
+  ): Promise<void> {
+    if (!this.sessionData) return;
+
+    const rect = element.getBoundingClientRect();
+    const clickTimestamp = Date.now();
+    const currentScrollY = window.scrollY;
+
+    // Extract additional data from element
+    const additionalData = {
+      element_tag: element.tagName.toLowerCase(),
+      element_class: element.className,
+      element_id: element.id,
+      element_text: element.textContent?.slice(0, 100) || '',
+      element_href: element.getAttribute('href'),
+      data_attributes: Array.from(element.attributes)
+        .filter(attr => attr.name.startsWith('data-'))
+        .reduce((acc, attr) => ({ ...acc, [attr.name]: attr.value }), {})
+    };
+
+    const enhancedClickData = {
+      url,
+      title,
+      position,
+      result_rank: position,
+      page_scroll_y: currentScrollY,
+      viewport_height: window.innerHeight,
+      viewport_coordinates: {
+        x: rect.left,
+        y: rect.top
+      },
+      page_coordinates: {
+        x: rect.left + window.scrollX,
+        y: rect.top + window.scrollY
+      },
+      additional_data: additionalData,
+      timestamp_action: clickTimestamp
+    };
+
+    // Call original trackClick first
+    await this.trackClick(url, title, position, queryId);
+
+    // If we have queryId, enhance the interaction record
+    if (queryId) {
+      try {
+        // Update the interaction with enhanced data
+        const { data: interactions } = await supabase
+          .from('interactions')
+          .select('id')
+          .eq('query_id', queryId)
+          .eq('clicked_url', url)
+          .order('created_at', { ascending: false })
+          .limit(1);
+
+        if (interactions && interactions.length > 0) {
+          const interactionId = interactions[0].id;
+
+          // Update interaction with enhanced fields
+          await supabase
+            .from('interactions')
+            .update({
+              interaction_type: 'click',
+              element_id: element.id || `result_${position}`,
+              element_text: element.textContent?.slice(0, 100) || title,
+              page_coordinates: `(${enhancedClickData.page_coordinates.x},${enhancedClickData.page_coordinates.y})`,
+              viewport_coordinates: `(${enhancedClickData.viewport_coordinates.x},${enhancedClickData.viewport_coordinates.y})`,
+              interaction_metadata: enhancedClickData.additional_data,
+              session_time_ms: clickTimestamp - this.sessionData.startTime
+            })
+            .eq('id', interactionId);
+
+          // Add detailed interaction record
+          await supabase
+            .from('interaction_details')
+            .insert({
+              interaction_id: interactionId,
+              interaction_type: 'click',
+              element_id: element.id || `result_${position}`,
+              value: url,
+              metadata: {
+                ...enhancedClickData,
+                action_type: 'result_click'
+              }
+            });
+
+          console.log('Enhanced click data tracked for interaction:', interactionId);
+        }
+      } catch (error) {
+        console.error('Failed to track enhanced click data:', error);
+      }
+    }
+  }
+
+  /**
+   * Track hover interactions
+   */
+  async trackHover(element: HTMLElement, duration: number, queryId?: string): Promise<void> {
+    if (!this.sessionData || !queryId) return;
+
+    const hoverData = {
+      element_id: element.id || element.className || 'unknown',
+      element_text: element.textContent?.slice(0, 50) || '',
+      hover_duration_ms: duration,
+      page_scroll_y: window.scrollY,
+      viewport_height: window.innerHeight,
+      timestamp: Date.now()
+    };
+
+    try {
+      // Insert hover interaction
+      const { data: interaction, error } = await supabase
+>>>>>>> f9f040b (Commit all unstaged changes before rebase and push)
         .from('interactions')
         .insert({
           query_id: queryId,
           interaction_type: 'hover',
+<<<<<<< HEAD
           element_id: elementId,
           hover_duration_ms: hoverDuration,
           interaction_time: new Date().toISOString(),
@@ -758,6 +949,234 @@ class TrackingService {
     }
   }
 
+=======
+          element_id: hoverData.element_id,
+          element_text: hoverData.element_text,
+          interaction_metadata: hoverData,
+          session_time_ms: Date.now() - this.sessionData.startTime
+        })
+        .select('id')
+        .single();
+
+      if (!error && interaction) {
+        // Add detailed hover record
+        await supabase
+          .from('interaction_details')
+          .insert({
+            interaction_id: interaction.id,
+            interaction_type: 'hover',
+            element_id: hoverData.element_id,
+            value: hoverData.element_text,
+            metadata: {
+              ...hoverData,
+              action_type: 'element_hover'
+            }
+          });
+
+        console.log('Hover interaction tracked:', hoverData);
+      }
+    } catch (error) {
+      console.error('Failed to track hover interaction:', error);
+    }
+  }
+
+  /**
+   * Enhanced scroll tracking with timing and interaction context
+   */
+  async trackEnhancedScroll(scrollY: number, queryId?: string): Promise<void> {
+    if (!this.sessionData) return;
+
+    const scrollData = {
+      scroll_position: scrollY,
+      viewport_height: window.innerHeight,
+      page_height: document.documentElement.scrollHeight,
+      scroll_percentage: Math.round((scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100),
+      timestamp_action: Date.now()
+    };
+
+    // Call original trackScroll
+    await this.trackScroll(scrollY);
+
+    // If we have queryId, track as interaction
+    if (queryId) {
+      try {
+        const { data: interaction, error } = await supabase
+          .from('interactions')
+          .insert({
+            query_id: queryId,
+            interaction_type: 'scroll',
+            scroll_depth: Math.min(scrollData.scroll_percentage, 100),
+            interaction_metadata: scrollData,
+            session_time_ms: Date.now() - this.sessionData.startTime
+          })
+          .select('id')
+          .single();
+
+        if (!error && interaction) {
+          // Add detailed scroll record
+          await supabase
+            .from('interaction_details')
+            .insert({
+              interaction_id: interaction.id,
+              interaction_type: 'scroll',
+              element_id: 'page',
+              value: scrollY.toString(),
+              metadata: {
+                ...scrollData,
+                action_type: 'page_scroll'
+              }
+            });
+
+          // Update query timing metrics to mark user scrolled
+          await supabase
+            .from('query_timing_metrics')
+            .update({ user_scrolled: true })
+            .eq('query_id', queryId);
+        }
+      } catch (error) {
+        console.error('Failed to track enhanced scroll:', error);
+      }
+    }
+  }
+
+  /**
+   * Track time to first interaction (any type)
+   */
+  async trackFirstInteraction(queryId: string, interactionType: string): Promise<void> {
+    if (!this.sessionData) return;
+
+    // Check if this is the first interaction for this query
+    try {
+      const { data: existingInteractions } = await supabase
+        .from('interactions')
+        .select('id')
+        .eq('query_id', queryId)
+        .limit(1);
+
+      // If this is the first interaction, we just track it
+      // The time_to_first_interaction_ms will be calculated in database views
+      if (!existingInteractions || existingInteractions.length === 0) {
+        console.log(`First interaction type for query ${queryId}: ${interactionType}`);
+        
+        // We can add a metadata entry to track this was the first interaction
+        const { data: latestInteraction } = await supabase
+          .from('interactions')
+          .select('id')
+          .eq('query_id', queryId)
+          .order('interaction_time', { ascending: false })
+          .limit(1);
+
+        if (latestInteraction && latestInteraction.length > 0) {
+          // Mark this interaction as the first one
+          await supabase
+            .from('interactions')
+            .update({
+              interaction_metadata: {
+                is_first_interaction: true,
+                first_interaction_type: interactionType
+              }
+            })
+            .eq('id', latestInteraction[0].id);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to track first interaction timing:', error);
+    }
+  }
+
+  /**
+   * Initialize enhanced event listeners for comprehensive tracking
+   */
+  setupEnhancedEventListeners(): void {
+    if (!this.sessionData) return;
+
+    let hoverStartTime: number | null = null;
+    let currentHoverElement: HTMLElement | null = null;
+
+    // Enhanced click listener
+    document.addEventListener('click', (event) => {
+      const target = event.target as HTMLElement;
+      const searchResult = target.closest('[data-result-rank]');
+      
+      if (searchResult) {
+        const rank = parseInt(searchResult.getAttribute('data-result-rank') || '0');
+        const url = searchResult.getAttribute('data-result-url') || '';
+        const title = searchResult.getAttribute('data-result-title') || '';
+        const queryId = searchResult.getAttribute('data-query-id') || undefined;
+
+        this.trackEnhancedClick(target, url, title, rank, queryId);
+        if (queryId) {
+          this.trackFirstInteraction(queryId, 'click');
+        }
+      }
+    });
+
+    // Hover tracking
+    document.addEventListener('mouseover', (event) => {
+      const target = event.target as HTMLElement;
+      const searchResult = target.closest('[data-result-rank]');
+      
+      if (searchResult) {
+        hoverStartTime = Date.now();
+        currentHoverElement = searchResult as HTMLElement;
+      }
+    });
+
+    document.addEventListener('mouseout', (event) => {
+      if (hoverStartTime && currentHoverElement) {
+        const hoverDuration = Date.now() - hoverStartTime;
+        const queryId = currentHoverElement.getAttribute('data-query-id') || undefined;
+        
+        if (hoverDuration > 100 && queryId) { // Only track hovers longer than 100ms
+          this.trackHover(currentHoverElement, hoverDuration, queryId);
+          this.trackFirstInteraction(queryId, 'hover');
+        }
+        
+        hoverStartTime = null;
+        currentHoverElement = null;
+      }
+    });
+
+    // Enhanced scroll listener
+    let scrollTimeout: NodeJS.Timeout;
+    document.addEventListener('scroll', () => {
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        const currentQueryId = document.querySelector('[data-current-query-id]')?.getAttribute('data-current-query-id');
+        this.trackEnhancedScroll(window.scrollY, currentQueryId || undefined);
+        
+        if (currentQueryId) {
+          this.trackFirstInteraction(currentQueryId, 'scroll');
+        }
+      }, 150); // Debounce scroll events
+    });
+
+    // Viewport resize tracking
+    window.addEventListener('resize', () => {
+      this.trackViewportMetrics();
+    });
+
+    // Focus tracking
+    document.addEventListener('focusin', (event) => {
+      const target = event.target as HTMLElement;
+      const searchInput = target.closest('input[type="search"], input[data-search-input]');
+      
+      if (searchInput) {
+        // Track search input focus as interaction
+        const currentQueryId = document.querySelector('[data-current-query-id]')?.getAttribute('data-current-query-id');
+        if (currentQueryId) {
+          this.trackFirstInteraction(currentQueryId, 'focus');
+        }
+      }
+    });
+
+    // Track initial viewport metrics
+    this.trackViewportMetrics();
+
+    console.log('✅ Enhanced event listeners initialized');
+  }
+
+>>>>>>> f9f040b (Commit all unstaged changes before rebase and push)
   getSessionData(): SessionData | null {
     return this.sessionData;
   }

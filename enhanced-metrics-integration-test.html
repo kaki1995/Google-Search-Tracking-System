@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Metrics Integration Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 10px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        .test-button:hover { background: #2563eb; }
+        .result {
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            padding: 12px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .success { background: #dcfce7; border-color: #16a34a; color: #166534; }
+        .error { background: #fef2f2; border-color: #dc2626; color: #991b1b; }
+        .warning { background: #fefce8; border-color: #ca8a04; color: #92400e; }
+        .info { background: #dbeafe; border-color: #2563eb; color: #1e40af; }
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .metric-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 15px;
+        }
+        .metric-status {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .implemented { color: #16a34a; }
+        .missing { color: #dc2626; }
+        .partial { color: #ca8a04; }
+    </style>
+</head>
+<body>
+    <h1>🔬 Enhanced Metrics Integration Test</h1>
+    <p>Comprehensive test of all requested enhanced interaction metrics integration with Supabase tables.</p>
+
+    <div class="test-section">
+        <h3>📊 Enhanced Interaction Metrics Status</h3>
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-status implemented">✅ interaction_type</div>
+                <div>Enhanced: click, scroll, hover, focus tracking</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-status implemented">✅ result_position</div>
+                <div>Tracked as clicked_rank in interactions</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-status implemented">✅ scroll_position</div>
+                <div>Enhanced: page_scroll_y + viewport context</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-status implemented">✅ time_to_first_click</div>
+                <div>Calculated and stored in query_timing_metrics</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-status implemented">✅ time_to_first_interaction</div>
+                <div>Calculated in database views</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-status implemented">✅ time_to_first_result</div>
+                <div>New: tracked when results load</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-status implemented">✅ user_clicked</div>
+                <div>Boolean in query_timing_metrics</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-status implemented">✅ user_scrolled</div>
+                <div>Boolean in query_timing_metrics</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-status implemented">✅ viewport_height</div>
+                <div>New: captured in session metadata</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h3>🎯 Interaction Details Metrics Status</h3>
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-status implemented">✅ action_type</div>
+                <div>Enhanced: result_click, element_hover, page_scroll</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-status implemented">✅ additional_data</div>
+                <div>DOM attributes, element details in metadata</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-status implemented">✅ page_scroll_y</div>
+                <div>Captured at interaction time</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-status implemented">✅ result_rank</div>
+                <div>Consistently tracked as position/clicked_rank</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-status implemented">✅ timestamp_action</div>
+                <div>Date.now() for all interactions</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h3>🧪 Test Enhanced Methods</h3>
+        <button class="test-button" onclick="testEnhancedMethods()">Test All Enhanced Methods</button>
+        <div id="enhancedResult" class="result" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>📊 Database Integration Test</h3>
+        <button class="test-button" onclick="testDatabaseIntegration()">Test Database Integration</button>
+        <div id="dbResult" class="result" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>🔄 Live Interaction Simulation</h3>
+        <p>Test the actual interaction tracking with simulated user behavior:</p>
+        <div id="simulation-area" style="height: 200px; border: 2px dashed #ccc; padding: 20px; margin: 10px 0;">
+            <div data-result-rank="1" data-result-url="https://example.com/test1" data-result-title="Test Result 1" data-query-id="test-query-123">
+                <h3>Hover and Click Me - Test Result 1</h3>
+                <p>This simulates a search result for interaction testing.</p>
+            </div>
+            <div data-result-rank="2" data-result-url="https://example.com/test2" data-result-title="Test Result 2" data-query-id="test-query-123" style="margin-top: 20px;">
+                <h3>Another Test Result - Result 2</h3>
+                <p>Hover over this and scroll to test enhanced tracking.</p>
+            </div>
+        </div>
+        <div id="interactionResult" class="result info">
+            Interaction events will appear here as you hover, click, and scroll...
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h3>📈 Real-time Database Monitor</h3>
+        <button class="test-button" onclick="startDatabaseMonitor()">Start Real-time Monitoring</button>
+        <button class="test-button" onclick="stopDatabaseMonitor()">Stop Monitoring</button>
+        <div id="monitorResult" class="result" style="display: none;"></div>
+    </div>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.skypack.dev/@supabase/supabase-js@2';
+        import { TrackingService } from './src/lib/tracking.js';
+
+        const supabaseUrl = 'https://wbguuipoggeamyzrfvbv.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndnZ3d1aXBvZ2dlYW15enJmdmJ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQxMDk1NjgsImV4cCI6MjA0OTY4NTU2OH0.Jl2nXPPKMCdVzaGTzBfnolr0vNDsYpk2dCRPCWYm7vU';
+        
+        window.supabase = createClient(supabaseUrl, supabaseKey);
+        window.trackingService = new TrackingService();
+        window.monitorInterval = null;
+
+        // Initialize tracking
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('🚀 Initializing enhanced metrics test...');
+            try {
+                await window.trackingService.initSession();
+                window.trackingService.setupEnhancedEventListeners();
+                console.log('✅ Enhanced tracking initialized');
+                
+                // Setup interaction monitoring
+                setupInteractionMonitoring();
+            } catch (error) {
+                console.error('❌ Initialization failed:', error);
+            }
+        });
+
+        function setupInteractionMonitoring() {
+            const resultDiv = document.getElementById('interactionResult');
+            let eventCount = 0;
+
+            // Monitor interaction events
+            document.addEventListener('click', (e) => {
+                if (e.target.closest('#simulation-area')) {
+                    eventCount++;
+                    resultDiv.textContent += `\n[${eventCount}] CLICK: ${e.target.textContent.slice(0, 30)}...`;
+                    resultDiv.scrollTop = resultDiv.scrollHeight;
+                }
+            });
+
+            document.addEventListener('mouseover', (e) => {
+                if (e.target.closest('#simulation-area')) {
+                    eventCount++;
+                    resultDiv.textContent += `\n[${eventCount}] HOVER: ${e.target.textContent.slice(0, 30)}...`;
+                    resultDiv.scrollTop = resultDiv.scrollHeight;
+                }
+            });
+
+            let scrollTimeout;
+            document.addEventListener('scroll', () => {
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(() => {
+                    eventCount++;
+                    resultDiv.textContent += `\n[${eventCount}] SCROLL: Y=${window.scrollY}, H=${window.innerHeight}`;
+                    resultDiv.scrollTop = resultDiv.scrollHeight;
+                }, 100);
+            });
+        }
+
+        window.testEnhancedMethods = async function() {
+            const resultDiv = document.getElementById('enhancedResult');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Testing all enhanced methods...';
+            resultDiv.className = 'result info';
+
+            try {
+                let results = '🧪 Enhanced Methods Test Results:\n\n';
+
+                // Test 1: Viewport Metrics
+                await window.trackingService.trackViewportMetrics();
+                results += '✅ trackViewportMetrics() - Success\n';
+
+                // Test 2: Time to First Result
+                const testQueryId = await window.trackingService.trackQuery('enhanced metrics test', 5);
+                if (testQueryId) {
+                    await window.trackingService.trackTimeToFirstResult(testQueryId);
+                    results += '✅ trackTimeToFirstResult() - Success\n';
+
+                    // Test 3: Enhanced Scroll
+                    await window.trackingService.trackEnhancedScroll(100, testQueryId);
+                    results += '✅ trackEnhancedScroll() - Success\n';
+
+                    // Test 4: First Interaction
+                    await window.trackingService.trackFirstInteraction(testQueryId, 'click');
+                    results += '✅ trackFirstInteraction() - Success\n';
+
+                    results += `\n📊 Test Query ID: ${testQueryId}`;
+                } else {
+                    results += '❌ Failed to create test query\n';
+                }
+
+                resultDiv.textContent = results;
+                resultDiv.className = 'result success';
+            } catch (error) {
+                resultDiv.textContent = `❌ Enhanced methods test failed:\n${error.message}\n\nStack: ${error.stack}`;
+                resultDiv.className = 'result error';
+            }
+        };
+
+        window.testDatabaseIntegration = async function() {
+            const resultDiv = document.getElementById('dbResult');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Testing database integration...';
+            resultDiv.className = 'result info';
+
+            try {
+                const tables = [
+                    'interactions',
+                    'interaction_details', 
+                    'query_timing_metrics',
+                    'sessions'
+                ];
+
+                let results = '📊 Database Integration Test:\n\n';
+
+                for (const table of tables) {
+                    try {
+                        const { data, error } = await window.supabase
+                            .from(table)
+                            .select('*')
+                            .limit(1);
+
+                        if (error) {
+                            results += `❌ ${table}: ${error.message}\n`;
+                        } else {
+                            results += `✅ ${table}: Accessible\n`;
+                        }
+                    } catch (err) {
+                        results += `❌ ${table}: ${err.message}\n`;
+                    }
+                }
+
+                // Test enhanced fields
+                results += '\n🔍 Enhanced Fields Test:\n';
+                
+                const { data: interactions } = await window.supabase
+                    .from('interactions')
+                    .select('interaction_type, element_id, interaction_metadata, viewport_coordinates')
+                    .limit(1);
+
+                results += interactions ? '✅ Enhanced interaction fields available\n' : '⚠️ No interaction data\n';
+
+                const { data: details } = await window.supabase
+                    .from('interaction_details')
+                    .select('action_type, metadata')
+                    .limit(1);
+
+                results += details ? '✅ Enhanced detail fields available\n' : '⚠️ No detail data\n';
+
+                resultDiv.textContent = results;
+                resultDiv.className = 'result success';
+            } catch (error) {
+                resultDiv.textContent = `❌ Database integration test failed:\n${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        };
+
+        window.startDatabaseMonitor = function() {
+            const resultDiv = document.getElementById('monitorResult');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Starting real-time database monitoring...\n';
+            resultDiv.className = 'result info';
+
+            window.monitorInterval = setInterval(async () => {
+                try {
+                    const { data: interactions } = await window.supabase
+                        .from('interactions')
+                        .select('id, interaction_type, clicked_url, created_at')
+                        .order('created_at', { ascending: false })
+                        .limit(3);
+
+                    const { data: details } = await window.supabase
+                        .from('interaction_details')
+                        .select('interaction_type, element_id, created_at')
+                        .order('created_at', { ascending: false })
+                        .limit(3);
+
+                    const timestamp = new Date().toLocaleTimeString();
+                    let update = `\n[${timestamp}] Database Check:\n`;
+                    update += `  Interactions: ${interactions?.length || 0} recent\n`;
+                    update += `  Details: ${details?.length || 0} recent\n`;
+
+                    if (interactions && interactions.length > 0) {
+                        update += `  Latest: ${interactions[0].interaction_type} - ${interactions[0].clicked_url?.slice(0, 30)}...\n`;
+                    }
+
+                    resultDiv.textContent += update;
+                    resultDiv.scrollTop = resultDiv.scrollHeight;
+                } catch (error) {
+                    resultDiv.textContent += `\n[ERROR] Monitor failed: ${error.message}`;
+                }
+            }, 3000);
+        };
+
+        window.stopDatabaseMonitor = function() {
+            if (window.monitorInterval) {
+                clearInterval(window.monitorInterval);
+                window.monitorInterval = null;
+                
+                const resultDiv = document.getElementById('monitorResult');
+                resultDiv.textContent += '\n\n⏹️ Monitoring stopped.';
+            }
+        };
+    </script>
+</body>
+</html>

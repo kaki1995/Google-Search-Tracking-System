@@ -1,3 +1,4 @@
+
 export type Json =
   | string
   | number
@@ -11,6 +12,31 @@ export type Database = {
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "13.0.4"
+  }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          operationName?: string
+          query?: string
+          variables?: Json
+          extensions?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
   }
   public: {
     Tables: {
@@ -320,6 +346,56 @@ export type Database = {
             referencedRelation: "sessions"
             referencedColumns: ["id"]
           },
+<<<<<<< HEAD
+=======
+        ]
+      }
+      queries: {
+        Row: {
+          clicked_rank: number | null
+          clicked_url: string | null
+          query_duration_sec: number | null
+          query_id: string
+          query_reformulation: boolean | null
+          query_text: string
+          scroll_depth: number | null
+          search_results: Json | null
+          session_id: string
+          timestamp_query: string | null
+        }
+        Insert: {
+          clicked_rank?: number | null
+          clicked_url?: string | null
+          query_duration_sec?: number | null
+          query_id?: string
+          query_reformulation?: boolean | null
+          query_text: string
+          scroll_depth?: number | null
+          search_results?: Json | null
+          session_id: string
+          timestamp_query?: string | null
+        }
+        Update: {
+          clicked_rank?: number | null
+          clicked_url?: string | null
+          query_duration_sec?: number | null
+          query_id?: string
+          query_reformulation?: boolean | null
+          query_text?: string
+          scroll_depth?: number | null
+          search_results?: Json | null
+          session_id?: string
+          timestamp_query?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "queries_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "user_sessions"
+            referencedColumns: ["session_id"]
+          },
+>>>>>>> f9f040b (Commit all unstaged changes before rebase and push)
         ]
       }
       query_timing_metrics: {
@@ -430,6 +506,9 @@ export type Database = {
       }
       sessions: {
         Row: {
+          background_survey_exit_reason: string | null
+          background_survey_exit_time: string | null
+          background_survey_status: string | null
           browser: string | null
           budget_range: string | null
           created_at: string | null
@@ -438,6 +517,9 @@ export type Database = {
           id: string
           location: string | null
           platform: string
+          post_survey_exit_reason: string | null
+          post_survey_exit_time: string | null
+          post_survey_status: string | null
           screen_resolution: string | null
           search_phase: Database["public"]["Enums"]["search_phase"] | null
           session_duration: number | null
@@ -452,6 +534,9 @@ export type Database = {
           welcome_page_action: string | null
         }
         Insert: {
+          background_survey_exit_reason?: string | null
+          background_survey_exit_time?: string | null
+          background_survey_status?: string | null
           browser?: string | null
           budget_range?: string | null
           created_at?: string | null
@@ -460,6 +545,9 @@ export type Database = {
           id?: string
           location?: string | null
           platform: string
+          post_survey_exit_reason?: string | null
+          post_survey_exit_time?: string | null
+          post_survey_status?: string | null
           screen_resolution?: string | null
           search_phase?: Database["public"]["Enums"]["search_phase"] | null
           session_duration?: number | null
@@ -474,6 +562,9 @@ export type Database = {
           welcome_page_action?: string | null
         }
         Update: {
+          background_survey_exit_reason?: string | null
+          background_survey_exit_time?: string | null
+          background_survey_status?: string | null
           browser?: string | null
           budget_range?: string | null
           created_at?: string | null
@@ -482,6 +573,9 @@ export type Database = {
           id?: string
           location?: string | null
           platform?: string
+          post_survey_exit_reason?: string | null
+          post_survey_exit_time?: string | null
+          post_survey_status?: string | null
           screen_resolution?: string | null
           search_phase?: Database["public"]["Enums"]["search_phase"] | null
           session_duration?: number | null
@@ -505,6 +599,110 @@ export type Database = {
           },
         ]
       }
+<<<<<<< HEAD
+    }
+    Views: {
+      [_ in never]: never
+=======
+      survey_exits: {
+        Row: {
+          created_at: string
+          exit_reason: string | null
+          exit_time: string
+          form_data: Json | null
+          id: string
+          page_url: string | null
+          questions_answered: number | null
+          session_id: string | null
+          survey_type: string
+          time_spent_ms: number | null
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string
+          exit_reason?: string | null
+          exit_time?: string
+          form_data?: Json | null
+          id?: string
+          page_url?: string | null
+          questions_answered?: number | null
+          session_id?: string | null
+          survey_type: string
+          time_spent_ms?: number | null
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string
+          exit_reason?: string | null
+          exit_time?: string
+          form_data?: Json | null
+          id?: string
+          page_url?: string | null
+          questions_answered?: number | null
+          session_id?: string | null
+          survey_type?: string
+          time_spent_ms?: number | null
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "survey_exits_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_sessions: {
+        Row: {
+          background_survey: Json | null
+          completed: boolean | null
+          consent_given: boolean | null
+          consent_timestamp: string | null
+          created_at: string | null
+          decision_confidence: number | null
+          device_type: string | null
+          exited_early: boolean | null
+          final_choice_url: string | null
+          search_experience_log_1: Json | null
+          search_experience_log_2: Json | null
+          session_id: string
+          user_id: string
+        }
+        Insert: {
+          background_survey?: Json | null
+          completed?: boolean | null
+          consent_given?: boolean | null
+          consent_timestamp?: string | null
+          created_at?: string | null
+          decision_confidence?: number | null
+          device_type?: string | null
+          exited_early?: boolean | null
+          final_choice_url?: string | null
+          search_experience_log_1?: Json | null
+          search_experience_log_2?: Json | null
+          session_id?: string
+          user_id: string
+        }
+        Update: {
+          background_survey?: Json | null
+          completed?: boolean | null
+          consent_given?: boolean | null
+          consent_timestamp?: string | null
+          created_at?: string | null
+          decision_confidence?: number | null
+          device_type?: string | null
+          exited_early?: boolean | null
+          final_choice_url?: string | null
+          search_experience_log_1?: Json | null
+          search_experience_log_2?: Json | null
+          session_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+>>>>>>> f9f040b (Commit all unstaged changes before rebase and push)
     }
     Views: {
       [_ in never]: never
@@ -683,6 +881,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {
       interaction_type: [

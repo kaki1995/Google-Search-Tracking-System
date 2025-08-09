@@ -3,11 +3,258 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Debug Interactions</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <title>Interaction Tracking Debug Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 10px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        .test-button:hover {
+            background: #2563eb;
+        }
+        .test-button:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+        }
+        .result {
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            padding: 12px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+        }
+        .success { background: #dcfce7; border-color: #16a34a; color: #166534; }
+        .error { background: #fef2f2; border-color: #dc2626; color: #991b1b; }
+        .warning { background: #fefce8; border-color: #ca8a04; color: #92400e; }
+        .info { background: #dbeafe; border-color: #2563eb; color: #1e40af; }
+    </style>
 </head>
 <body>
-    <h1>Debug Interactions Table</h1>
+    <h1>🔍 Interaction Tracking Debug Test</h1>
+    <p>This test specifically checks why interaction records are not appearing in the database.</p>
+
+    <div class="test-card">
+        <h3>📊 Database Connection Test</h3>
+        <button class="test-button" onclick="testDatabaseConnection()">Test Database Connection</button>
+        <div id="dbConnectionResult" class="result" style="display: none;"></div>
+    </div>
+
+    <div class="test-card">
+        <h3>🎯 Query Creation Test</h3>
+        <button class="test-button" onclick="testQueryCreation()">Create Test Query</button>
+        <div id="queryResult" class="result" style="display: none;"></div>
+    </div>
+
+    <div class="test-card">
+        <h3>🖱️ Direct Interaction Test</h3>
+        <button class="test-button" onclick="testDirectInteraction()">Test Direct Interaction Insert</button>
+        <div id="interactionResult" class="result" style="display: none;"></div>
+    </div>
+
+    <div class="test-card">
+        <h3>🔄 Full Click Tracking Test</h3>
+        <button class="test-button" onclick="testFullClickTracking()">Test Full Click Tracking</button>
+        <div id="clickTrackingResult" class="result" style="display: none;"></div>
+    </div>
+
+    <div class="test-card">
+        <h3>📋 Database Records Check</h3>
+        <button class="test-button" onclick="checkInteractionRecords()">Check Interaction Records</button>
+        <div id="recordsResult" class="result" style="display: none;"></div>
+    </div>
+
+    <div class="test-card">
+        <h3>🔧 Session Status</h3>
+        <div id="sessionStatus" class="result info">Loading session status...</div>
+    </div>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.skypack.dev/@supabase/supabase-js@2';
+        import { TrackingService } from './src/lib/tracking.js';
+
+        // Initialize Supabase
+        const supabaseUrl = 'https://wbguuipoggeamyzrfvbv.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndnZ3d1aXBvZ2dlYW15enJmdmJ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQxMDk1NjgsImV4cCI6MjA0OTY4NTU2OH0.Jl2nXPPKMCdVzaGTzBfnolr0vNDsYpk2dCRPCWYm7vU';
+        
+        window.supabase = createClient(supabaseUrl, supabaseKey);
+        window.trackingService = new TrackingService();
+
+        // Initialize session
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                await window.trackingService.initSession();
+                document.getElementById('sessionStatus').textContent = `✅ Session initialized: ${window.trackingService.sessionData?.sessionId || 'Unknown'}`;
+                document.getElementById('sessionStatus').className = 'result success';
+            } catch (error) {
+                document.getElementById('sessionStatus').textContent = `❌ Session initialization failed: ${error.message}`;
+                document.getElementById('sessionStatus').className = 'result error';
+            }
+        });
+
+        window.testDatabaseConnection = async function() {
+            const resultDiv = document.getElementById('dbConnectionResult');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Testing database connection...';
+            resultDiv.className = 'result info';
+
+            try {
+                const { data, error } = await window.supabase
+                    .from('sessions')
+                    .select('count(*)')
+                    .limit(1);
+
+                if (error) throw error;
+
+                resultDiv.textContent = '✅ Database connection successful!\nSessions table accessible.';
+                resultDiv.className = 'result success';
+            } catch (error) {
+                resultDiv.textContent = `❌ Database connection failed:\n${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        };
+
+        window.testQueryCreation = async function() {
+            const resultDiv = document.getElementById('queryResult');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Creating test query...';
+            resultDiv.className = 'result info';
+
+            try {
+                if (!window.trackingService.sessionData) {
+                    throw new Error('No session data available');
+                }
+
+                const queryId = await window.trackingService.trackQuery('debug test query', 10);
+                
+                resultDiv.textContent = `✅ Test query created successfully!\nQuery ID: ${queryId}`;
+                resultDiv.className = 'result success';
+                
+                window.testQueryId = queryId; // Store for later tests
+            } catch (error) {
+                resultDiv.textContent = `❌ Query creation failed:\n${error.message}\n\nStack: ${error.stack}`;
+                resultDiv.className = 'result error';
+            }
+        };
+
+        window.testDirectInteraction = async function() {
+            const resultDiv = document.getElementById('interactionResult');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Testing direct interaction insert...';
+            resultDiv.className = 'result info';
+
+            try {
+                if (!window.testQueryId) {
+                    throw new Error('No test query ID available. Please run query creation test first.');
+                }
+
+                const interactionData = {
+                    query_id: window.testQueryId,
+                    clicked_url: 'https://example.com/debug-test',
+                    clicked_rank: 1,
+                    clicked_result_count: 1
+                };
+
+                console.log('Attempting to insert interaction:', interactionData);
+
+                const { data: interaction, error } = await window.supabase
+                    .from('interactions')
+                    .insert(interactionData)
+                    .select('id')
+                    .single();
+
+                if (error) throw error;
+
+                resultDiv.textContent = `✅ Direct interaction insert successful!\nInteraction ID: ${interaction.id}\nData: ${JSON.stringify(interactionData, null, 2)}`;
+                resultDiv.className = 'result success';
+                
+                window.testInteractionId = interaction.id;
+            } catch (error) {
+                resultDiv.textContent = `❌ Direct interaction insert failed:\n${error.message}\n\nFull error: ${JSON.stringify(error, null, 2)}`;
+                resultDiv.className = 'result error';
+            }
+        };
+
+        window.testFullClickTracking = async function() {
+            const resultDiv = document.getElementById('clickTrackingResult');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Testing full click tracking...';
+            resultDiv.className = 'result info';
+
+            try {
+                if (!window.testQueryId) {
+                    throw new Error('No test query ID available. Please run query creation test first.');
+                }
+
+                console.log('Testing trackClick with queryId:', window.testQueryId);
+
+                await window.trackingService.trackClick(
+                    'https://example.com/full-test', 
+                    'Debug Test Result', 
+                    2, 
+                    window.testQueryId
+                );
+
+                resultDiv.textContent = `✅ Full click tracking completed!\nCheck browser console for detailed logs.\nQuery ID used: ${window.testQueryId}`;
+                resultDiv.className = 'result success';
+            } catch (error) {
+                resultDiv.textContent = `❌ Full click tracking failed:\n${error.message}\n\nStack: ${error.stack}`;
+                resultDiv.className = 'result error';
+            }
+        };
+
+        window.checkInteractionRecords = async function() {
+            const resultDiv = document.getElementById('recordsResult');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Checking interaction records...';
+            resultDiv.className = 'result info';
+
+            try {
+                const { data: interactions, error } = await window.supabase
+                    .from('interactions')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(10);
+
+                if (error) throw error;
+
+                if (interactions.length === 0) {
+                    resultDiv.textContent = '⚠️ No interaction records found in database.\nThis confirms the issue you reported.';
+                    resultDiv.className = 'result warning';
+                } else {
+                    resultDiv.textContent = `✅ Found ${interactions.length} interaction records:\n\n${JSON.stringify(interactions, null, 2)}`;
+                    resultDiv.className = 'result success';
+                }
+            } catch (error) {
+                resultDiv.textContent = `❌ Failed to check interaction records:\n${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        };
+    </script>
+</body>
+</html>
     
     <button id="testInteraction">Test Direct Interaction Insert</button>
     <button id="testWithExistingQuery">Test with Existing Query ID</button>

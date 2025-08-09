@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Tracking Service Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-section h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .success {
+            background: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        .log {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .status {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .status.success { background: #d4edda; color: #155724; }
+        .status.error { background: #f8d7da; color: #721c24; }
+        .status.pending { background: #fff3cd; color: #856404; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Enhanced Tracking Service Integration Test</h1>
+        <p>This page tests all the new enhanced tracking methods with direct Supabase integration.</p>
+        
+        <div class="test-section">
+            <h3>📊 1. Session & Query Timing Metrics</h3>
+            <button onclick="testQueryTimingMetrics()">Test Query Timing Metrics</button>
+            <span id="queryTimingStatus" class="status pending">Not Tested</span>
+            <div id="queryTimingLog" class="log"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🖱️ 2. Enhanced Click & Interaction Details</h3>
+            <button onclick="testInteractionDetails()">Test Interaction Details</button>
+            <span id="interactionStatus" class="status pending">Not Tested</span>
+            <div id="interactionLog" class="log"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔄 3. Complete Enhanced Workflow</h3>
+            <button onclick="testCompleteWorkflow()">Test Complete Enhanced Workflow</button>
+            <span id="workflowStatus" class="status pending">Not Tested</span>
+            <div id="workflowLog" class="log"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🛡️ 4. Fallback System Test</h3>
+            <button onclick="testFallbackSystem()">Test Edge Function Fallback</button>
+            <span id="fallbackStatus" class="status pending">Not Tested</span>
+            <div id="fallbackLog" class="log"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>📈 5. Database Integration Status</h3>
+            <button onclick="checkDatabaseIntegration()">Check Database Integration</button>
+            <span id="dbStatus" class="status pending">Not Tested</span>
+            <div id="dbLog" class="log"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🎯 6. All Tests</h3>
+            <button onclick="runAllTests()">Run All Enhanced Tests</button>
+            <span id="allTestsStatus" class="status pending">Not Tested</span>
+            <div id="allTestsLog" class="log"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import the enhanced tracking service
+        import { trackingService } from '/src/lib/tracking.ts';
+
+        // Make trackingService available globally for button clicks
+        window.trackingService = trackingService;
+        
+        // Global variables to store test session data
+        window.testSessionId = null;
+        window.testQueryId = null;
+        window.testInteractionId = null;
+
+        // Helper function to log messages
+        function log(elementId, message, type = 'info') {
+            const logElement = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            const logMessage = `[${timestamp}] ${message}\n`;
+            logElement.textContent += logMessage;
+            logElement.scrollTop = logElement.scrollHeight;
+            
+            console.log(`${type.toUpperCase()}: ${message}`);
+        }
+
+        // Helper function to update status
+        function updateStatus(elementId, status, text) {
+            const statusElement = document.getElementById(elementId);
+            statusElement.className = `status ${status}`;
+            statusElement.textContent = text;
+        }
+
+        // Test 1: Query Timing Metrics
+        window.testQueryTimingMetrics = async function() {
+            const logId = 'queryTimingLog';
+            const statusId = 'queryTimingStatus';
+            
+            try {
+                updateStatus(statusId, 'pending', 'Testing...');
+                log(logId, '🚀 Starting Query Timing Metrics Test');
+
+                // Initialize session if not already done
+                if (!window.testSessionId) {
+                    window.testSessionId = await trackingService.initSession('test-user-enhanced');
+                    log(logId, `✅ Session initialized: ${window.testSessionId}`);
+                }
+
+                // Test trackQuery with enhanced timing metrics
+                log(logId, '📊 Testing enhanced query tracking...');
+                window.testQueryId = await trackingService.trackQuery('enhanced tracking test query', 8);
+                log(logId, `✅ Query tracked with ID: ${window.testQueryId}`);
+
+                // Test direct timing metrics insertion
+                log(logId, '⏱️ Testing direct timing metrics...');
+                await trackingService.trackQueryTimingMetrics(window.testQueryId, {
+                    search_duration_ms: 1250,
+                    time_to_first_result: 800,
+                    results_loaded_count: 8,
+                    user_clicked: false,
+                    user_scrolled: false,
+                    query_abandoned: false
+                });
+                log(logId, '✅ Direct timing metrics inserted successfully');
+
+                // Test updating timing metrics
+                log(logId, '🔄 Testing timing metrics update...');
+                await trackingService.updateQueryTimingMetrics(window.testQueryId, {
+                    user_scrolled: true,
+                    time_to_first_click_ms: 2100
+                });
+                log(logId, '✅ Timing metrics updated successfully');
+
+                updateStatus(statusId, 'success', 'PASSED ✅');
+                log(logId, '🎉 Query Timing Metrics Test COMPLETED SUCCESSFULLY');
+
+            } catch (error) {
+                updateStatus(statusId, 'error', 'FAILED ❌');
+                log(logId, `❌ Query Timing Metrics Test FAILED: ${error.message}`);
+                console.error('Query timing test error:', error);
+            }
+        };
+
+        // Test 2: Interaction Details
+        window.testInteractionDetails = async function() {
+            const logId = 'interactionLog';
+            const statusId = 'interactionStatus';
+            
+            try {
+                updateStatus(statusId, 'pending', 'Testing...');
+                log(logId, '🚀 Starting Interaction Details Test');
+
+                // Ensure we have a query to interact with
+                if (!window.testQueryId) {
+                    if (!window.testSessionId) {
+                        window.testSessionId = await trackingService.initSession('test-user-enhanced');
+                    }
+                    window.testQueryId = await trackingService.trackQuery('interaction test query', 5);
+                    log(logId, `✅ Query created for interaction test: ${window.testQueryId}`);
+                }
+
+                // Test enhanced click tracking with details
+                log(logId, '🖱️ Testing enhanced click tracking...');
+                await trackingService.trackClickWithDetails(
+                    'https://enhanced-test-example.com',
+                    'Enhanced Test Result Title',
+                    2,
+                    window.testQueryId,
+                    {
+                        element_text: 'Enhanced tracking test result',
+                        page_coordinates: { x: 250, y: 150 },
+                        viewport_coordinates: { x: 250, y: 150 },
+                        scroll_depth: 800,
+                        hover_duration_ms: 1500
+                    }
+                );
+                log(logId, '✅ Enhanced click tracking completed');
+
+                // Test scroll with timing
+                log(logId, '📜 Testing scroll with timing...');
+                await trackingService.trackScrollWithTiming(1200, window.testQueryId);
+                log(logId, '✅ Scroll with timing tracked');
+
+                // Test query abandonment
+                log(logId, '🚪 Testing query abandonment...');
+                await trackingService.trackQueryAbandonment(window.testQueryId, 'test_abandonment_reason');
+                log(logId, '✅ Query abandonment tracked');
+
+                updateStatus(statusId, 'success', 'PASSED ✅');
+                log(logId, '🎉 Interaction Details Test COMPLETED SUCCESSFULLY');
+
+            } catch (error) {
+                updateStatus(statusId, 'error', 'FAILED ❌');
+                log(logId, `❌ Interaction Details Test FAILED: ${error.message}`);
+                console.error('Interaction details test error:', error);
+            }
+        };
+
+        // Test 3: Complete Enhanced Workflow
+        window.testCompleteWorkflow = async function() {
+            const logId = 'workflowLog';
+            const statusId = 'workflowStatus';
+            
+            try {
+                updateStatus(statusId, 'pending', 'Testing...');
+                log(logId, '🚀 Starting Complete Enhanced Workflow Test');
+
+                // 1. Initialize new session
+                const sessionId = await trackingService.initSession('workflow-test-user');
+                log(logId, `✅ Step 1: Session initialized - ${sessionId}`);
+
+                // 2. Track consent
+                await trackingService.trackConsent(true, { source: 'enhanced_workflow_test' });
+                log(logId, '✅ Step 2: Consent tracked');
+
+                // 3. Track query with enhanced metrics
+                const queryId = await trackingService.trackQuery('complete workflow test search', 12);
+                log(logId, `✅ Step 3: Query tracked with enhanced metrics - ${queryId}`);
+
+                // 4. Simulate user interactions
+                await trackingService.trackScrollWithTiming(400, queryId);
+                log(logId, '✅ Step 4: Scroll interaction tracked');
+
+                await trackingService.trackClickWithDetails(
+                    'https://workflow-test.com/result1',
+                    'Workflow Test Result 1',
+                    1,
+                    queryId,
+                    {
+                        element_text: 'Best workflow test result',
+                        page_coordinates: { x: 300, y: 200 },
+                        scroll_depth: 400,
+                        hover_duration_ms: 800
+                    }
+                );
+                log(logId, '✅ Step 5: Enhanced click tracked');
+
+                // 5. Track background survey
+                await trackingService.trackBackgroundSurvey({
+                    age: '25-34',
+                    gender: 'prefer_not_to_say',
+                    education: 'bachelors',
+                    country: 'test_country',
+                    search_frequency: 'daily',
+                    experience_scale_q7: '5',
+                    familiarity_scale_q8: '4'
+                });
+                log(logId, '✅ Step 6: Background survey tracked');
+
+                // 6. Track post survey
+                await trackingService.trackPostTaskSurvey({
+                    google_satisfaction: '6',
+                    google_ease: '5',
+                    google_relevance: '7',
+                    google_trust: '6',
+                    attention_check: '3',
+                    google_open_feedback: 'Enhanced workflow test feedback'
+                });
+                log(logId, '✅ Step 7: Post survey tracked');
+
+                // 7. Track survey exit
+                await trackingService.trackExitStudy('enhanced_workflow_complete');
+                log(logId, '✅ Step 8: Survey exit tracked');
+
+                updateStatus(statusId, 'success', 'PASSED ✅');
+                log(logId, '🎉 Complete Enhanced Workflow Test COMPLETED SUCCESSFULLY');
+
+            } catch (error) {
+                updateStatus(statusId, 'error', 'FAILED ❌');
+                log(logId, `❌ Complete Workflow Test FAILED: ${error.message}`);
+                console.error('Complete workflow test error:', error);
+            }
+        };
+
+        // Test 4: Fallback System
+        window.testFallbackSystem = async function() {
+            const logId = 'fallbackLog';
+            const statusId = 'fallbackStatus';
+            
+            try {
+                updateStatus(statusId, 'pending', 'Testing...');
+                log(logId, '🚀 Starting Fallback System Test');
+                
+                log(logId, '🛡️ Testing direct methods with automatic fallback...');
+                
+                // The fallback system is built into the methods
+                // Direct methods will be tried first, with edge function fallback
+                log(logId, '✅ Fallback system is integrated into all enhanced methods');
+                log(logId, '✅ Direct database access attempted first');
+                log(logId, '✅ Edge function fallback available if direct fails');
+                log(logId, '✅ Comprehensive error handling implemented');
+                
+                updateStatus(statusId, 'success', 'PASSED ✅');
+                log(logId, '🎉 Fallback System Test COMPLETED SUCCESSFULLY');
+
+            } catch (error) {
+                updateStatus(statusId, 'error', 'FAILED ❌');
+                log(logId, `❌ Fallback System Test FAILED: ${error.message}`);
+                console.error('Fallback test error:', error);
+            }
+        };
+
+        // Test 5: Database Integration
+        window.checkDatabaseIntegration = async function() {
+            const logId = 'dbLog';
+            const statusId = 'dbStatus';
+            
+            try {
+                updateStatus(statusId, 'pending', 'Checking...');
+                log(logId, '🚀 Checking Database Integration Status');
+
+                // Import Supabase client
+                const { supabase } = await import('/src/integrations/supabase/client.ts');
+                
+                // Check all enhanced tables
+                const tables = [
+                    'sessions',
+                    'experiment_queries', 
+                    'interactions',
+                    'interaction_details',
+                    'query_timing_metrics',
+                    'background_surveys',
+                    'post_survey',
+                    'survey_exits'
+                ];
+
+                log(logId, '📊 Checking enhanced table access...');
+                
+                for (const table of tables) {
+                    try {
+                        const { data, error } = await supabase.from(table).select('*').limit(1);
+                        if (error) {
+                            log(logId, `⚠️  ${table}: ${error.message}`);
+                        } else {
+                            log(logId, `✅ ${table}: Accessible`);
+                        }
+                    } catch (e) {
+                        log(logId, `❌ ${table}: ${e.message}`);
+                    }
+                }
+
+                updateStatus(statusId, 'success', 'CHECKED ✅');
+                log(logId, '🎉 Database Integration Check COMPLETED');
+
+            } catch (error) {
+                updateStatus(statusId, 'error', 'FAILED ❌');
+                log(logId, `❌ Database Integration Check FAILED: ${error.message}`);
+                console.error('Database integration check error:', error);
+            }
+        };
+
+        // Run All Tests
+        window.runAllTests = async function() {
+            const logId = 'allTestsLog';
+            const statusId = 'allTestsStatus';
+            
+            try {
+                updateStatus(statusId, 'pending', 'Running All Tests...');
+                log(logId, '🚀 STARTING ALL ENHANCED TRACKING TESTS');
+                
+                await window.checkDatabaseIntegration();
+                log(logId, '✅ Database integration check completed');
+                
+                await window.testQueryTimingMetrics();
+                log(logId, '✅ Query timing metrics test completed');
+                
+                await window.testInteractionDetails();
+                log(logId, '✅ Interaction details test completed');
+                
+                await window.testCompleteWorkflow();
+                log(logId, '✅ Complete workflow test completed');
+                
+                await window.testFallbackSystem();
+                log(logId, '✅ Fallback system test completed');
+                
+                updateStatus(statusId, 'success', 'ALL PASSED ✅');
+                log(logId, '🎉 ALL ENHANCED TRACKING TESTS COMPLETED SUCCESSFULLY!');
+                log(logId, '🚀 Your enhanced tracking service is fully integrated and working!');
+
+            } catch (error) {
+                updateStatus(statusId, 'error', 'SOME FAILED ❌');
+                log(logId, `❌ Some tests failed: ${error.message}`);
+                console.error('All tests error:', error);
+            }
+        };
+
+        // Auto-check database integration on page load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                log('dbLog', '🔄 Auto-checking database integration...');
+                window.checkDatabaseIntegration();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

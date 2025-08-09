@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Database Recording Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8fafc;
+        }
+        .test-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .test-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        .test-button:hover { background: #2563eb; }
+        .test-button:disabled { background: #94a3b8; cursor: not-allowed; }
+        .result {
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            padding: 12px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .success { background: #dcfce7; border-color: #16a34a; color: #166534; }
+        .error { background: #fef2f2; border-color: #dc2626; color: #991b1b; }
+        .warning { background: #fefce8; border-color: #ca8a04; color: #92400e; }
+        .info { background: #dbeafe; border-color: #2563eb; color: #1e40af; }
+        .live-count {
+            font-size: 24px;
+            font-weight: bold;
+            color: #16a34a;
+            text-align: center;
+            margin: 10px 0;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-active { background: #16a34a; animation: pulse 1s infinite; }
+        .status-error { background: #dc2626; }
+        .status-waiting { background: #f59e0b; }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Live Database Recording Test</h1>
+    <p>Testing whether enhanced metrics are actually being recorded in Supabase database...</p>
+
+    <div class="test-grid">
+        <!-- Real-time Database Monitor -->
+        <div class="test-card">
+            <h3><span id="dbStatus" class="status-indicator status-waiting"></span>Database Monitor</h3>
+            <div class="live-count" id="recordCount">Checking...</div>
+            <button class="test-button" onclick="startMonitoring()">Start Monitoring</button>
+            <button class="test-button" onclick="stopMonitoring()">Stop</button>
+            <div id="monitorResult" class="result info">Click "Start Monitoring" to begin live database monitoring...</div>
+        </div>
+
+        <!-- Live Test Actions -->
+        <div class="test-card">
+            <h3>🧪 Live Test Actions</h3>
+            <button class="test-button" onclick="performSearch()">Perform Test Search</button>
+            <button class="test-button" onclick="simulateClick()">Simulate Click</button>
+            <button class="test-button" onclick="testEnhancedMetrics()">Test Enhanced Metrics</button>
+            <div id="actionResult" class="result" style="display: none;"></div>
+        </div>
+
+        <!-- Recent Records View -->
+        <div class="test-card">
+            <h3>📊 Recent Records</h3>
+            <button class="test-button" onclick="showRecentRecords()">Refresh Records</button>
+            <div id="recentRecords" class="result" style="display: none;"></div>
+        </div>
+
+        <!-- Console Output -->
+        <div class="test-card">
+            <h3>🖥️ Console Output</h3>
+            <button class="test-button" onclick="clearConsole()">Clear Console</button>
+            <div id="consoleOutput" class="result info">Console output will appear here...</div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Supabase
+        const supabaseUrl = 'https://wbguuipoggeamyzrfvbv.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndnZ3d1aXBvZ2dlYW15enJmdmJ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQxMDk1NjgsImV4cCI6MjA0OTY4NTU2OH0.Jl2nXPPKMCdVzaGTzBfnolr0vNDsYpk2dCRPCWYm7vU';
+
+        let supabase;
+        let monitoringInterval;
+        let totalRecords = 0;
+
+        // Override console methods to capture output
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+
+        function logToDiv(type, ...args) {
+            const output = document.getElementById('consoleOutput');
+            const timestamp = new Date().toLocaleTimeString();
+            const message = args.map(arg => 
+                typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+            ).join(' ');
+            
+            output.textContent += `[${timestamp}] ${type.toUpperCase()}: ${message}\n`;
+            output.scrollTop = output.scrollHeight;
+            
+            // Call original method
+            if (type === 'log') originalLog(...args);
+            else if (type === 'error') originalError(...args);
+            else if (type === 'warn') originalWarn(...args);
+        }
+
+        console.log = (...args) => logToDiv('log', ...args);
+        console.error = (...args) => logToDiv('error', ...args);
+        console.warn = (...args) => logToDiv('warn', ...args);
+
+        async function initSupabase() {
+            try {
+                // Import Supabase dynamically
+                const { createClient } = await import('https://cdn.skypack.dev/@supabase/supabase-js@2');
+                supabase = createClient(supabaseUrl, supabaseKey);
+                console.log('✅ Supabase client initialized');
+                
+                // Test connection
+                const { data, error } = await supabase.from('interactions').select('count', { count: 'exact', head: true });
+                if (error) {
+                    console.error('❌ Supabase connection test failed:', error);
+                } else {
+                    console.log('✅ Supabase connection successful');
+                }
+                
+                return true;
+            } catch (error) {
+                console.error('❌ Failed to initialize Supabase:', error);
+                return false;
+            }
+        }
+
+        async function startMonitoring() {
+            if (!supabase) {
+                const success = await initSupabase();
+                if (!success) return;
+            }
+
+            const statusEl = document.getElementById('dbStatus');
+            const countEl = document.getElementById('recordCount');
+            const resultEl = document.getElementById('monitorResult');
+            
+            statusEl.className = 'status-indicator status-active';
+            resultEl.textContent = 'Starting monitoring...\n';
+            resultEl.className = 'result info';
+
+            let checkCount = 0;
+            monitoringInterval = setInterval(async () => {
+                checkCount++;
+                const timestamp = new Date().toLocaleTimeString();
+                
+                try {
+                    // Get current counts
+                    const [interactions, details, timing, queries] = await Promise.all([
+                        supabase.from('interactions').select('*', { count: 'exact', head: true }),
+                        supabase.from('interaction_details').select('*', { count: 'exact', head: true }),
+                        supabase.from('query_timing_metrics').select('*', { count: 'exact', head: true }),
+                        supabase.from('experiment_queries').select('*', { count: 'exact', head: true })
+                    ]);
+
+                    const currentTotal = (interactions.count || 0) + (details.count || 0) + (timing.count || 0) + (queries.count || 0);
+                    const newRecords = currentTotal - totalRecords;
+                    totalRecords = currentTotal;
+
+                    countEl.textContent = `${totalRecords} Total Records`;
+                    
+                    let update = `[${timestamp}] Check #${checkCount}:\n`;
+                    update += `  Interactions: ${interactions.count || 0}\n`;
+                    update += `  Details: ${details.count || 0}\n`;
+                    update += `  Timing: ${timing.count || 0}\n`;
+                    update += `  Queries: ${queries.count || 0}\n`;
+                    
+                    if (newRecords > 0) {
+                        update += `  🆕 NEW RECORDS: +${newRecords}\n`;
+                        resultEl.className = 'result success';
+                        console.log(`🎉 New records detected: +${newRecords}`);
+                    } else {
+                        update += `  📊 No new records\n`;
+                    }
+                    
+                    update += '\n';
+                    resultEl.textContent += update;
+                    resultEl.scrollTop = resultEl.scrollHeight;
+
+                } catch (error) {
+                    update = `[${timestamp}] ❌ Monitor error: ${error.message}\n\n`;
+                    resultEl.textContent += update;
+                    statusEl.className = 'status-indicator status-error';
+                    console.error('Monitor error:', error);
+                }
+            }, 3000); // Check every 3 seconds
+        }
+
+        function stopMonitoring() {
+            if (monitoringInterval) {
+                clearInterval(monitoringInterval);
+                monitoringInterval = null;
+                
+                const statusEl = document.getElementById('dbStatus');
+                const resultEl = document.getElementById('monitorResult');
+                
+                statusEl.className = 'status-indicator status-waiting';
+                resultEl.textContent += '\n⏹️ Monitoring stopped.\n';
+                console.log('Monitoring stopped');
+            }
+        }
+
+        async function performSearch() {
+            const resultEl = document.getElementById('actionResult');
+            resultEl.style.display = 'block';
+            resultEl.textContent = 'Performing test search...';
+            resultEl.className = 'result info';
+
+            try {
+                // Open main app in new window
+                const testWindow = window.open('http://localhost:8080/', '_blank');
+                
+                if (!testWindow) {
+                    throw new Error('Failed to open test window - popup blocked?');
+                }
+
+                resultEl.textContent = '✅ Test window opened! Perform a search there and watch the database monitor for new records.';
+                resultEl.className = 'result success';
+                console.log('Test window opened for search testing');
+
+            } catch (error) {
+                resultEl.textContent = `❌ Failed to open test window: ${error.message}`;
+                resultEl.className = 'result error';
+                console.error('Test search failed:', error);
+            }
+        }
+
+        async function simulateClick() {
+            if (!supabase) {
+                const success = await initSupabase();
+                if (!success) return;
+            }
+
+            const resultEl = document.getElementById('actionResult');
+            resultEl.style.display = 'block';
+            resultEl.textContent = 'Simulating database records...';
+            resultEl.className = 'result info';
+
+            try {
+                console.log('Creating simulated records...');
+
+                // Create a test query
+                const { data: query, error: queryError } = await supabase
+                    .from('experiment_queries')
+                    .insert({
+                        session_id: 'test-session-' + Date.now(),
+                        query_text: 'database recording test',
+                        result_count: 5,
+                        query_timestamp: new Date().toISOString()
+                    })
+                    .select('*')
+                    .single();
+
+                if (queryError) throw queryError;
+                console.log('✅ Test query created:', query.id);
+
+                // Create a test interaction
+                const { data: interaction, error: intError } = await supabase
+                    .from('interactions')
+                    .insert({
+                        query_id: query.id,
+                        clicked_url: 'https://example.com/test-' + Date.now(),
+                        clicked_rank: 1,
+                        clicked_result_count: 1,
+                        interaction_type: 'click'
+                    })
+                    .select('*')
+                    .single();
+
+                if (intError) throw intError;
+                console.log('✅ Test interaction created:', interaction.id);
+
+                // Create interaction detail
+                const { data: detail, error: detError } = await supabase
+                    .from('interaction_details')
+                    .insert({
+                        interaction_id: interaction.id,
+                        interaction_type: 'click',
+                        element_id: 'test-element',
+                        value: 'test-click',
+                        metadata: {
+                            action_type: 'result_click',
+                            timestamp_action: Date.now(),
+                            page_scroll_y: Math.floor(Math.random() * 1000),
+                            viewport_height: 800
+                        }
+                    })
+                    .select('*')
+                    .single();
+
+                if (detError) throw detError;
+                console.log('✅ Test detail created:', detail.id);
+
+                resultEl.textContent = `✅ Successfully created test records!\n\nQuery ID: ${query.id}\nInteraction ID: ${interaction.id}\nDetail ID: ${detail.id}\n\nCheck the database monitor for updates!`;
+                resultEl.className = 'result success';
+
+            } catch (error) {
+                resultEl.textContent = `❌ Failed to create test records: ${error.message}`;
+                resultEl.className = 'result error';
+                console.error('Simulation failed:', error);
+            }
+        }
+
+        async function testEnhancedMetrics() {
+            const resultEl = document.getElementById('actionResult');
+            resultEl.style.display = 'block';
+            resultEl.textContent = 'Testing enhanced metrics...';
+            resultEl.className = 'result info';
+
+            try {
+                console.log('Testing enhanced metrics integration...');
+
+                // Open enhanced test page
+                const testWindow = window.open('http://localhost:8080/enhanced-metrics-integration-test.html', '_blank');
+                
+                if (!testWindow) {
+                    throw new Error('Failed to open enhanced test window - popup blocked?');
+                }
+
+                resultEl.textContent = '✅ Enhanced metrics test window opened!\n\nUse the test buttons there to generate enhanced tracking data and watch the database monitor for new records.';
+                resultEl.className = 'result success';
+                console.log('Enhanced metrics test window opened');
+
+            } catch (error) {
+                resultEl.textContent = `❌ Failed to open enhanced test: ${error.message}`;
+                resultEl.className = 'result error';
+                console.error('Enhanced metrics test failed:', error);
+            }
+        }
+
+        async function showRecentRecords() {
+            if (!supabase) {
+                const success = await initSupabase();
+                if (!success) return;
+            }
+
+            const resultEl = document.getElementById('recentRecords');
+            resultEl.style.display = 'block';
+            resultEl.textContent = 'Loading recent records...';
+            resultEl.className = 'result info';
+
+            try {
+                // Get recent records from all tables
+                const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+                
+                const [interactions, details, timing] = await Promise.all([
+                    supabase
+                        .from('interactions')
+                        .select('*')
+                        .gte('created_at', fiveMinutesAgo)
+                        .order('created_at', { ascending: false })
+                        .limit(5),
+                    supabase
+                        .from('interaction_details')
+                        .select('*')
+                        .gte('created_at', fiveMinutesAgo)
+                        .order('created_at', { ascending: false })
+                        .limit(5),
+                    supabase
+                        .from('query_timing_metrics')
+                        .select('*')
+                        .gte('created_at', fiveMinutesAgo)
+                        .order('created_at', { ascending: false })
+                        .limit(5)
+                ]);
+
+                let report = '📊 RECENT RECORDS (Last 5 minutes)\n';
+                report += '=' * 50 + '\n\n';
+
+                report += `🔗 Recent Interactions (${interactions.data?.length || 0}):\n`;
+                if (interactions.data && interactions.data.length > 0) {
+                    interactions.data.forEach((record, idx) => {
+                        report += `  ${idx + 1}. ${record.interaction_type} - ${record.clicked_url}\n`;
+                        report += `     Created: ${new Date(record.created_at).toLocaleTimeString()}\n`;
+                    });
+                } else {
+                    report += '  No recent interactions found\n';
+                }
+
+                report += `\n📋 Recent Details (${details.data?.length || 0}):\n`;
+                if (details.data && details.data.length > 0) {
+                    details.data.forEach((record, idx) => {
+                        report += `  ${idx + 1}. ${record.interaction_type} - ${record.element_id}\n`;
+                        report += `     Created: ${new Date(record.created_at).toLocaleTimeString()}\n`;
+                    });
+                } else {
+                    report += '  No recent details found\n';
+                }
+
+                report += `\n⏱️ Recent Timing (${timing.data?.length || 0}):\n`;
+                if (timing.data && timing.data.length > 0) {
+                    timing.data.forEach((record, idx) => {
+                        report += `  ${idx + 1}. Time to first click: ${record.time_to_first_click_ms}ms\n`;
+                        report += `     Created: ${new Date(record.created_at).toLocaleTimeString()}\n`;
+                    });
+                } else {
+                    report += '  No recent timing found\n';
+                }
+
+                resultEl.textContent = report;
+                resultEl.className = 'result success';
+                console.log('Recent records loaded successfully');
+
+            } catch (error) {
+                resultEl.textContent = `❌ Failed to load recent records: ${error.message}`;
+                resultEl.className = 'result error';
+                console.error('Failed to load recent records:', error);
+            }
+        }
+
+        function clearConsole() {
+            document.getElementById('consoleOutput').textContent = 'Console cleared...\n';
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🔍 Database Recording Test initialized');
+            console.log('Ready to test enhanced metrics recording!');
+        });
+    </script>
+</body>
+</html>

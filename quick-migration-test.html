@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Migration Verification</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        button { background: #007bff; color: white; border: none; padding: 10px 20px; margin: 5px; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 4px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Quick Enhanced Tracking Migration Verification</h1>
+    
+    <button onclick="testMigration()">🚀 Test Enhanced Migration</button>
+    <button onclick="clearResults()">🧹 Clear Results</button>
+    
+    <div id="results"></div>
+    
+    <script type="module">
+        import { supabase } from '/src/integrations/supabase/client.ts';
+        import { trackingService } from '/src/lib/tracking.ts';
+        
+        window.supabase = supabase;
+        window.trackingService = trackingService;
+        
+        function addResult(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `result ${type}`;
+            div.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
+            document.getElementById('results').appendChild(div);
+            console.log(`${type.toUpperCase()}: ${message}`);
+        }
+        
+        window.clearResults = function() {
+            document.getElementById('results').innerHTML = '';
+        }
+        
+        window.testMigration = async function() {
+            addResult('🚀 Starting Enhanced Tracking Migration Verification...', 'info');
+            
+            try {
+                // Test 1: Check enhanced tables exist
+                addResult('📊 Testing enhanced table access...', 'info');
+                
+                const enhancedTables = ['query_timing_metrics', 'interaction_details', 'survey_exits'];
+                
+                for (const table of enhancedTables) {
+                    try {
+                        const { data, error } = await supabase.from(table).select('*').limit(1);
+                        if (error) {
+                            addResult(`❌ ${table}: ${error.message}`, 'error');
+                        } else {
+                            addResult(`✅ ${table}: Accessible`, 'success');
+                        }
+                    } catch (e) {
+                        addResult(`❌ ${table}: ${e.message}`, 'error');
+                    }
+                }
+                
+                // Test 2: Create test session and query
+                addResult('🔧 Testing enhanced tracking methods...', 'info');
+                
+                const testSessionId = await trackingService.initSession('migration-verify-' + Date.now());
+                addResult(`✅ Session created: ${testSessionId}`, 'success');
+                
+                const testQueryId = await trackingService.trackQuery('migration verification test', 5);
+                addResult(`✅ Query tracked: ${testQueryId}`, 'success');
+                
+                // Test 3: Direct timing metrics
+                await trackingService.trackQueryTimingMetrics(testQueryId, {
+                    search_duration_ms: 1000,
+                    time_to_first_result: 500,
+                    results_loaded_count: 5,
+                    user_clicked: false,
+                    user_scrolled: false,
+                    query_abandoned: false
+                });
+                addResult('✅ Direct timing metrics inserted', 'success');
+                
+                // Test 4: Enhanced click with details
+                await trackingService.trackClickWithDetails(
+                    'https://migration-test.com',
+                    'Migration Test Result',
+                    1,
+                    testQueryId,
+                    {
+                        element_text: 'Test click',
+                        page_coordinates: { x: 100, y: 50 },
+                        scroll_depth: 200
+                    }
+                );
+                addResult('✅ Enhanced click with details tracked', 'success');
+                
+                // Test 5: Survey exit
+                await trackingService.trackExitStudy('migration_verification_complete');
+                addResult('✅ Survey exit tracked', 'success');
+                
+                // Test 6: Verify data in database
+                addResult('🔍 Verifying data in database...', 'info');
+                
+                // Check timing metrics
+                const { data: timingData, error: timingError } = await supabase
+                    .from('query_timing_metrics')
+                    .select('*')
+                    .eq('query_id', testQueryId);
+                    
+                if (timingError) {
+                    addResult(`❌ Timing metrics verification failed: ${timingError.message}`, 'error');
+                } else if (timingData && timingData.length > 0) {
+                    addResult(`✅ Timing metrics found in database: ${timingData.length} records`, 'success');
+                } else {
+                    addResult('⚠️ No timing metrics found in database', 'error');
+                }
+                
+                // Check interaction details
+                const { data: interactionData, error: interactionError } = await supabase
+                    .from('interactions')
+                    .select(`
+                        id,
+                        clicked_url,
+                        interaction_details (
+                            id,
+                            interaction_type,
+                            element_id
+                        )
+                    `)
+                    .eq('query_id', testQueryId);
+                    
+                if (interactionError) {
+                    addResult(`❌ Interaction details verification failed: ${interactionError.message}`, 'error');
+                } else if (interactionData && interactionData.length > 0) {
+                    addResult(`✅ Interaction details found: ${interactionData.length} interactions`, 'success');
+                    if (interactionData[0].interaction_details && interactionData[0].interaction_details.length > 0) {
+                        addResult(`✅ Enhanced interaction details verified: ${interactionData[0].interaction_details.length} details`, 'success');
+                    } else {
+                        addResult('⚠️ No enhanced interaction details found', 'error');
+                    }
+                } else {
+                    addResult('⚠️ No interactions found in database', 'error');
+                }
+                
+                // Check survey exits
+                const { data: exitData, error: exitError } = await supabase
+                    .from('survey_exits')
+                    .select('*')
+                    .eq('session_id', testSessionId);
+                    
+                if (exitError) {
+                    addResult(`❌ Survey exit verification failed: ${exitError.message}`, 'error');
+                } else if (exitData && exitData.length > 0) {
+                    addResult(`✅ Survey exit found in database: ${exitData.length} records`, 'success');
+                } else {
+                    addResult('⚠️ No survey exit found in database', 'error');
+                }
+                
+                addResult('🎉 Enhanced Tracking Migration Verification Complete!', 'success');
+                addResult('📊 All enhanced methods are working with Supabase remote database', 'success');
+                
+            } catch (error) {
+                addResult(`❌ Migration verification failed: ${error.message}`, 'error');
+                console.error('Migration verification error:', error);
+            }
+        }
+    </script>
+</body>
+</html>

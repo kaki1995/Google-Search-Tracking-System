@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detailed Interaction Debug</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 10px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        .test-button:hover { background: #2563eb; }
+        .test-button:disabled { background: #94a3b8; cursor: not-allowed; }
+        .result {
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            padding: 12px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .success { background: #dcfce7; border-color: #16a34a; color: #166534; }
+        .error { background: #fef2f2; border-color: #dc2626; color: #991b1b; }
+        .warning { background: #fefce8; border-color: #ca8a04; color: #92400e; }
+        .info { background: #dbeafe; border-color: #2563eb; color: #1e40af; }
+    </style>
+</head>
+<body>
+    <h1>🔬 Detailed Interaction Debug Analysis</h1>
+    <p>Comprehensive diagnosis of why interaction records aren't appearing.</p>
+
+    <div class="test-card">
+        <h3>📊 Database Tables Status</h3>
+        <button class="test-button" onclick="checkAllTables()">Check All Tables</button>
+        <div id="tablesResult" class="result" style="display: none;"></div>
+    </div>
+
+    <div class="test-card">
+        <h3>🧪 Session & Query Flow Test</h3>
+        <button class="test-button" onclick="testSessionQueryFlow()">Test Complete Flow</button>
+        <div id="flowResult" class="result" style="display: none;"></div>
+    </div>
+
+    <div class="test-card">
+        <h3>🖱️ Real Click Simulation</h3>
+        <p>Simulate exactly what happens when user clicks a search result:</p>
+        <button class="test-button" onclick="simulateRealSearchClick()">Simulate Search Result Click</button>
+        <div id="clickResult" class="result" style="display: none;"></div>
+    </div>
+
+    <div class="test-card">
+        <h3>🔍 Raw Database Query</h3>
+        <button class="test-button" onclick="checkRawInteractions()">Check Raw Interactions</button>
+        <button class="test-button" onclick="checkRecentQueries()">Check Recent Queries</button>
+        <div id="rawResult" class="result" style="display: none;"></div>
+    </div>
+
+    <div class="test-card">
+        <h3>📈 Console Logs Monitor</h3>
+        <div id="console-monitor" class="result info">
+            Console output will appear here...
+            <br>Check browser dev tools Console tab for detailed logs.
+        </div>
+    </div>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.skypack.dev/@supabase/supabase-js@2';
+        import { TrackingService } from './src/lib/tracking.js';
+
+        const supabaseUrl = 'https://wbguuipoggeamyzrfvbv.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndnZ3d1aXBvZ2dlYW15enJmdmJ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQxMDk1NjgsImV4cCI6MjA0OTY4NTU2OH0.Jl2nXPPKMCdVzaGTzBfnolr0vNDsYpk2dCRPCWYm7vU';
+        
+        window.supabase = createClient(supabaseUrl, supabaseKey);
+        window.trackingService = new TrackingService();
+
+        // Override console.log to capture in our monitor
+        const originalLog = console.log;
+        const originalError = console.error;
+        
+        window.logs = [];
+        
+        console.log = (...args) => {
+            window.logs.push(['LOG', new Date().toISOString(), ...args]);
+            updateConsoleMonitor();
+            originalLog.apply(console, args);
+        };
+        
+        console.error = (...args) => {
+            window.logs.push(['ERROR', new Date().toISOString(), ...args]);
+            updateConsoleMonitor();
+            originalError.apply(console, args);
+        };
+
+        function updateConsoleMonitor() {
+            const monitor = document.getElementById('console-monitor');
+            const recent = window.logs.slice(-10).map(log => 
+                `[${log[0]}] ${log[1]}: ${log.slice(2).map(item => 
+                    typeof item === 'object' ? JSON.stringify(item, null, 2) : String(item)
+                ).join(' ')}`
+            ).join('\n');
+            monitor.textContent = recent || 'No console output yet...';
+        }
+
+        // Initialize tracking service
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('🚀 Starting detailed interaction debug...');
+            try {
+                await window.trackingService.initSession();
+                console.log('✅ Session initialized:', window.trackingService.sessionData?.sessionId);
+            } catch (error) {
+                console.error('❌ Session initialization failed:', error);
+            }
+        });
+
+        window.checkAllTables = async function() {
+            const resultDiv = document.getElementById('tablesResult');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Checking all tables...';
+            resultDiv.className = 'result info';
+
+            try {
+                const tables = ['sessions', 'experiment_queries', 'interactions', 'interaction_details'];
+                const results = {};
+
+                for (const table of tables) {
+                    try {
+                        const { data, error } = await window.supabase
+                            .from(table)
+                            .select('count(*)', { count: 'exact' })
+                            .limit(0);
+
+                        if (error) {
+                            results[table] = `❌ Error: ${error.message}`;
+                        } else {
+                            results[table] = `✅ Exists - ${data.length === 0 ? '0' : 'unknown'} records`;
+                        }
+                    } catch (err) {
+                        results[table] = `❌ Exception: ${err.message}`;
+                    }
+                }
+
+                resultDiv.textContent = Object.entries(results)
+                    .map(([table, status]) => `${table}: ${status}`)
+                    .join('\n');
+                resultDiv.className = 'result success';
+            } catch (error) {
+                resultDiv.textContent = `❌ Failed to check tables: ${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        };
+
+        window.testSessionQueryFlow = async function() {
+            const resultDiv = document.getElementById('flowResult');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Testing complete session and query flow...';
+            resultDiv.className = 'result info';
+
+            try {
+                let results = '';
+
+                // Step 1: Check session
+                if (!window.trackingService.sessionData) {
+                    throw new Error('No session data - this is the problem!');
+                }
+                results += `✅ Session exists: ${window.trackingService.sessionData.sessionId}\n`;
+
+                // Step 2: Create a query
+                console.log('Creating test query...');
+                const queryId = await window.trackingService.trackQuery('test search query for interaction debug', 8);
+                results += `✅ Query created: ${queryId}\n`;
+
+                // Step 3: Verify query was saved
+                const { data: savedQuery, error: queryError } = await window.supabase
+                    .from('experiment_queries')
+                    .select('*')
+                    .eq('id', queryId)
+                    .single();
+
+                if (queryError) {
+                    throw new Error(`Query not saved: ${queryError.message}`);
+                }
+                results += `✅ Query verified in DB: ${savedQuery.query_text}\n`;
+
+                // Step 4: Now test interaction creation
+                console.log('Testing interaction with queryId:', queryId);
+                
+                const interactionData = {
+                    query_id: queryId,
+                    clicked_url: 'https://example.com/debug-flow-test',
+                    clicked_rank: 3,
+                    clicked_result_count: 1
+                };
+
+                const { data: interaction, error: interactionError } = await window.supabase
+                    .from('interactions')
+                    .insert(interactionData)
+                    .select('*')
+                    .single();
+
+                if (interactionError) {
+                    throw new Error(`Interaction creation failed: ${interactionError.message}`);
+                }
+
+                results += `✅ Interaction created successfully!\n`;
+                results += `   ID: ${interaction.id}\n`;
+                results += `   Query ID: ${interaction.query_id}\n`;
+                results += `   URL: ${interaction.clicked_url}\n`;
+                results += `   Rank: ${interaction.clicked_rank}\n`;
+
+                resultDiv.textContent = results;
+                resultDiv.className = 'result success';
+
+                // Store for other tests
+                window.debugQueryId = queryId;
+                window.debugInteractionId = interaction.id;
+
+            } catch (error) {
+                resultDiv.textContent = `❌ Flow test failed:\n${error.message}\n\nStack: ${error.stack}`;
+                resultDiv.className = 'result error';
+            }
+        };
+
+        window.simulateRealSearchClick = async function() {
+            const resultDiv = document.getElementById('clickResult');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Simulating real search result click...';
+            resultDiv.className = 'result info';
+
+            try {
+                if (!window.debugQueryId) {
+                    throw new Error('No debug query ID. Please run "Test Complete Flow" first.');
+                }
+
+                console.log('🖱️ Simulating search result click...');
+                console.log('Using queryId:', window.debugQueryId);
+
+                // This exactly matches what happens in SearchResults.tsx
+                await window.trackingService.trackClick(
+                    'https://example.com/simulated-search-result',
+                    'Simulated Search Result Title',
+                    2, // position
+                    window.debugQueryId
+                );
+
+                resultDiv.textContent = `✅ Simulated click completed!\n\nCheck console logs for details.\nUsed Query ID: ${window.debugQueryId}\n\nIf this worked, the issue is likely:\n1. queryId not being passed in real app\n2. Session not initialized properly\n3. SearchResults component not calling trackClick`;
+                resultDiv.className = 'result success';
+
+            } catch (error) {
+                resultDiv.textContent = `❌ Simulated click failed:\n${error.message}\n\nStack: ${error.stack}`;
+                resultDiv.className = 'result error';
+            }
+        };
+
+        window.checkRawInteractions = async function() {
+            const resultDiv = document.getElementById('rawResult');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Checking raw interactions...';
+            resultDiv.className = 'result info';
+
+            try {
+                const { data: interactions, error } = await window.supabase
+                    .from('interactions')
+                    .select(`
+                        *,
+                        experiment_queries (
+                            query_text,
+                            created_at
+                        )
+                    `)
+                    .order('created_at', { ascending: false })
+                    .limit(10);
+
+                if (error) throw error;
+
+                if (interactions.length === 0) {
+                    resultDiv.textContent = '⚠️ NO INTERACTIONS FOUND\n\nThis confirms your issue. The interactions table is empty.';
+                    resultDiv.className = 'result warning';
+                } else {
+                    resultDiv.textContent = `✅ Found ${interactions.length} interactions:\n\n${JSON.stringify(interactions, null, 2)}`;
+                    resultDiv.className = 'result success';
+                }
+            } catch (error) {
+                resultDiv.textContent = `❌ Failed to check interactions:\n${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        };
+
+        window.checkRecentQueries = async function() {
+            const resultDiv = document.getElementById('rawResult');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Checking recent queries...';
+            resultDiv.className = 'result info';
+
+            try {
+                const { data: queries, error } = await window.supabase
+                    .from('experiment_queries')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(5);
+
+                if (error) throw error;
+
+                resultDiv.textContent = `Recent queries (${queries.length} found):\n\n${JSON.stringify(queries, null, 2)}`;
+                resultDiv.className = 'result success';
+            } catch (error) {
+                resultDiv.textContent = `❌ Failed to check queries:\n${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        };
+    </script>
+</body>
+</html>
