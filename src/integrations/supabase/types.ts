@@ -693,6 +693,22 @@ export type Database = {
           query_id: string | null
           time_to_first_click_ms: number | null
         }
+        Insert: {
+          first_click_id?: string | null
+          first_click_time?: string | null
+          first_clicked_rank?: number | null
+          first_clicked_url?: string | null
+          query_id?: string | null
+          time_to_first_click_ms?: never
+        }
+        Update: {
+          first_click_id?: string | null
+          first_click_time?: string | null
+          first_clicked_rank?: number | null
+          first_clicked_url?: string | null
+          query_id?: string | null
+          time_to_first_click_ms?: never
+        }
         Relationships: [
           {
             foreignKeyName: "interactions_query_id_fkey"
@@ -733,6 +749,24 @@ export type Database = {
             | null
           query_id: string | null
           time_to_first_interaction_ms: number | null
+        }
+        Insert: {
+          first_interaction_id?: string | null
+          first_interaction_time?: string | null
+          first_interaction_type?:
+            | Database["public"]["Enums"]["interaction_type"]
+            | null
+          query_id?: string | null
+          time_to_first_interaction_ms?: never
+        }
+        Update: {
+          first_interaction_id?: string | null
+          first_interaction_time?: string | null
+          first_interaction_type?:
+            | Database["public"]["Enums"]["interaction_type"]
+            | null
+          query_id?: string | null
+          time_to_first_interaction_ms?: never
         }
         Relationships: [
           {
