@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Interactions</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <h1>Debug Interactions Table</h1>
+    
+    <button id="testInteraction">Test Direct Interaction Insert</button>
+    <button id="testWithExistingQuery">Test with Existing Query ID</button>
+    <button id="checkInteractions">Check Interactions Table</button>
+    
+    <div id="output"></div>
+    
+    <script>
+        const { createClient } = supabase;
+        const supabaseClient = createClient(
+            'https://wbguuipoggeamyzrfvbv.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndiZ3V1aXBvZ2dlYW15enJmdmJ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3Nzc2OTksImV4cCI6MjA2OTM1MzY5OX0.ddgmJnxg6hipRZ8_r9WyQpvsM-pkhBlRoybPdtGPEtY'
+        );
+        
+        function logOutput(message) {
+            const output = document.getElementById('output');
+            output.innerHTML += '<div>' + JSON.stringify(message, null, 2) + '</div><br>';
+        }
+        
+        document.getElementById('testInteraction').addEventListener('click', async () => {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('interactions')
+                    .insert({
+                        query_id: '9faf3fb1-d129-4c33-942d-cbec07a1b0e7', // Using existing query ID
+                        clicked_url: 'https://test.com',
+                        clicked_rank: 1,
+                        interaction_type: 'click'
+                    })
+                    .select('*')
+                    .single();
+                    
+                if (error) {
+                    logOutput({ error: 'Failed to insert interaction', details: error });
+                } else {
+                    logOutput({ success: 'Interaction inserted', data });
+                }
+            } catch (err) {
+                logOutput({ error: 'Exception during insert', details: err.message });
+            }
+        });
+        
+        document.getElementById('testWithExistingQuery').addEventListener('click', async () => {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('interactions')
+                    .insert({
+                        query_id: '5c90a04e-9f51-4e35-936d-fd0c237c96fa', // Using the latest query ID
+                        clicked_url: 'https://apple.com/iphone',
+                        clicked_rank: 1,
+                        interaction_type: 'click',
+                        element_id: 'search_result_1',
+                        element_text: 'Apple iPhone',
+                        session_time_ms: 15000,
+                        query_time_ms: 5000
+                    })
+                    .select('*')
+                    .single();
+                    
+                if (error) {
+                    logOutput({ error: 'Failed to insert with existing query', details: error });
+                } else {
+                    logOutput({ success: 'Interaction inserted with existing query', data });
+                }
+            } catch (err) {
+                logOutput({ error: 'Exception during insert with existing query', details: err.message });
+            }
+        });
+        
+        document.getElementById('checkInteractions').addEventListener('click', async () => {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('interactions')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(10);
+                    
+                if (error) {
+                    logOutput({ error: 'Failed to fetch interactions', details: error });
+                } else {
+                    logOutput({ interactions: data, count: data.length });
+                }
+            } catch (err) {
+                logOutput({ error: 'Exception during fetch', details: err.message });
+            }
+        });
+    </script>
+</body>
+</html>
