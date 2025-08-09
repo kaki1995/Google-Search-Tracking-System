@@ -65,13 +65,6 @@ export type Database = {
             referencedRelation: "sessions"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "background_surveys_session_id_fkey"
-            columns: ["session_id"]
-            isOneToOne: false
-            referencedRelation: "v_enhanced_session_metrics"
-            referencedColumns: ["id"]
-          },
         ]
       }
       experiment_queries: {
@@ -144,38 +137,10 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "experiment_queries_previous_query_id_fkey"
-            columns: ["previous_query_id"]
-            isOneToOne: false
-            referencedRelation: "v_enhanced_query_metrics"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "experiment_queries_previous_query_id_fkey"
-            columns: ["previous_query_id"]
-            isOneToOne: false
-            referencedRelation: "v_query_end"
-            referencedColumns: ["query_id"]
-          },
-          {
-            foreignKeyName: "experiment_queries_previous_query_id_fkey"
-            columns: ["previous_query_id"]
-            isOneToOne: false
-            referencedRelation: "v_results_rendered"
-            referencedColumns: ["query_id"]
-          },
-          {
             foreignKeyName: "experiment_queries_session_id_fkey"
             columns: ["session_id"]
             isOneToOne: false
             referencedRelation: "sessions"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "experiment_queries_session_id_fkey"
-            columns: ["session_id"]
-            isOneToOne: false
-            referencedRelation: "v_enhanced_session_metrics"
             referencedColumns: ["id"]
           },
         ]
@@ -215,20 +180,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "interactions"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "interaction_details_interaction_id_fkey"
-            columns: ["interaction_id"]
-            isOneToOne: false
-            referencedRelation: "v_first_click"
-            referencedColumns: ["first_click_id"]
-          },
-          {
-            foreignKeyName: "interaction_details_interaction_id_fkey"
-            columns: ["interaction_id"]
-            isOneToOne: false
-            referencedRelation: "v_first_interaction"
-            referencedColumns: ["first_interaction_id"]
           },
         ]
       }
@@ -313,27 +264,6 @@ export type Database = {
             referencedRelation: "experiment_queries"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "interactions_query_id_fkey"
-            columns: ["query_id"]
-            isOneToOne: false
-            referencedRelation: "v_enhanced_query_metrics"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "interactions_query_id_fkey"
-            columns: ["query_id"]
-            isOneToOne: false
-            referencedRelation: "v_query_end"
-            referencedColumns: ["query_id"]
-          },
-          {
-            foreignKeyName: "interactions_query_id_fkey"
-            columns: ["query_id"]
-            isOneToOne: false
-            referencedRelation: "v_results_rendered"
-            referencedColumns: ["query_id"]
-          },
         ]
       }
       post_survey: {
@@ -390,13 +320,6 @@ export type Database = {
             referencedRelation: "sessions"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "post_survey_session_id_fkey"
-            columns: ["session_id"]
-            isOneToOne: false
-            referencedRelation: "v_enhanced_session_metrics"
-            referencedColumns: ["id"]
-          },
         ]
       }
       query_timing_metrics: {
@@ -446,27 +369,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "experiment_queries"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "query_timing_metrics_query_id_fkey"
-            columns: ["query_id"]
-            isOneToOne: false
-            referencedRelation: "v_enhanced_query_metrics"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "query_timing_metrics_query_id_fkey"
-            columns: ["query_id"]
-            isOneToOne: false
-            referencedRelation: "v_query_end"
-            referencedColumns: ["query_id"]
-          },
-          {
-            foreignKeyName: "query_timing_metrics_query_id_fkey"
-            columns: ["query_id"]
-            isOneToOne: false
-            referencedRelation: "v_results_rendered"
-            referencedColumns: ["query_id"]
           },
         ]
       }
@@ -522,13 +424,6 @@ export type Database = {
             columns: ["session_id"]
             isOneToOne: true
             referencedRelation: "sessions"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "session_timing_summary_session_id_fkey"
-            columns: ["session_id"]
-            isOneToOne: true
-            referencedRelation: "v_enhanced_session_metrics"
             referencedColumns: ["id"]
           },
         ]
@@ -605,230 +500,11 @@ export type Database = {
             referencedRelation: "experiment_queries"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "sessions_current_query_id_fkey"
-            columns: ["current_query_id"]
-            isOneToOne: false
-            referencedRelation: "v_enhanced_query_metrics"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "sessions_current_query_id_fkey"
-            columns: ["current_query_id"]
-            isOneToOne: false
-            referencedRelation: "v_query_end"
-            referencedColumns: ["query_id"]
-          },
-          {
-            foreignKeyName: "sessions_current_query_id_fkey"
-            columns: ["current_query_id"]
-            isOneToOne: false
-            referencedRelation: "v_results_rendered"
-            referencedColumns: ["query_id"]
-          },
         ]
       }
     }
     Views: {
-      v_enhanced_query_metrics: {
-        Row: {
-          first_clicked_rank: number | null
-          id: string | null
-          query_abandoned: boolean | null
-          query_start_time: string | null
-          query_text: string | null
-          results_count: number | null
-          results_loaded_count: number | null
-          session_id: string | null
-          time_to_first_click_ms: number | null
-          time_to_first_result_ms: number | null
-          total_interactions: number | null
-          total_query_duration_ms: number | null
-          user_clicked: boolean | null
-          user_scrolled: boolean | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "experiment_queries_session_id_fkey"
-            columns: ["session_id"]
-            isOneToOne: false
-            referencedRelation: "sessions"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "experiment_queries_session_id_fkey"
-            columns: ["session_id"]
-            isOneToOne: false
-            referencedRelation: "v_enhanced_session_metrics"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      v_enhanced_session_metrics: {
-        Row: {
-          avg_time_per_query: number | null
-          avg_time_to_click: number | null
-          clicks_per_query: number | null
-          id: string | null
-          interaction_count: number | null
-          queries_per_minute: number | null
-          query_count: number | null
-          screen_resolution: string | null
-          search_phase: Database["public"]["Enums"]["search_phase"] | null
-          start_time: string | null
-          successful_queries: number | null
-          total_clicks: number | null
-          total_searches: number | null
-          total_session_duration_ms: number | null
-          user_agent: string | null
-        }
-        Relationships: []
-      }
-      v_first_click: {
-        Row: {
-          first_click_id: string | null
-          first_click_time: string | null
-          first_clicked_rank: number | null
-          first_clicked_url: string | null
-          query_id: string | null
-          time_to_first_click_ms: number | null
-        }
-        Insert: {
-          first_click_id?: string | null
-          first_click_time?: string | null
-          first_clicked_rank?: number | null
-          first_clicked_url?: string | null
-          query_id?: string | null
-          time_to_first_click_ms?: never
-        }
-        Update: {
-          first_click_id?: string | null
-          first_click_time?: string | null
-          first_clicked_rank?: number | null
-          first_clicked_url?: string | null
-          query_id?: string | null
-          time_to_first_click_ms?: never
-        }
-        Relationships: [
-          {
-            foreignKeyName: "interactions_query_id_fkey"
-            columns: ["query_id"]
-            isOneToOne: false
-            referencedRelation: "experiment_queries"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "interactions_query_id_fkey"
-            columns: ["query_id"]
-            isOneToOne: false
-            referencedRelation: "v_enhanced_query_metrics"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "interactions_query_id_fkey"
-            columns: ["query_id"]
-            isOneToOne: false
-            referencedRelation: "v_query_end"
-            referencedColumns: ["query_id"]
-          },
-          {
-            foreignKeyName: "interactions_query_id_fkey"
-            columns: ["query_id"]
-            isOneToOne: false
-            referencedRelation: "v_results_rendered"
-            referencedColumns: ["query_id"]
-          },
-        ]
-      }
-      v_first_interaction: {
-        Row: {
-          first_interaction_id: string | null
-          first_interaction_time: string | null
-          first_interaction_type:
-            | Database["public"]["Enums"]["interaction_type"]
-            | null
-          query_id: string | null
-          time_to_first_interaction_ms: number | null
-        }
-        Insert: {
-          first_interaction_id?: string | null
-          first_interaction_time?: string | null
-          first_interaction_type?:
-            | Database["public"]["Enums"]["interaction_type"]
-            | null
-          query_id?: string | null
-          time_to_first_interaction_ms?: never
-        }
-        Update: {
-          first_interaction_id?: string | null
-          first_interaction_time?: string | null
-          first_interaction_type?:
-            | Database["public"]["Enums"]["interaction_type"]
-            | null
-          query_id?: string | null
-          time_to_first_interaction_ms?: never
-        }
-        Relationships: [
-          {
-            foreignKeyName: "interactions_query_id_fkey"
-            columns: ["query_id"]
-            isOneToOne: false
-            referencedRelation: "experiment_queries"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "interactions_query_id_fkey"
-            columns: ["query_id"]
-            isOneToOne: false
-            referencedRelation: "v_enhanced_query_metrics"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "interactions_query_id_fkey"
-            columns: ["query_id"]
-            isOneToOne: false
-            referencedRelation: "v_query_end"
-            referencedColumns: ["query_id"]
-          },
-          {
-            foreignKeyName: "interactions_query_id_fkey"
-            columns: ["query_id"]
-            isOneToOne: false
-            referencedRelation: "v_results_rendered"
-            referencedColumns: ["query_id"]
-          },
-        ]
-      }
-      v_query_end: {
-        Row: {
-          query_end_time: string | null
-          query_id: string | null
-          total_interactions: number | null
-          total_query_duration_ms: number | null
-        }
-        Relationships: []
-      }
-      v_results_rendered: {
-        Row: {
-          first_result_load_time: string | null
-          query_id: string | null
-          results_loaded_count: number | null
-          time_to_first_result_ms: number | null
-        }
-        Insert: {
-          first_result_load_time?: string | null
-          query_id?: string | null
-          results_loaded_count?: number | null
-          time_to_first_result_ms?: never
-        }
-        Update: {
-          first_result_load_time?: string | null
-          query_id?: string | null
-          results_loaded_count?: number | null
-          time_to_first_result_ms?: never
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       create_enhanced_session: {
