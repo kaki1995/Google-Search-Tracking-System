@@ -37,16 +37,24 @@ export default function Welcome() {
   }, [searchParams, agreed]);
   const handleContinue = async () => {
     if (agreed === true && sessionInitialized) {
-      // Track consent given
+      // Track consent given (final consent action)
       await trackingService.trackConsent(true);
       navigate("/background-survey");
     }
   };
   
   const handleExit = async () => {
-    // Track user exiting without consent
+    // Track exit button click specifically
+    await trackingService.trackExitButtonClick();
+    // Also mark as final exit action
     await trackingService.trackWelcomePageAction('exited');
     navigate("/exit-study");
+  };
+
+  const handleConsentChange = async (checked: boolean) => {
+    setAgreed(checked);
+    // Track checkbox interaction
+    await trackingService.trackConsentCheckbox(checked);
   };
   return <div className="min-h-screen relative bg-background py-8 px-6 md:px-8 lg:px-12"
     style={{
@@ -121,7 +129,7 @@ export default function Welcome() {
           {/* Consent */}
           <div className="flex flex-col items-start gap-6 mb-8 mx-auto mt-8">
             <div className="flex items-start gap-3">
-              <input type="checkbox" id="consent" checked={agreed === true} onChange={e => setAgreed(e.target.checked)} className="w-4 h-4 text-blue-600 bg-white border-gray-300 rounded focus:ring-blue-500 mt-1" />
+              <input type="checkbox" id="consent" checked={agreed === true} onChange={e => handleConsentChange(e.target.checked)} className="w-4 h-4 text-blue-600 bg-white border-gray-300 rounded focus:ring-blue-500 mt-1" />
               <label htmlFor="consent" className="text-base text-gray-700 cursor-pointer">
                 I have read the above and voluntarily agree to participate in this study.
               </label>

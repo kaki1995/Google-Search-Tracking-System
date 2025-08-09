@@ -114,7 +114,7 @@ class TrackingService {
     }
   }
 
-  async trackWelcomePageAction(action: 'consented' | 'exited' | 'in_progress'): Promise<void> {
+  async trackWelcomePageAction(action: 'consented' | 'exited' | 'in_progress' | 'consent_clicked' | 'consent_unchecked' | 'exit_button_clicked'): Promise<void> {
     if (!this.sessionData) {
       console.warn('No session data available for welcome page tracking');
       return;
@@ -123,28 +123,62 @@ class TrackingService {
     console.log('Tracking welcome page action:', action, 'for session:', this.sessionData.sessionId);
     
     try {
-      const { data, error } = await supabase
-        .from('sessions')
-        .update({
-          welcome_page_action: action
-        })
-        .eq('id', this.sessionData.sessionId)
-        .select('welcome_page_action');
+      // Only update the main welcome_page_action for final states
+      const finalStates = ['consented', 'exited'];
+      const updateData: any = {};
+      
+      if (finalStates.includes(action)) {
+        updateData.welcome_page_action = action;
+      }
 
-      if (error) {
-        console.error('Failed to update welcome page action:', error);
-      } else {
-        console.log('Welcome page action updated successfully:', data);
+      if (Object.keys(updateData).length > 0) {
+        const { data, error } = await supabase
+          .from('sessions')
+          .update(updateData)
+          .eq('id', this.sessionData.sessionId)
+          .select('welcome_page_action');
+
+        if (error) {
+          console.error('Failed to update welcome page action:', error);
+        } else {
+          console.log('Welcome page action updated successfully:', data);
+        }
       }
     } catch (error) {
       console.error('Failed to update welcome page action:', error);
     }
 
-    // Also track as an event
+    // Always track as an event for detailed analytics
     await this.trackEvent({
       type: 'consent',
       timestamp: Date.now(),
-      data: { welcome_page_action: action }
+      data: { welcome_page_action: action, page: 'welcome' }
+    });
+  }
+
+  async trackConsentCheckbox(isChecked: boolean): Promise<void> {
+    // Track when user clicks the consent checkbox
+    if (isChecked) {
+      await this.trackWelcomePageAction('consent_clicked');
+    } else {
+      await this.trackWelcomePageAction('consent_unchecked');
+    }
+    
+    await this.trackEvent({
+      type: 'consent',
+      timestamp: Date.now(),
+      data: { consent_checkbox_checked: isChecked, action: 'checkbox_interaction' }
+    });
+  }
+
+  async trackExitButtonClick(): Promise<void> {
+    // Track when user clicks the exit button specifically
+    await this.trackWelcomePageAction('exit_button_clicked');
+    
+    await this.trackEvent({
+      type: 'consent',
+      timestamp: Date.now(),
+      data: { action: 'exit_button_clicked', page: 'welcome' }
     });
   }
 
