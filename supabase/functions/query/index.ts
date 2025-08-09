@@ -6,8 +6,9 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-const GOOGLE_API_KEY = "AIzaSyATKkbTWhLwe0RgeWoY_iiMW7w2QoPkWpw";
-const GOOGLE_SEARCH_ENGINE_ID = "007dc6ac33e6f436c";
+// SECURITY: Use environment variables instead of hardcoded credentials
+const GOOGLE_API_KEY = Deno.env.get('GOOGLE_API_KEY');
+const GOOGLE_SEARCH_ENGINE_ID = Deno.env.get('GOOGLE_SEARCH_ENGINE_ID');
 
 Deno.serve(async (req) => {
   // Handle CORS preflight requests
@@ -45,10 +46,33 @@ Deno.serve(async (req) => {
 
     const { session_id, query_text } = requestData;
 
+    // SECURITY: Input validation and sanitization
     if (!session_id || !query_text) {
       console.log('Missing required fields:', { session_id, query_text });
       return new Response(
         JSON.stringify({ error: 'Missing session_id or query_text' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // SECURITY: Additional input validation
+    if (typeof session_id !== 'string' || typeof query_text !== 'string') {
+      return new Response(
+        JSON.stringify({ error: 'Invalid data types for session_id or query_text' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (query_text.length > 1000) {
+      return new Response(
+        JSON.stringify({ error: 'Query text too long (max 1000 characters)' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (session_id.length > 100) {
+      return new Response(
+        JSON.stringify({ error: 'Session ID too long' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }

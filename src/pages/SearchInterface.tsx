@@ -231,8 +231,8 @@ export default function SearchInterface() {
       console.error("Failed to log click:", error);
     }
 
-    // Open the link
-    window.open(result.link, "_blank");
+    // SECURITY: Open link with security attributes
+    window.open(result.link, "_blank", "noopener,noreferrer");
   };
   const handleCopyLink = (link: string) => {
     navigator.clipboard.writeText(link);
