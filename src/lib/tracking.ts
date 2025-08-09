@@ -45,6 +45,10 @@ export interface SessionData {
 class TrackingService {
   private sessionData: SessionData | null = null;
   private isTracking = false;
+  private queryStartTime: number | null = null;
+  private sessionStartTime: number | null = null;
+  private firstClickRecorded = false;
+  private firstInteractionRecorded = false;
 
   async initSession(token?: string): Promise<string> {
     const urlParams = new URLSearchParams(window.location.search);
@@ -69,6 +73,12 @@ class TrackingService {
       events: [],
       startTime: Date.now()
     };
+
+    // Initialize timing trackers
+    this.sessionStartTime = Date.now();
+    this.queryStartTime = null;
+    this.firstClickRecorded = false;
+    this.firstInteractionRecorded = false;
 
     // Save to localStorage for session recovery
     localStorage.setItem('research_session', JSON.stringify(this.sessionData));
@@ -119,6 +129,8 @@ class TrackingService {
     if (!this.sessionData) return null;
 
     const searchStartTime = Date.now();
+    this.queryStartTime = searchStartTime; // Track when this query started
+    
     const queryData = {
       query,
       timestamp: searchStartTime,
@@ -138,7 +150,12 @@ class TrackingService {
       console.log('Inserting query to experiment_queries:', {
         session_id: this.sessionData.sessionId,
         query_text: query,
-        reformulation_count: this.isQueryReformulation(query) ? 1 : 0
+        reformulation_count: this.isQueryReformulation(query) ? 1 : 0,
+        query_start_time: new Date(searchStartTime).toISOString(),
+        results_count: resultsCount,
+        results_loaded_count: resultsCount,
+        complexity: this.calculateQueryComplexity(query),
+        structure_type: this.determineQueryStructureType(query)
       });
 
       const { data, error } = await supabase
@@ -146,7 +163,12 @@ class TrackingService {
         .insert({
           session_id: this.sessionData.sessionId,
           query_text: query,
-          reformulation_count: this.isQueryReformulation(query) ? 1 : 0
+          reformulation_count: this.isQueryReformulation(query) ? 1 : 0,
+          query_start_time: new Date(searchStartTime).toISOString(),
+          results_count: resultsCount,
+          results_loaded_count: resultsCount,
+          complexity: this.calculateQueryComplexity(query),
+          structure_type: this.determineQueryStructureType(query)
         })
         .select('id')
         .single();
@@ -184,20 +206,31 @@ class TrackingService {
   async trackClick(url: string, title: string, position: number, queryId?: string): Promise<void> {
     if (!this.sessionData) return;
 
+    const clickTimestamp = Date.now();
     const clickData = {
       url,
       title,
       position,
-      timestamp: Date.now()
+      timestamp: clickTimestamp
     };
 
     this.sessionData.searchPhase.clicks.push(clickData);
     
     await this.trackEvent({
       type: 'click',
-      timestamp: Date.now(),
+      timestamp: clickTimestamp,
       data: clickData
     });
+
+    // Calculate timing metrics
+    const timeToClick = this.sessionStartTime ? clickTimestamp - this.sessionStartTime : null;
+    const timeToClickFromQuery = this.queryStartTime ? clickTimestamp - this.queryStartTime : null;
+    
+    // Track if this is the first click
+    const isFirstClick = !this.firstClickRecorded;
+    if (isFirstClick) {
+      this.firstClickRecorded = true;
+    }
 
     // Log to interactions table if queryId provided
     if (queryId) {
@@ -215,7 +248,18 @@ class TrackingService {
             query_id: queryId,
             clicked_url: url,
             clicked_rank: position,
-            clicked_result_count: 1
+            clicked_result_count: 1,
+            interaction_type: 'click',
+            interaction_time: new Date(clickTimestamp).toISOString(),
+            element_id: `search_result_${position}`,
+            element_text: title,
+            session_time_ms: timeToClick,
+            query_time_ms: timeToClickFromQuery,
+            interaction_metadata: {
+              is_first_click: isFirstClick,
+              viewport_height: window.innerHeight,
+              scroll_position: window.scrollY
+            }
           })
           .select('id')
           .single();
@@ -239,12 +283,15 @@ class TrackingService {
           });
 
           // Track query timing metrics for this click
-          const queryStartTime = this.sessionData?.events.find(e => e.type === 'query')?.timestamp;
           await supabase.functions.invoke('realtime-streams/track-query-timing', {
             body: {
               query_id: queryId,
               user_clicked: true,
-              time_to_first_click_ms: queryStartTime ? Date.now() - queryStartTime : null
+              time_to_first_click_ms: isFirstClick ? timeToClickFromQuery : null,
+              search_duration_ms: timeToClickFromQuery,
+              results_loaded_count: this.sessionData?.searchPhase.queries.find(q => q.timestamp === this.queryStartTime)?.resultsCount || 0,
+              user_scrolled: this.sessionData?.searchPhase.scrollEvents.length > 0,
+              query_abandoned: false
             }
           });
         } catch (edgeError) {
@@ -261,18 +308,49 @@ class TrackingService {
   async trackScroll(scrollY: number): Promise<void> {
     if (!this.sessionData) return;
 
+    const scrollTimestamp = Date.now();
     const scrollData = {
       scrollY,
-      timestamp: Date.now()
+      timestamp: scrollTimestamp
     };
 
     this.sessionData.searchPhase.scrollEvents.push(scrollData);
     
     await this.trackEvent({
       type: 'scroll',
-      timestamp: Date.now(),
+      timestamp: scrollTimestamp,
       data: scrollData
     });
+
+    // Track first interaction if this is the first scroll
+    if (!this.firstInteractionRecorded) {
+      this.firstInteractionRecorded = true;
+      const timeToFirstInteraction = this.queryStartTime ? scrollTimestamp - this.queryStartTime : null;
+      
+      // Log this as an interaction if we have a current query
+      const currentQueryId = sessionStorage.getItem("current_query_id");
+      if (currentQueryId && timeToFirstInteraction) {
+        try {
+          await supabase
+            .from('interactions')
+            .insert({
+              query_id: currentQueryId,
+              interaction_type: 'scroll',
+              interaction_time: new Date(scrollTimestamp).toISOString(),
+              query_time_ms: timeToFirstInteraction,
+              session_time_ms: this.sessionStartTime ? scrollTimestamp - this.sessionStartTime : null,
+              scroll_depth: Math.round((scrollY / document.documentElement.scrollHeight) * 100),
+              interaction_metadata: {
+                is_first_interaction: true,
+                scroll_position: scrollY,
+                viewport_height: window.innerHeight
+              }
+            });
+        } catch (error) {
+          console.error('Failed to log first scroll interaction:', error);
+        }
+      }
+    }
   }
 
   async trackBackgroundSurvey(surveyData: any): Promise<void> {
@@ -511,6 +589,99 @@ class TrackingService {
     
     const lastQuery = previousQueries[previousQueries.length - 1];
     return lastQuery.query !== queryText;
+  }
+
+  private calculateQueryComplexity(query: string): number {
+    // Calculate complexity score (1-10) based on various factors
+    let score = 1;
+    
+    // Length factor
+    if (query.length > 50) score += 2;
+    else if (query.length > 20) score += 1;
+    
+    // Word count factor
+    const wordCount = query.split(' ').length;
+    if (wordCount > 6) score += 2;
+    else if (wordCount > 3) score += 1;
+    
+    // Special characters/operators
+    if (/[\"']/.test(query)) score += 1; // Quotes
+    if (/[+\-]/.test(query)) score += 1; // Boolean operators
+    if (/site:|filetype:|intitle:/.test(query)) score += 2; // Search operators
+    
+    // Question words
+    if (/^(how|what|where|when|why|who)/i.test(query)) score += 1;
+    
+    return Math.min(score, 10);
+  }
+
+  private determineQueryStructureType(query: string): string {
+    // Determine query structure type
+    if (/^(how|what|where|when|why|who)/i.test(query)) {
+      return 'question';
+    } else if (/site:|filetype:|intitle:/.test(query)) {
+      return 'advanced_search';
+    } else if (/[\"']/.test(query)) {
+      return 'phrase_search';
+    } else if (query.split(' ').length === 1) {
+      return 'single_term';
+    } else if (query.split(' ').length <= 3) {
+      return 'short_phrase';
+    } else {
+      return 'long_phrase';
+    }
+  }
+
+  async trackQueryAbandonment(queryId: string): Promise<void> {
+    // Track when a query is abandoned (no clicks after a certain time)
+    try {
+      await supabase.functions.invoke('realtime-streams/track-query-timing', {
+        body: {
+          query_id: queryId,
+          query_abandoned: true,
+          query_end_time: new Date().toISOString(),
+          search_duration_ms: this.queryStartTime ? Date.now() - this.queryStartTime : null
+        }
+      });
+    } catch (error) {
+      console.error('Failed to track query abandonment:', error);
+    }
+  }
+
+  async trackResultLoad(queryId: string, resultsCount: number, loadTime: number): Promise<void> {
+    // Track when search results are loaded
+    try {
+      await supabase.functions.invoke('realtime-streams/track-query-timing', {
+        body: {
+          query_id: queryId,
+          time_to_first_result: loadTime,
+          results_loaded_count: resultsCount
+        }
+      });
+    } catch (error) {
+      console.error('Failed to track result load:', error);
+    }
+  }
+
+  async trackHover(elementId: string, hoverDuration: number, queryId?: string): Promise<void> {
+    // Track hover interactions
+    if (!this.sessionData || !queryId) return;
+
+    try {
+      await supabase
+        .from('interactions')
+        .insert({
+          query_id: queryId,
+          interaction_type: 'hover',
+          element_id: elementId,
+          hover_duration_ms: hoverDuration,
+          interaction_time: new Date().toISOString(),
+          session_time_ms: this.sessionStartTime ? Date.now() - this.sessionStartTime : null,
+          query_time_ms: this.queryStartTime ? Date.now() - this.queryStartTime : null
+        });
+    } catch (error) {
+      console.error('Failed to track hover:', error);
+    }
   }
 
   getSessionData(): SessionData | null {
