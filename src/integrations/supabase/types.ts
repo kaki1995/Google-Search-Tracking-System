@@ -772,18 +772,6 @@ export type Database = {
           total_interactions: number | null
           total_query_duration_ms: number | null
         }
-        Insert: {
-          query_end_time?: string | null
-          query_id?: string | null
-          total_interactions?: never
-          total_query_duration_ms?: never
-        }
-        Update: {
-          query_end_time?: string | null
-          query_id?: string | null
-          total_interactions?: never
-          total_query_duration_ms?: never
-        }
         Relationships: []
       }
       v_results_rendered: {
