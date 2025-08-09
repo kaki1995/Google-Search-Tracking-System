@@ -14,19 +14,38 @@ export default function Welcome() {
         const token = searchParams.get('token');
         const sessionId = await trackingService.initSession(token);
         console.log('Session initialized:', sessionId);
+        
+        // Track that user is on welcome page
+        await trackingService.trackWelcomePageAction('in_progress');
+        
         setSessionInitialized(true);
       } catch (error) {
         console.error('Failed to initialize session:', error);
       }
     };
     initializeSession();
-  }, [searchParams]);
-  const handleContinue = () => {
+
+    // Track page exit if user leaves without completing
+    const handleBeforeUnload = async () => {
+      if (agreed !== true) {
+        await trackingService.trackWelcomePageAction('exited');
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [searchParams, agreed]);
+  const handleContinue = async () => {
     if (agreed === true && sessionInitialized) {
+      // Track consent given
+      await trackingService.trackConsent(true);
       navigate("/background-survey");
     }
   };
-  const handleExit = () => {
+  
+  const handleExit = async () => {
+    // Track user exiting without consent
+    await trackingService.trackWelcomePageAction('exited');
     navigate("/exit-study");
   };
   return <div className="min-h-screen relative bg-background py-8 px-6 md:px-8 lg:px-12"

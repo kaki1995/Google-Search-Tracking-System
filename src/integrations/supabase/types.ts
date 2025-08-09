@@ -449,6 +449,7 @@ export type Database = {
           updated_at: string | null
           user_agent: string | null
           user_id: string
+          welcome_page_action: string | null
         }
         Insert: {
           browser?: string | null
@@ -470,6 +471,7 @@ export type Database = {
           updated_at?: string | null
           user_agent?: string | null
           user_id: string
+          welcome_page_action?: string | null
         }
         Update: {
           browser?: string | null
@@ -491,6 +493,7 @@ export type Database = {
           updated_at?: string | null
           user_agent?: string | null
           user_id?: string
+          welcome_page_action?: string | null
         }
         Relationships: [
           {

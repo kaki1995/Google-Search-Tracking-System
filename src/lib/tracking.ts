@@ -114,10 +114,50 @@ class TrackingService {
     }
   }
 
+  async trackWelcomePageAction(action: 'consented' | 'exited' | 'in_progress'): Promise<void> {
+    if (!this.sessionData) {
+      console.warn('No session data available for welcome page tracking');
+      return;
+    }
+
+    console.log('Tracking welcome page action:', action, 'for session:', this.sessionData.sessionId);
+    
+    try {
+      const { data, error } = await supabase
+        .from('sessions')
+        .update({
+          welcome_page_action: action
+        })
+        .eq('id', this.sessionData.sessionId)
+        .select('welcome_page_action');
+
+      if (error) {
+        console.error('Failed to update welcome page action:', error);
+      } else {
+        console.log('Welcome page action updated successfully:', data);
+      }
+    } catch (error) {
+      console.error('Failed to update welcome page action:', error);
+    }
+
+    // Also track as an event
+    await this.trackEvent({
+      type: 'consent',
+      timestamp: Date.now(),
+      data: { welcome_page_action: action }
+    });
+  }
+
   async trackConsent(given: boolean, details?: any): Promise<void> {
     if (!this.sessionData) return;
 
     this.sessionData.consentGiven = given;
+    
+    // Update welcome page action based on consent
+    if (given) {
+      await this.trackWelcomePageAction('consented');
+    }
+    
     await this.trackEvent({
       type: 'consent',
       timestamp: Date.now(),
@@ -165,8 +205,8 @@ class TrackingService {
           query_text: query,
           reformulation_count: this.isQueryReformulation(query) ? 1 : 0,
           query_start_time: new Date(searchStartTime).toISOString(),
-          results_count: resultsCount,
-          results_loaded_count: resultsCount,
+          results_count: Math.min(resultsCount, 2147483647), // Cap to max int value
+          results_loaded_count: Math.min(resultsCount, 2147483647), // Cap to max int value
           complexity: this.calculateQueryComplexity(query),
           structure_type: this.determineQueryStructureType(query)
         })
