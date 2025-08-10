@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import BrowserBar from "@/components/BrowserBar";
 import StudyButton from "@/components/StudyButton";
 import { trackingService } from "@/lib/tracking";
+import { enhancedTrackingService } from "@/lib/tracking_enhanced";
 export default function Welcome() {
   const [agreed, setAgreed] = useState<boolean | null>(null);
   const [sessionInitialized, setSessionInitialized] = useState(false);
@@ -12,8 +13,17 @@ export default function Welcome() {
     const initializeSession = async () => {
       try {
         const token = searchParams.get('token');
+        
+        // Initialize both tracking services
         const sessionId = await trackingService.initSession(token);
-        console.log('Session initialized:', sessionId);
+        const enhancedSessionId = await enhancedTrackingService.initializeSession(
+          token || 'anonymous',
+          undefined, // budget_range
+          undefined, // location
+          undefined  // device_type
+        );
+        
+        console.log('Sessions initialized:', { sessionId, enhancedSessionId });
         
         // Track that user is on welcome page
         await trackingService.trackWelcomePageAction('in_progress');

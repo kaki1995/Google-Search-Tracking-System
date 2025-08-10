@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { trackingService } from "@/lib/tracking";
+import { enhancedTrackingService } from "@/lib/tracking_enhanced";
 import { performGoogleSearch } from "@/lib/googleSearch";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -93,14 +94,18 @@ const SearchResults = () => {
         return prev;
       });
       
-      // Track the search query and get query ID
+      // Track the search query and get query ID from both services
       const resultsCount = Array.isArray(searchResults) ? searchResults.length : 0;
       const queryId = await trackingService.trackQuery(sanitizedQuery, resultsCount);
-      setCurrentQueryId(queryId);
+      const enhancedQueryId = await enhancedTrackingService.trackQuery(sanitizedQuery, resultsCount);
+      setCurrentQueryId(queryId || enhancedQueryId);
       
       // Track time to first result now that results are loaded
       if (queryId) {
         await trackingService.trackTimeToFirstResult(queryId);
+      }
+      if (enhancedQueryId) {
+        await enhancedTrackingService.trackTimeToFirstResult(enhancedQueryId);
       }
       
       setSearchCount(prev => prev + 1);
@@ -139,12 +144,18 @@ const SearchResults = () => {
       
       // Track the click with enhanced details
       if (currentQueryId) {
-        await trackingService.trackClickWithDetails(
+        await enhancedTrackingService.trackClickWithDetails(
           result.link,
           result.title,
           index + 1,
           currentQueryId,
-          event?.target as HTMLElement || undefined
+          {
+            element_text: result.title,
+            page_coordinates: event ? { x: event.clientX, y: event.clientY } : undefined,
+            viewport_coordinates: event ? { x: event.clientX, y: event.clientY } : undefined,
+            scroll_depth: window.scrollY,
+            hover_duration_ms: 0
+          }
         );
       }
       
