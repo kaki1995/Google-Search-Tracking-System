@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Interaction Tracking</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        button { margin: 10px; padding: 10px 20px; background: #007cba; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+        pre { background: #f5f5f5; padding: 10px; border-radius: 3px; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .test-result { display: none; margin-top: 10px; padding: 10px; border-radius: 5px; }
+        .search-result { 
+            padding: 15px; 
+            margin: 10px 0; 
+            border: 1px solid #ddd; 
+            border-radius: 5px; 
+            cursor: pointer;
+            background: #f9f9f9;
+        }
+        .search-result:hover { background: #e9e9e9; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Interaction Tracking Test</h1>
+
+    <div class="section">
+        <h3>Step 1: Initialize Session & Query</h3>
+        <button onclick="initializeSession()">Initialize Session</button>
+        <div id="session-result" class="test-result"></div>
+    </div>
+
+    <div class="section">
+        <h3>Step 2: Test Click Tracking</h3>
+        <div class="search-result" onclick="testBasicClick(this, 1)">
+            Test Search Result 1 - Click to test basic tracking
+        </div>
+        <div class="search-result" onclick="testEnhancedClick(this, 2)">
+            Test Search Result 2 - Click to test enhanced tracking
+        </div>
+        <div id="click-result" class="test-result"></div>
+    </div>
+
+    <div class="section">
+        <h3>Step 3: Test Interaction Details</h3>
+        <button onclick="testInteractionDetails()">Test Interaction Details</button>
+        <div id="details-result" class="test-result"></div>
+    </div>
+
+    <div class="section">
+        <h3>Step 4: Test Scroll Tracking</h3>
+        <button onclick="testScrollTracking()">Test Scroll Tracking</button>
+        <div id="scroll-result" class="test-result"></div>
+        <div style="height: 1000px; background: linear-gradient(to bottom, #ffffff, #cccccc);">
+            Scroll down to test scroll tracking...
+        </div>
+    </div>
+
+    <div class="section">
+        <h3>Step 5: Check Database Records</h3>
+        <button onclick="checkInteractions()">Check Interactions</button>
+        <button onclick="checkInteractionDetails()">Check Interaction Details</button>
+        <div id="database-result" class="test-result"></div>
+    </div>
+
+    <script type="module">
+        const SUPABASE_URL = "https://wbguuipoggeamyzrfvbv.supabase.co";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndnZ3d1aXBvZ2dlYW15enJmdmJ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQxMDk1NjgsImV4cCI6MjA0OTY4NTU2OH0.Jl2nXPPKMCdVzaGTzBfnolr0vNDsYpk2dCRPCWYm7vU";
+        
+        window.supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        // Import tracking service - simulate it since we can't import ES modules easily
+        window.testSessionId = null;
+        window.testQueryId = null;
+
+        window.initializeSession = async function() {
+            const resultDiv = document.getElementById('session-result');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Initializing session and query...';
+            resultDiv.className = 'test-result info';
+
+            try {
+                // Create test session
+                const sessionId = 'test_' + Date.now();
+                window.testSessionId = sessionId;
+                
+                const { data: session, error: sessionError } = await window.supabase
+                    .from('sessions')
+                    .insert({
+                        id: sessionId,
+                        user_id: 'test_user_' + Date.now(),
+                        platform: 'Google',
+                        device_type: 'desktop',
+                        browser: 'Chrome'
+                    })
+                    .select('id')
+                    .single();
+
+                if (sessionError) throw sessionError;
+
+                // Create test query
+                const { data: query, error: queryError } = await window.supabase
+                    .from('experiment_queries')
+                    .insert({
+                        session_id: sessionId,
+                        query_text: 'test interaction tracking query',
+                        results_count: 5
+                    })
+                    .select('id')
+                    .single();
+
+                if (queryError) throw queryError;
+                
+                window.testQueryId = query.id;
+
+                resultDiv.textContent = `✅ Session and query created successfully!\nSession ID: ${sessionId}\nQuery ID: ${query.id}`;
+                resultDiv.className = 'test-result success';
+                
+            } catch (error) {
+                resultDiv.textContent = `❌ Failed to initialize: ${error.message}`;
+                resultDiv.className = 'test-result error';
+                console.error('Initialization error:', error);
+            }
+        };
+
+        window.testBasicClick = async function(element, position) {
+            const resultDiv = document.getElementById('click-result');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Testing basic click tracking...';
+            resultDiv.className = 'test-result info';
+
+            try {
+                if (!window.testQueryId) {
+                    throw new Error('Please initialize session first');
+                }
+
+                // Test basic click tracking
+                const url = `https://example.com/result-${position}`;
+                const title = `Test Result ${position}`;
+
+                const { data, error } = await window.supabase
+                    .from('interactions')
+                    .insert({
+                        query_id: window.testQueryId,
+                        interaction_type: 'click',
+                        clicked_url: url,
+                        clicked_rank: position,
+                        clicked_result_count: 1,
+                        element_id: `search_result_${position}`,
+                        element_text: title,
+                        session_time_ms: Date.now(),
+                        interaction_time: new Date().toISOString()
+                    })
+                    .select('id')
+                    .single();
+
+                if (error) throw error;
+
+                resultDiv.textContent = `✅ Basic click tracked successfully!\nInteraction ID: ${data.id}`;
+                resultDiv.className = 'test-result success';
+                
+            } catch (error) {
+                resultDiv.textContent = `❌ Failed to track click: ${error.message}`;
+                resultDiv.className = 'test-result error';
+                console.error('Click tracking error:', error);
+            }
+        };
+
+        window.testEnhancedClick = async function(element, position) {
+            const resultDiv = document.getElementById('click-result');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Testing enhanced click tracking...';
+            resultDiv.className = 'test-result info';
+
+            try {
+                if (!window.testQueryId) {
+                    throw new Error('Please initialize session first');
+                }
+
+                const rect = element.getBoundingClientRect();
+                const url = `https://example.com/enhanced-result-${position}`;
+                const title = `Enhanced Test Result ${position}`;
+
+                // Create interaction record
+                const { data: interaction, error: interactionError } = await window.supabase
+                    .from('interactions')
+                    .insert({
+                        query_id: window.testQueryId,
+                        interaction_type: 'click',
+                        clicked_url: url,
+                        clicked_rank: position,
+                        clicked_result_count: 1,
+                        element_id: `search_result_${position}`,
+                        element_text: title,
+                        session_time_ms: Date.now(),
+                        interaction_time: new Date().toISOString(),
+                        scroll_depth: window.scrollY,
+                        page_coordinates: `(${rect.left + window.scrollX}, ${rect.top + window.scrollY})`,
+                        viewport_coordinates: `(${rect.left}, ${rect.top})`,
+                        interaction_metadata: {
+                            element_tag: element.tagName.toLowerCase(),
+                            element_class: element.className,
+                            viewport_height: window.innerHeight,
+                            viewport_width: window.innerWidth
+                        }
+                    })
+                    .select('id')
+                    .single();
+
+                if (interactionError) throw interactionError;
+
+                // Create interaction details record
+                const { data: detail, error: detailError } = await window.supabase
+                    .from('interaction_details')
+                    .insert({
+                        interaction_id: interaction.id,
+                        interaction_type: 'click',
+                        element_id: `search_result_${position}`,
+                        value: url,
+                        metadata: {
+                            title,
+                            position,
+                            element_text: element.textContent,
+                            page_coordinates: { x: rect.left + window.scrollX, y: rect.top + window.scrollY },
+                            viewport_coordinates: { x: rect.left, y: rect.top },
+                            scroll_depth: window.scrollY,
+                            timestamp: Date.now()
+                        }
+                    })
+                    .select('id')
+                    .single();
+
+                if (detailError) throw detailError;
+
+                resultDiv.textContent = `✅ Enhanced click tracked successfully!\nInteraction ID: ${interaction.id}\nDetail ID: ${detail.id}`;
+                resultDiv.className = 'test-result success';
+                
+            } catch (error) {
+                resultDiv.textContent = `❌ Failed to track enhanced click: ${error.message}`;
+                resultDiv.className = 'test-result error';
+                console.error('Enhanced click tracking error:', error);
+            }
+        };
+
+        window.testInteractionDetails = async function() {
+            const resultDiv = document.getElementById('details-result');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Testing interaction details...';
+            resultDiv.className = 'test-result info';
+
+            try {
+                if (!window.testQueryId) {
+                    throw new Error('Please initialize session first');
+                }
+
+                // Create a test interaction first
+                const { data: interaction, error: interactionError } = await window.supabase
+                    .from('interactions')
+                    .insert({
+                        query_id: window.testQueryId,
+                        interaction_type: 'hover',
+                        element_id: 'test_hover_element',
+                        session_time_ms: Date.now(),
+                        interaction_time: new Date().toISOString(),
+                        hover_duration_ms: 1500
+                    })
+                    .select('id')
+                    .single();
+
+                if (interactionError) throw interactionError;
+
+                // Then create detailed information
+                const { data: detail, error: detailError } = await window.supabase
+                    .from('interaction_details')
+                    .insert({
+                        interaction_id: interaction.id,
+                        interaction_type: 'hover',
+                        element_id: 'test_hover_element',
+                        value: 'hover_test_value',
+                        metadata: {
+                            hover_duration: 1500,
+                            element_type: 'test',
+                            action_context: 'interaction_details_test'
+                        }
+                    })
+                    .select('id')
+                    .single();
+
+                if (detailError) throw detailError;
+
+                resultDiv.textContent = `✅ Interaction details tested successfully!\nInteraction ID: ${interaction.id}\nDetail ID: ${detail.id}`;
+                resultDiv.className = 'test-result success';
+                
+            } catch (error) {
+                resultDiv.textContent = `❌ Failed to test interaction details: ${error.message}`;
+                resultDiv.className = 'test-result error';
+                console.error('Interaction details error:', error);
+            }
+        };
+
+        window.testScrollTracking = async function() {
+            const resultDiv = document.getElementById('scroll-result');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Testing scroll tracking...';
+            resultDiv.className = 'test-result info';
+
+            try {
+                if (!window.testQueryId) {
+                    throw new Error('Please initialize session first');
+                }
+
+                const scrollY = window.scrollY;
+                const scrollPercentage = Math.round((scrollY / (document.body.scrollHeight - window.innerHeight)) * 100);
+
+                // Create scroll interaction
+                const { data: interaction, error: interactionError } = await window.supabase
+                    .from('interactions')
+                    .insert({
+                        query_id: window.testQueryId,
+                        interaction_type: 'scroll',
+                        scroll_depth: Math.min(scrollPercentage, 100),
+                        session_time_ms: Date.now(),
+                        interaction_time: new Date().toISOString(),
+                        interaction_metadata: {
+                            scroll_y: scrollY,
+                            scroll_percentage: scrollPercentage,
+                            viewport_height: window.innerHeight,
+                            document_height: document.body.scrollHeight
+                        }
+                    })
+                    .select('id')
+                    .single();
+
+                if (interactionError) throw interactionError;
+
+                // Add scroll details
+                const { data: detail, error: detailError } = await window.supabase
+                    .from('interaction_details')
+                    .insert({
+                        interaction_id: interaction.id,
+                        interaction_type: 'scroll',
+                        element_id: 'page',
+                        value: scrollY.toString(),
+                        metadata: {
+                            scroll_percentage: scrollPercentage,
+                            viewport_height: window.innerHeight,
+                            document_height: document.body.scrollHeight
+                        }
+                    })
+                    .select('id')
+                    .single();
+
+                if (detailError) throw detailError;
+
+                resultDiv.textContent = `✅ Scroll tracking tested successfully!\nInteraction ID: ${interaction.id}\nDetail ID: ${detail.id}\nScroll: ${scrollY}px (${scrollPercentage}%)`;
+                resultDiv.className = 'test-result success';
+                
+            } catch (error) {
+                resultDiv.textContent = `❌ Failed to test scroll tracking: ${error.message}`;
+                resultDiv.className = 'test-result error';
+                console.error('Scroll tracking error:', error);
+            }
+        };
+
+        window.checkInteractions = async function() {
+            const resultDiv = document.getElementById('database-result');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Checking interactions...';
+            resultDiv.className = 'test-result info';
+
+            try {
+                const { data, error } = await window.supabase
+                    .from('interactions')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(10);
+
+                if (error) throw error;
+
+                resultDiv.innerHTML = `
+                    <div class="success">✅ Found ${data.length} interaction records:</div>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+                resultDiv.className = 'test-result success';
+                
+            } catch (error) {
+                resultDiv.textContent = `❌ Failed to check interactions: ${error.message}`;
+                resultDiv.className = 'test-result error';
+                console.error('Check interactions error:', error);
+            }
+        };
+
+        window.checkInteractionDetails = async function() {
+            const resultDiv = document.getElementById('database-result');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Checking interaction details...';
+            resultDiv.className = 'test-result info';
+
+            try {
+                const { data, error } = await window.supabase
+                    .from('interaction_details')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(10);
+
+                if (error) throw error;
+
+                resultDiv.innerHTML = `
+                    <div class="success">✅ Found ${data.length} interaction detail records:</div>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+                resultDiv.className = 'test-result success';
+                
+            } catch (error) {
+                resultDiv.textContent = `❌ Failed to check interaction details: ${error.message}`;
+                resultDiv.className = 'test-result error';
+                console.error('Check interaction details error:', error);
+            }
+        };
+    </script>
+</body>
+</html>

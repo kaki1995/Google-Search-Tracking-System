@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Database Schema Check</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        button { padding: 10px 15px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <h1>Quick Database Schema Check</h1>
+    
+    <div class="section">
+        <h2>Test Table Access</h2>
+        <button onclick="checkTables()">Check All Tables</button>
+        <div id="tableResults"></div>
+    </div>
+
+    <div class="section">
+        <h2>Test Data Insert</h2>
+        <button onclick="testInserts()">Test Basic Inserts</button>
+        <div id="insertResults"></div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://wbguuipoggeamyzrfvbv.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndieHVpaXBwZ2dlYW15enJmdmJ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzMzNjE3MzUsImV4cCI6MjA0ODkzNzczNX0.PvWfN1fTf2cJfNcCB8_m8l2M_SX2T7E6CX7yOYgLaL8';
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        async function checkTables() {
+            const tables = ['interactions', 'interaction_details', 'background_surveys', 'post_query', 'post_survey', 'survey_exits'];
+            const results = [];
+            
+            for (const table of tables) {
+                try {
+                    const { data, error } = await supabase.from(table).select('*').limit(1);
+                    if (error) {
+                        results.push(`❌ ${table}: ${error.message}`);
+                    } else {
+                        results.push(`✅ ${table}: Table exists and accessible`);
+                    }
+                } catch (err) {
+                    results.push(`❌ ${table}: ${err.message}`);
+                }
+            }
+            
+            document.getElementById('tableResults').innerHTML = `<pre>${results.join('\n')}</pre>`;
+        }
+
+        async function testInserts() {
+            const sessionId = 'test-' + Date.now();
+            const results = [];
+            
+            // Test background_surveys
+            try {
+                const { data, error } = await supabase
+                    .from('background_surveys')
+                    .insert({
+                        session_id: sessionId,
+                        age_group: '25-34',
+                        gender: 'test',
+                        education: 'test',
+                        country: 'test'
+                    })
+                    .select();
+                    
+                if (error) {
+                    results.push(`❌ background_surveys: ${error.message}`);
+                } else {
+                    results.push(`✅ background_surveys: Insert successful`);
+                }
+            } catch (err) {
+                results.push(`❌ background_surveys: ${err.message}`);
+            }
+
+            // Test post_survey (or post_query)
+            try {
+                const { data, error } = await supabase
+                    .from('post_survey')
+                    .insert({
+                        session_id: sessionId,
+                        search_satisfaction: 5,
+                        interface_ease: 5
+                    })
+                    .select();
+                    
+                if (error) {
+                    results.push(`❌ post_survey: ${error.message}`);
+                } else {
+                    results.push(`✅ post_survey: Insert successful`);
+                }
+            } catch (err) {
+                // Try post_query instead
+                try {
+                    const { data, error } = await supabase
+                        .from('post_query')
+                        .insert({
+                            session_id: sessionId,
+                            feedback: 'test',
+                            rating: 5
+                        })
+                        .select();
+                        
+                    if (error) {
+                        results.push(`❌ post_query: ${error.message}`);
+                    } else {
+                        results.push(`✅ post_query: Insert successful`);
+                    }
+                } catch (err2) {
+                    results.push(`❌ post_query/post_survey: ${err2.message}`);
+                }
+            }
+
+            // Test interactions
+            try {
+                const { data, error } = await supabase
+                    .from('interactions')
+                    .insert({
+                        session_id: sessionId,
+                        interaction_type: 'click',
+                        timestamp: new Date().toISOString()
+                    })
+                    .select();
+                    
+                if (error) {
+                    results.push(`❌ interactions: ${error.message}`);
+                } else {
+                    results.push(`✅ interactions: Insert successful`);
+                }
+            } catch (err) {
+                results.push(`❌ interactions: ${err.message}`);
+            }
+
+            // Test interaction_details
+            try {
+                const { data, error } = await supabase
+                    .from('interaction_details')
+                    .insert({
+                        action_type: 'test',
+                        timestamp: new Date().toISOString()
+                    })
+                    .select();
+                    
+                if (error) {
+                    results.push(`❌ interaction_details: ${error.message}`);
+                } else {
+                    results.push(`✅ interaction_details: Insert successful`);
+                }
+            } catch (err) {
+                results.push(`❌ interaction_details: ${err.message}`);
+            }
+            
+            document.getElementById('insertResults').innerHTML = `<pre>${results.join('\n')}</pre>`;
+        }
+
+        // Auto-run table check
+        window.onload = function() {
+            checkTables();
+        };
+    </script>
+</body>
+</html>

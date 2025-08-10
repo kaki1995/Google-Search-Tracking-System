@@ -124,7 +124,7 @@ const SearchResults = () => {
     }
   };
 
-  const handleResultClick = async (result: SearchResult, index: number) => {
+  const handleResultClick = async (result: SearchResult, index: number, event?: React.MouseEvent) => {
     try {
       // Validate URL before opening
       const url = new URL(result.link);
@@ -137,8 +137,16 @@ const SearchResults = () => {
         return;
       }
       
-      // Track the click
-      await trackingService.trackClick(result.link, result.title, index + 1, currentQueryId || undefined);
+      // Track the click with enhanced details
+      if (currentQueryId) {
+        await trackingService.trackClickWithDetails(
+          result.link,
+          result.title,
+          index + 1,
+          currentQueryId,
+          event?.target as HTMLElement || undefined
+        );
+      }
       
       // Open in new tab with security attributes
       const newWindow = window.open(result.link, '_blank', 'noopener,noreferrer');
@@ -315,7 +323,7 @@ const SearchResults = () => {
                       </button>
                     </div>
                     <button
-                      onClick={() => handleResultClick(result, index)}
+                      onClick={(e) => handleResultClick(result, index, e)}
                       className="block text-left w-full"
                       data-result-rank={index + 1}
                       data-result-url={result.link}

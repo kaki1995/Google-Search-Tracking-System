@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fixed Tracking Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .info { background-color: #cce7ff; color: #004085; }
+        button { padding: 10px 15px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; white-space: pre-wrap; }
+        .status { margin: 5px 0; padding: 8px; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <h1>Fixed Tracking Implementation Test</h1>
+    
+    <div class="section">
+        <h2>1. Test Database Recording</h2>
+        <button onclick="testDatabaseRecording()">Test All Tables</button>
+        <div id="dbResults"></div>
+    </div>
+
+    <div class="section">
+        <h2>2. Test Tracking Service Functions</h2>
+        <button onclick="testTrackingService()">Test Tracking Service</button>
+        <div id="trackingResults"></div>
+    </div>
+
+    <div class="section">
+        <h2>3. Verify Current Data</h2>
+        <button onclick="verifyCurrentData()">Check Recorded Data</button>
+        <div id="verifyResults"></div>
+    </div>
+
+    <div class="section">
+        <h2>4. Summary & Instructions</h2>
+        <div id="summaryResults">
+            <div class="status info">
+                <strong>📋 Test Instructions:</strong><br>
+                1. Click "Test All Tables" to verify database accessibility<br>
+                2. Click "Test Tracking Service" to simulate app tracking<br>
+                3. Click "Check Recorded Data" to verify data was saved<br>
+                4. Go to the main app at <a href="http://localhost:8083/" target="_blank">http://localhost:8083/</a> and test tracking
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://wbguuipoggeamyzrfvbv.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndieHVpaXBwZ2dlYW15enJmdmJ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzMzNjE3MzUsImV4cCI6MjA0ODkzNzczNX0.PvWfN1fTf2cJfNcCB8_m8l2M_SX2T7E6CX7yOYgLaL8';
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        async function testDatabaseRecording() {
+            const sessionId = 'fixed-test-' + Date.now();
+            const results = [];
+            let successCount = 0;
+            let totalTests = 0;
+            
+            results.push('🔧 Testing Fixed Database Recording Implementation...\n');
+
+            // Test 1: background_surveys
+            totalTests++;
+            try {
+                const { data, error } = await supabase
+                    .from('background_surveys')
+                    .insert({
+                        session_id: sessionId,
+                        age_group: '25-34',
+                        gender: 'prefer_not_to_say',
+                        education: 'bachelors',
+                        country: 'test_country'
+                    })
+                    .select();
+                    
+                if (error) {
+                    results.push(`❌ background_surveys: ${error.message}`);
+                } else {
+                    results.push(`✅ background_surveys: Successfully recorded (ID: ${data[0]?.id})`);
+                    successCount++;
+                }
+            } catch (err) {
+                results.push(`❌ background_surveys: ${err.message}`);
+            }
+
+            // Test 2: interactions
+            totalTests++;
+            try {
+                const { data, error } = await supabase
+                    .from('interactions')
+                    .insert({
+                        session_id: sessionId,
+                        interaction_type: 'click',
+                        target_url: 'https://example.com',
+                        target_title: 'Test Result',
+                        result_position: 1,
+                        timestamp: new Date().toISOString()
+                    })
+                    .select();
+                    
+                if (error) {
+                    results.push(`❌ interactions: ${error.message}`);
+                } else {
+                    results.push(`✅ interactions: Successfully recorded (ID: ${data[0]?.id})`);
+                    successCount++;
+                    
+                    // Test 2b: interaction_details (if interaction was created)
+                    const interactionId = data[0]?.id;
+                    if (interactionId) {
+                        totalTests++;
+                        try {
+                            const { data: detailData, error: detailError } = await supabase
+                                .from('interaction_details')
+                                .insert({
+                                    interaction_id: interactionId,
+                                    interaction_type: 'click',
+                                    action_type: 'click',
+                                    element_id: 'test-button',
+                                    timestamp_action: new Date().toISOString()
+                                })
+                                .select();
+                                
+                            if (detailError) {
+                                results.push(`❌ interaction_details: ${detailError.message}`);
+                            } else {
+                                results.push(`✅ interaction_details: Successfully recorded (ID: ${detailData[0]?.id})`);
+                                successCount++;
+                            }
+                        } catch (err) {
+                            results.push(`❌ interaction_details: ${err.message}`);
+                        }
+                    }
+                }
+            } catch (err) {
+                results.push(`❌ interactions: ${err.message}`);
+            }
+
+            // Test 3: post_survey
+            totalTests++;
+            try {
+                const { data, error } = await supabase
+                    .from('post_survey')
+                    .insert({
+                        session_id: sessionId,
+                        search_satisfaction: 6,
+                        interface_ease: 5,
+                        results_relevance: 7
+                    })
+                    .select();
+                    
+                if (error) {
+                    results.push(`❌ post_survey: ${error.message}`);
+                } else {
+                    results.push(`✅ post_survey: Successfully recorded (ID: ${data[0]?.id})`);
+                    successCount++;
+                }
+            } catch (err) {
+                results.push(`❌ post_survey: ${err.message}`);
+            }
+
+            results.push(`\n📊 Database Test Results: ${successCount}/${totalTests} successful`);
+            
+            if (successCount === totalTests) {
+                results.push(`🎉 All database tables are working perfectly!`);
+            } else if (successCount > 0) {
+                results.push(`⚠️ Some tables are working. Check specific errors above.`);
+            } else {
+                results.push(`🚨 No tables are accessible. Check database connection and permissions.`);
+            }
+            
+            document.getElementById('dbResults').innerHTML = `<pre>${results.join('\n')}</pre>`;
+        }
+
+        async function testTrackingService() {
+            const results = [];
+            results.push('🎯 Testing Tracking Service Implementation...\n');
+            
+            // Simulate the main app's tracking calls
+            const testData = {
+                sessionId: 'tracking-test-' + Date.now(),
+                queryId: 'query-test-' + Date.now()
+            };
+
+            // Test background survey tracking
+            try {
+                const { data, error } = await supabase
+                    .from('background_surveys')
+                    .insert({
+                        session_id: testData.sessionId,
+                        age_group: '25-34',
+                        gender: 'test',
+                        education: 'bachelors',
+                        country: 'test_country',
+                        native_language: 'English',
+                        shopping_experience: 5,
+                        product_research_familiarity: 4,
+                        google_search_frequency: 'daily'
+                    })
+                    .select();
+                    
+                if (error) {
+                    results.push(`❌ Background Survey Tracking: ${error.message}`);
+                } else {
+                    results.push(`✅ Background Survey Tracking: Working (ID: ${data[0]?.id})`);
+                }
+            } catch (err) {
+                results.push(`❌ Background Survey Tracking: ${err.message}`);
+            }
+
+            // Test post survey tracking
+            try {
+                const { data, error } = await supabase
+                    .from('post_survey')
+                    .insert({
+                        session_id: testData.sessionId,
+                        search_satisfaction: 6,
+                        interface_ease: 5,
+                        results_relevance: 7,
+                        results_trust: 6,
+                        attention_check: 3,
+                        free_feedback: 'Test feedback from tracking service',
+                        task_duration: '5-10 minutes',
+                        search_tool_type: 'Google'
+                    })
+                    .select();
+                    
+                if (error) {
+                    results.push(`❌ Post Survey Tracking: ${error.message}`);
+                } else {
+                    results.push(`✅ Post Survey Tracking: Working (ID: ${data[0]?.id})`);
+                }
+            } catch (err) {
+                results.push(`❌ Post Survey Tracking: ${err.message}`);
+            }
+
+            // Test interaction tracking
+            try {
+                const { data, error } = await supabase
+                    .from('interactions')
+                    .insert({
+                        session_id: testData.sessionId,
+                        query_id: testData.queryId,
+                        interaction_type: 'click',
+                        target_url: 'https://example.com/test',
+                        target_title: 'Tracking Service Test Result',
+                        result_position: 2,
+                        timestamp: new Date().toISOString()
+                    })
+                    .select();
+                    
+                if (error) {
+                    results.push(`❌ Interaction Tracking: ${error.message}`);
+                } else {
+                    results.push(`✅ Interaction Tracking: Working (ID: ${data[0]?.id})`);
+                }
+            } catch (err) {
+                results.push(`❌ Interaction Tracking: ${err.message}`);
+            }
+
+            results.push(`\n🔍 Tracking Service Test Complete!`);
+            results.push(`🔗 Now test the main app at: http://localhost:8083/`);
+            
+            document.getElementById('trackingResults').innerHTML = `<pre>${results.join('\n')}</pre>`;
+        }
+
+        async function verifyCurrentData() {
+            const results = [];
+            results.push('📋 Verifying Current Data in Database...\n');
+            
+            const tables = ['background_surveys', 'interactions', 'interaction_details', 'post_survey'];
+            
+            for (const table of tables) {
+                try {
+                    const { data, error, count } = await supabase
+                        .from(table)
+                        .select('*', { count: 'exact' })
+                        .order('created_at', { ascending: false })
+                        .limit(3);
+                        
+                    if (error) {
+                        results.push(`❌ ${table}: ${error.message}`);
+                    } else {
+                        results.push(`📊 ${table}: ${count || 0} total records`);
+                        if (data && data.length > 0) {
+                            results.push(`   Recent: ${JSON.stringify(data[0], null, 2).substring(0, 200)}...`);
+                        }
+                        results.push('');
+                    }
+                } catch (err) {
+                    results.push(`❌ ${table}: ${err.message}`);
+                }
+            }
+            
+            document.getElementById('verifyResults').innerHTML = `<pre>${results.join('\n')}</pre>`;
+        }
+
+        // Auto-start first test
+        window.onload = function() {
+            testDatabaseRecording();
+        };
+    </script>
+</body>
+</html>

@@ -42,17 +42,13 @@ export default function Welcome() {
       navigate("/background-survey");
     }
   };
-<<<<<<< HEAD
-  
   const handleExit = async () => {
     // Track exit button click specifically
     await trackingService.trackExitButtonClick();
     // Also mark as final exit action
     await trackingService.trackWelcomePageAction('exited');
-=======
-  const handleExit = async () => {
+    // Track exit study event for enhanced metrics
     await trackingService.trackExitStudy('user_clicked_exit_study');
->>>>>>> f9f040b (Commit all unstaged changes before rebase and push)
     navigate("/exit-study");
   };
 
@@ -61,16 +57,17 @@ export default function Welcome() {
     // Track checkbox interaction
     await trackingService.trackConsentCheckbox(checked);
   };
-  return <div className="min-h-screen relative bg-background py-8 px-6 md:px-8 lg:px-12"
-    style={{
-      backgroundImage: "url('/mountain-background.jpg')",
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      backgroundRepeat: 'no-repeat'
-    }}>
+
+  return (
+    <div className="min-h-screen relative bg-background py-8 px-6 md:px-8 lg:px-12"
+      style={{
+        backgroundImage: "url('/mountain-background.jpg')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}>
       {/* Background overlay for better text readability */}
       <div className="absolute inset-0 bg-black bg-opacity-20"></div>
-      
       <div className="max-w-4xl mx-auto relative z-10">
         {/* Content */}
         <div className="bg-white bg-opacity-95 backdrop-blur-sm rounded-lg shadow-lg p-8 md:p-12 lg:p-16">
@@ -81,21 +78,18 @@ export default function Welcome() {
               <div className="flex items-center">
                 <img src="/lovable-uploads/acd96fcf-765a-409c-9b4e-21f07b00c747.png" alt="Google Logo" className="w-16 h-16 object-contain" />
               </div>
-              
               {/* TUM Logo */}
               <div className="flex items-center">
                 <img src="/lovable-uploads/189f5203-a64b-43cb-aa46-339285dc29e0.png" alt="TUM Logo" className="w-20 h-16 object-contain" />
               </div>
             </div>
           </div>
-
           {/* Title */}
           <div className="text-center mb-8">
             <h1 className="text-3xl font-semibold text-gray-900 mb-6">
               Welcome to Our Project Study
             </h1>
           </div>
-
           {/* Content */}
           <div className="text-base leading-7 text-gray-700 space-y-4 mx-auto text-justify">
             <p>
@@ -104,7 +98,6 @@ export default function Welcome() {
             <p>
               This study is part of a collaborative research project between <strong>Google's Istanbul Office</strong> and the <strong>Technical University of Munich</strong>. We are investigating how consumers search for products using online tools.
             </p>
-
             {/* Information Box */}
             <div className="border border-blue-200 rounded-lg p-4 my-6 bg-sky-100">
               <div className="space-y-3">
@@ -122,7 +115,6 @@ export default function Welcome() {
                 </div>
               </div>
             </div>
-
             <p>
               This study complies with the data protection regulations under the <strong>General Data Protection Regulation (GDPR)</strong>. No personally identifiable information will be collected or stored without your explicit consent.
             </p>
@@ -130,7 +122,6 @@ export default function Welcome() {
               If you choose to continue, we will provide further details about the task and how your responses will contribute to academic research on consumer search behavior.
             </p>
           </div>
-
           {/* Consent */}
           <div className="flex flex-col items-start gap-6 mb-8 mx-auto mt-8">
             <div className="flex items-start gap-3">
@@ -140,7 +131,6 @@ export default function Welcome() {
               </label>
             </div>
           </div>
-
           {/* Buttons */}
           <div className="flex justify-between pt-8">
             <button onClick={handleExit} className="px-8 py-2 text-sm font-medium border-2 border-gray-300 text-gray-700 bg-white rounded-lg hover:bg-gray-50 transition-colors">
@@ -152,5 +142,6 @@ export default function Welcome() {
           </div>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 }

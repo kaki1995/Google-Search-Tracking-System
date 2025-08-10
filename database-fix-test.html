@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Fix Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        button { padding: 10px 15px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <h1>Database Fix Test</h1>
+    
+    <div class="section">
+        <h2>Test Fixed Implementation</h2>
+        <button onclick="testFixedTrackingImplementation()">Test All Tables</button>
+        <div id="testResults"></div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://wbguuipoggeamyzrfvbv.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndieHVpaXBwZ2dlYW15enJmdmJ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzMzNjE3MzUsImV4cCI6MjA0ODkzNzczNX0.PvWfN1fTf2cJfNcCB8_m8l2M_SX2T7E6CX7yOYgLaL8';
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        async function testFixedTrackingImplementation() {
+            const sessionId = 'fix-test-' + Date.now();
+            const results = [];
+            
+            results.push('Starting comprehensive database recording test...\n');
+
+            // 1. Test background_surveys with minimal data
+            try {
+                const { data, error } = await supabase
+                    .from('background_surveys')
+                    .insert({
+                        session_id: sessionId,
+                        age_group: '25-34',
+                        gender: 'test'
+                    })
+                    .select();
+                    
+                if (error) {
+                    results.push(`❌ background_surveys failed: ${error.message}`);
+                } else {
+                    results.push(`✅ background_surveys: Successfully inserted ID ${data[0]?.id}`);
+                }
+            } catch (err) {
+                results.push(`❌ background_surveys exception: ${err.message}`);
+            }
+
+            // 2. Test interactions with minimal data
+            try {
+                const { data, error } = await supabase
+                    .from('interactions')
+                    .insert({
+                        session_id: sessionId,
+                        interaction_type: 'test_click'
+                    })
+                    .select();
+                    
+                if (error) {
+                    results.push(`❌ interactions failed: ${error.message}`);
+                } else {
+                    results.push(`✅ interactions: Successfully inserted ID ${data[0]?.id}`);
+                    
+                    // 3. Test interaction_details using the interaction ID
+                    const interactionId = data[0]?.id;
+                    if (interactionId) {
+                        try {
+                            const { data: detailData, error: detailError } = await supabase
+                                .from('interaction_details')
+                                .insert({
+                                    interaction_id: interactionId,
+                                    action_type: 'test_action'
+                                })
+                                .select();
+                                
+                            if (detailError) {
+                                results.push(`❌ interaction_details failed: ${detailError.message}`);
+                            } else {
+                                results.push(`✅ interaction_details: Successfully inserted ID ${detailData[0]?.id}`);
+                            }
+                        } catch (err) {
+                            results.push(`❌ interaction_details exception: ${err.message}`);
+                        }
+                    }
+                }
+            } catch (err) {
+                results.push(`❌ interactions exception: ${err.message}`);
+            }
+
+            // 4. Test post_survey
+            try {
+                const { data, error } = await supabase
+                    .from('post_survey')
+                    .insert({
+                        session_id: sessionId
+                    })
+                    .select();
+                    
+                if (error) {
+                    results.push(`❌ post_survey failed: ${error.message}`);
+                } else {
+                    results.push(`✅ post_survey: Successfully inserted ID ${data[0]?.id}`);
+                }
+            } catch (err) {
+                // Try post_query as fallback
+                try {
+                    const { data, error } = await supabase
+                        .from('post_query')
+                        .insert({
+                            session_id: sessionId
+                        })
+                        .select();
+                        
+                    if (error) {
+                        results.push(`❌ post_query failed: ${error.message}`);
+                    } else {
+                        results.push(`✅ post_query: Successfully inserted ID ${data[0]?.id}`);
+                    }
+                } catch (err2) {
+                    results.push(`❌ post_survey/post_query both failed: ${err2.message}`);
+                }
+            }
+
+            results.push('\n📊 Test Summary:');
+            const successCount = results.filter(r => r.includes('✅')).length;
+            const failCount = results.filter(r => r.includes('❌')).length;
+            results.push(`✅ Successful: ${successCount}`);
+            results.push(`❌ Failed: ${failCount}`);
+            
+            if (successCount > 0) {
+                results.push('\n🎉 Some tables are working! The app can record data.');
+                results.push('❗ Check the browser console for any tracking errors in the main app.');
+            }
+            
+            document.getElementById('testResults').innerHTML = `<pre>${results.join('\n')}</pre>`;
+        }
+    </script>
+</body>
+</html>
