@@ -113,84 +113,21 @@ const TaskInstructions = () => {
                   10. What is your smartphone budget? <span className="text-red-500">*</span><br />
                   <span className="text-sm font-normal text-gray-600">(Please select one option based on your real-life financial habits.)</span>
                 </label>
-                <div className="flex flex-wrap gap-4 mt-2">
-                  <label className="flex items-center gap-2">
-                    <input 
-                      type="radio" 
-                      name="budget" 
-                      value="under-150" 
-                      checked={budgetRange === "under-150"} 
-                      onChange={(e) => setBudgetRange(e.target.checked ? e.target.value : "")} 
-                      className="w-4 h-4" 
-                    />
-                    <span className="text-sm">Under €150</span>
-                  </label>
-                  <label className="flex items-center gap-2">
-                    <input 
-                      type="radio" 
-                      name="budget" 
-                      value="150-299" 
-                      checked={budgetRange === "150-299"} 
-                      onChange={(e) => setBudgetRange(e.target.checked ? e.target.value : "")} 
-                      className="w-4 h-4" 
-                    />
-                    <span className="text-sm">€150-299</span>
-                  </label>
-                  <label className="flex items-center gap-2">
-                    <input 
-                      type="radio" 
-                      name="budget" 
-                      value="300-449" 
-                      checked={budgetRange === "300-449"} 
-                      onChange={(e) => setBudgetRange(e.target.checked ? e.target.value : "")} 
-                      className="w-4 h-4" 
-                    />
-                    <span className="text-sm">€300-449</span>
-                  </label>
-                  <label className="flex items-center gap-2">
-                    <input 
-                      type="radio" 
-                      name="budget" 
-                      value="450-599" 
-                      checked={budgetRange === "450-599"} 
-                      onChange={(e) => setBudgetRange(e.target.checked ? e.target.value : "")} 
-                      className="w-4 h-4" 
-                    />
-                    <span className="text-sm">€450-599</span>
-                  </label>
-                  <label className="flex items-center gap-2">
-                    <input 
-                      type="radio" 
-                      name="budget" 
-                      value="600-799" 
-                      checked={budgetRange === "600-799"} 
-                      onChange={(e) => setBudgetRange(e.target.checked ? e.target.value : "")} 
-                      className="w-4 h-4" 
-                    />
-                    <span className="text-sm">€600-799</span>
-                  </label>
-                  <label className="flex items-center gap-2">
-                    <input 
-                      type="radio" 
-                      name="budget" 
-                      value="over-800" 
-                      checked={budgetRange === "over-800"} 
-                      onChange={(e) => setBudgetRange(e.target.checked ? e.target.value : "")} 
-                      className="w-4 h-4" 
-                    />
-                    <span className="text-sm">Over €800</span>
-                  </label>
-                  <label className="flex items-center gap-2">
-                    <input 
-                      type="radio" 
-                      name="budget" 
-                      value="not-sure" 
-                      checked={budgetRange === "not-sure"} 
-                      onChange={(e) => setBudgetRange(e.target.checked ? e.target.value : "")} 
-                      className="w-4 h-4" 
-                    />
-                    <span className="text-sm">Not Sure</span>
-                  </label>
+                <div className="mt-2">
+                  <Select onValueChange={(v) => setBudgetRange(v)} value={budgetRange}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select your budget" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="under-150">Under €150</SelectItem>
+                      <SelectItem value="150-299">€150-299</SelectItem>
+                      <SelectItem value="300-449">€300-449</SelectItem>
+                      <SelectItem value="450-599">€450-599</SelectItem>
+                      <SelectItem value="600-799">€600-799</SelectItem>
+                      <SelectItem value="over-800">Over €800</SelectItem>
+                      <SelectItem value="not-sure">Not Sure</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
             </form>

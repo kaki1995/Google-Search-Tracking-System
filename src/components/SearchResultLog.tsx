@@ -112,38 +112,20 @@ export default function SearchResultLog() {
                   <FormLabel className="text-base font-medium text-gray-900">
                     12. What is its storage capacity? <span className="text-sm font-normal text-gray-600 italic">(Optional)</span>
                   </FormLabel>
-                  <div className="flex flex-wrap gap-4 mt-2">
-                    <label className="flex items-center gap-2">
-                      <input type="radio" name="storage_capacity" value="64gb" checked={field.value === "64gb"} onChange={e => {
-                  field.onChange(e.target.value);
-                }} className="w-4 h-4" />
-                      <span className="text-sm">64 GB</span>
-                    </label>
-                    <label className="flex items-center gap-2">
-                      <input type="radio" name="storage_capacity" value="128gb" checked={field.value === "128gb"} onChange={e => {
-                  field.onChange(e.target.value);
-                }} className="w-4 h-4" />
-                      <span className="text-sm">128 GB</span>
-                    </label>
-                    <label className="flex items-center gap-2">
-                      <input type="radio" name="storage_capacity" value="256gb" checked={field.value === "256gb"} onChange={e => {
-                  field.onChange(e.target.value);
-                }} className="w-4 h-4" />
-                      <span className="text-sm">256 GB</span>
-                    </label>
-                    <label className="flex items-center gap-2">
-                      <input type="radio" name="storage_capacity" value="512gb" checked={field.value === "512gb"} onChange={e => {
-                  field.onChange(e.target.value);
-                }} className="w-4 h-4" />
-                      <span className="text-sm">512 GB</span>
-                    </label>
-                    <label className="flex items-center gap-2">
-                      <input type="radio" name="storage_capacity" value="1tb" checked={field.value === "1tb"} onChange={e => {
-                  field.onChange(e.target.value);
-                }} className="w-4 h-4" />
-                      <span className="text-sm">1 TB and above</span>
-                    </label>
-                  </div>
+                  <FormControl>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select storage capacity" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="64gb">64 GB</SelectItem>
+                        <SelectItem value="128gb">128 GB</SelectItem>
+                        <SelectItem value="256gb">256 GB</SelectItem>
+                        <SelectItem value="512gb">512 GB</SelectItem>
+                        <SelectItem value="1tb">1 TB and above</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
                   <FormMessage />
                 </FormItem>} />
 
@@ -154,62 +136,24 @@ export default function SearchResultLog() {
                   <FormLabel className="text-base font-medium text-gray-900">
                     13. What is its color? <span className="text-sm font-normal text-gray-600 italic">(Optional)</span>
                   </FormLabel>
-                  <div className="flex flex-wrap gap-4 mt-2">
-                    <label className="flex items-center gap-2">
-                      <input type="radio" name="color" value="black" checked={field.value === "black"} onChange={e => {
-                  field.onChange(e.target.value);
-                }} className="w-4 h-4" />
-                      <span className="text-sm">Black</span>
-                    </label>
-                    <label className="flex items-center gap-2">
-                      <input type="radio" name="color" value="white" checked={field.value === "white"} onChange={e => {
-                  field.onChange(e.target.value);
-                }} className="w-4 h-4" />
-                      <span className="text-sm">White</span>
-                    </label>
-                    <label className="flex items-center gap-2">
-                      <input type="radio" name="color" value="blue" checked={field.value === "blue"} onChange={e => {
-                  field.onChange(e.target.value);
-                }} className="w-4 h-4" />
-                      <span className="text-sm">Blue</span>
-                    </label>
-                    <label className="flex items-center gap-2">
-                      <input type="radio" name="color" value="gray" checked={field.value === "gray"} onChange={e => {
-                  field.onChange(e.target.value);
-                }} className="w-4 h-4" />
-                      <span className="text-sm">Gray / Graphite</span>
-                    </label>
-                    <label className="flex items-center gap-2">
-                      <input type="radio" name="color" value="green" checked={field.value === "green"} onChange={e => {
-                  field.onChange(e.target.value);
-                }} className="w-4 h-4" />
-                      <span className="text-sm">Green</span>
-                    </label>
-                    <label className="flex items-center gap-2">
-                      <input type="radio" name="color" value="silver" checked={field.value === "silver"} onChange={e => {
-                  field.onChange(e.target.value);
-                }} className="w-4 h-4" />
-                      <span className="text-sm">Silver</span>
-                    </label>
-                    <label className="flex items-center gap-2">
-                      <input type="radio" name="color" value="gold" checked={field.value === "gold"} onChange={e => {
-                  field.onChange(e.target.value);
-                }} className="w-4 h-4" />
-                      <span className="text-sm">Gold</span>
-                    </label>
-                    <label className="flex items-center gap-2">
-                      <input type="radio" name="color" value="red" checked={field.value === "red"} onChange={e => {
-                  field.onChange(e.target.value);
-                }} className="w-4 h-4" />
-                      <span className="text-sm">Red</span>
-                    </label>
-                    <label className="flex items-center gap-2">
-                      <input type="radio" name="color" value="other" checked={field.value === "other"} onChange={e => {
-                  field.onChange(e.target.value);
-                }} className="w-4 h-4" />
-                      <span className="text-sm">Other</span>
-                    </label>
-                  </div>
+                  <FormControl>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select color" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="black">Black</SelectItem>
+                        <SelectItem value="white">White</SelectItem>
+                        <SelectItem value="blue">Blue</SelectItem>
+                        <SelectItem value="gray">Gray / Graphite</SelectItem>
+                        <SelectItem value="green">Green</SelectItem>
+                        <SelectItem value="silver">Silver</SelectItem>
+                        <SelectItem value="gold">Gold</SelectItem>
+                        <SelectItem value="red">Red</SelectItem>
+                        <SelectItem value="other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
                   <FormMessage />
                 </FormItem>} />
 

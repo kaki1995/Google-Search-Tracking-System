@@ -122,74 +122,21 @@ export default function BackgroundSurvey() {
                     <FormLabel className="text-base font-medium text-gray-900">
                       1. What is your age group? <span className="text-red-500">*</span>
                     </FormLabel>
-                    <div className="flex flex-wrap gap-4 mt-2">
-                      <label className="flex items-center gap-2">
-                        <input 
-                          type="radio" 
-                          name="age" 
-                          value="under-18" 
-                          checked={field.value === "under-18"} 
-                          onChange={field.onChange} 
-                          className="w-4 h-4" 
-                        />
-                        <span className="text-sm">Under 18</span>
-                      </label>
-                      <label className="flex items-center gap-2">
-                        <input 
-                          type="radio" 
-                          name="age" 
-                          value="18-24" 
-                          checked={field.value === "18-24"} 
-                          onChange={field.onChange} 
-                          className="w-4 h-4" 
-                        />
-                        <span className="text-sm">18-24</span>
-                      </label>
-                      <label className="flex items-center gap-2">
-                        <input 
-                          type="radio" 
-                          name="age" 
-                          value="25-34" 
-                          checked={field.value === "25-34"} 
-                          onChange={field.onChange} 
-                          className="w-4 h-4" 
-                        />
-                        <span className="text-sm">25-34</span>
-                      </label>
-                      <label className="flex items-center gap-2">
-                        <input 
-                          type="radio" 
-                          name="age" 
-                          value="35-44" 
-                          checked={field.value === "35-44"} 
-                          onChange={field.onChange} 
-                          className="w-4 h-4" 
-                        />
-                        <span className="text-sm">35-44</span>
-                      </label>
-                      <label className="flex items-center gap-2">
-                        <input 
-                          type="radio" 
-                          name="age" 
-                          value="45-54" 
-                          checked={field.value === "45-54"} 
-                          onChange={field.onChange} 
-                          className="w-4 h-4" 
-                        />
-                        <span className="text-sm">45-54</span>
-                      </label>
-                      <label className="flex items-center gap-2">
-                        <input 
-                          type="radio" 
-                          name="age" 
-                          value="55-and-above" 
-                          checked={field.value === "55-and-above"} 
-                          onChange={field.onChange} 
-                          className="w-4 h-4" 
-                        />
-                        <span className="text-sm">55 and above</span>
-                      </label>
-                    </div>
+                    <FormControl>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select age group" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="under-18">Under 18</SelectItem>
+                          <SelectItem value="18-24">18-24</SelectItem>
+                          <SelectItem value="25-34">25-34</SelectItem>
+                          <SelectItem value="35-44">35-44</SelectItem>
+                          <SelectItem value="45-54">45-54</SelectItem>
+                          <SelectItem value="55-and-above">55 and above</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
                     <FormMessage />
                   </FormItem>} />
 
@@ -202,52 +149,19 @@ export default function BackgroundSurvey() {
                     <FormLabel className="text-base font-medium text-gray-900">
                       2. What is your gender? <span className="text-red-500">*</span>
                     </FormLabel>
-                    <div className="flex flex-wrap gap-4 mt-2">
-                      <label className="flex items-center gap-2">
-                        <input 
-                          type="radio" 
-                          name="gender" 
-                          value="female" 
-                          checked={field.value === "female"} 
-                          onChange={field.onChange} 
-                          className="w-4 h-4" 
-                        />
-                        <span className="text-sm">Female</span>
-                      </label>
-                      <label className="flex items-center gap-2">
-                        <input 
-                          type="radio" 
-                          name="gender" 
-                          value="male" 
-                          checked={field.value === "male"} 
-                          onChange={field.onChange} 
-                          className="w-4 h-4" 
-                        />
-                        <span className="text-sm">Male</span>
-                      </label>
-                      <label className="flex items-center gap-2">
-                        <input 
-                          type="radio" 
-                          name="gender" 
-                          value="non-binary" 
-                          checked={field.value === "non-binary"} 
-                          onChange={field.onChange} 
-                          className="w-4 h-4" 
-                        />
-                        <span className="text-sm">Non-binary / Diverse</span>
-                      </label>
-                      <label className="flex items-center gap-2">
-                        <input 
-                          type="radio" 
-                          name="gender" 
-                          value="prefer-not-to-say" 
-                          checked={field.value === "prefer-not-to-say"} 
-                          onChange={field.onChange} 
-                          className="w-4 h-4" 
-                        />
-                        <span className="text-sm">Prefer not to say</span>
-                      </label>
-                    </div>
+                    <FormControl>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select gender" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="female">Female</SelectItem>
+                          <SelectItem value="male">Male</SelectItem>
+                          <SelectItem value="non-binary">Non-binary / Diverse</SelectItem>
+                          <SelectItem value="prefer-not-to-say">Prefer not to say</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
                     <FormMessage />
                   </FormItem>} />
 
@@ -260,52 +174,19 @@ export default function BackgroundSurvey() {
                     <FormLabel className="text-base font-medium text-gray-900">
                       3. What is your highest level of education? <span className="text-red-500">*</span>
                     </FormLabel>
-                    <div className="flex flex-wrap gap-4 mt-2">
-                      <label className="flex items-center gap-2">
-                        <input 
-                          type="radio" 
-                          name="education" 
-                          value="high-school" 
-                          checked={field.value === "high-school"} 
-                          onChange={field.onChange} 
-                          className="w-4 h-4" 
-                        />
-                        <span className="text-sm">High school or below</span>
-                      </label>
-                      <label className="flex items-center gap-2">
-                        <input 
-                          type="radio" 
-                          name="education" 
-                          value="bachelor" 
-                          checked={field.value === "bachelor"} 
-                          onChange={field.onChange} 
-                          className="w-4 h-4" 
-                        />
-                        <span className="text-sm">Bachelor's degree</span>
-                      </label>
-                      <label className="flex items-center gap-2">
-                        <input 
-                          type="radio" 
-                          name="education" 
-                          value="master" 
-                          checked={field.value === "master"} 
-                          onChange={field.onChange} 
-                          className="w-4 h-4" 
-                        />
-                        <span className="text-sm">Master's degree</span>
-                      </label>
-                      <label className="flex items-center gap-2">
-                        <input 
-                          type="radio" 
-                          name="education" 
-                          value="doctorate" 
-                          checked={field.value === "doctorate"} 
-                          onChange={field.onChange} 
-                          className="w-4 h-4" 
-                        />
-                        <span className="text-sm">Doctorate / PhD</span>
-                      </label>
-                    </div>
+                    <FormControl>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select education level" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="high-school">High school or below</SelectItem>
+                          <SelectItem value="bachelor">Bachelor's degree</SelectItem>
+                          <SelectItem value="master">Master's degree</SelectItem>
+                          <SelectItem value="doctorate">Doctorate / PhD</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
                     <FormMessage />
                   </FormItem>} />
 
@@ -318,63 +199,20 @@ export default function BackgroundSurvey() {
                     <FormLabel className="text-base font-medium text-gray-900">
                       4. What is your current employment status? <span className="text-red-500">*</span>
                     </FormLabel>
-                    <div className="flex flex-wrap gap-4 mt-2">
-                      <label className="flex items-center gap-2">
-                        <input 
-                          type="radio" 
-                          name="employment" 
-                          value="student" 
-                          checked={field.value === "student"} 
-                          onChange={field.onChange} 
-                          className="w-4 h-4" 
-                        />
-                        <span className="text-sm">Student</span>
-                      </label>
-                      <label className="flex items-center gap-2">
-                        <input 
-                          type="radio" 
-                          name="employment" 
-                          value="employed" 
-                          checked={field.value === "employed"} 
-                          onChange={field.onChange} 
-                          className="w-4 h-4" 
-                        />
-                        <span className="text-sm">Employed</span>
-                      </label>
-                      <label className="flex items-center gap-2">
-                        <input 
-                          type="radio" 
-                          name="employment" 
-                          value="self-employed" 
-                          checked={field.value === "self-employed"} 
-                          onChange={field.onChange} 
-                          className="w-4 h-4" 
-                        />
-                        <span className="text-sm">Self-employed</span>
-                      </label>
-                      <label className="flex items-center gap-2">
-                        <input 
-                          type="radio" 
-                          name="employment" 
-                          value="unemployed" 
-                          checked={field.value === "unemployed"} 
-                          onChange={field.onChange} 
-                          className="w-4 h-4" 
-                        />
-                        <span className="text-sm">Unemployed</span>
-                      </label>
-                      <label className="flex items-center gap-2">
-                        <input 
-                          type="radio" 
-                          name="employment" 
-                          value="other" 
-                          checked={field.value === "other"} 
-                          onChange={field.onChange} 
-                          className="w-4 h-4" 
-                        />
-                        <span className="text-sm">Other</span>
-                      </label>
-                    </div>
+                    <FormControl>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select employment status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="student">Student</SelectItem>
+                          <SelectItem value="employed">Employed</SelectItem>
+                          <SelectItem value="self-employed">Self-employed</SelectItem>
+                          <SelectItem value="unemployed">Unemployed</SelectItem>
+                          <SelectItem value="other">Other</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
                     <FormMessage />
                   </FormItem>} />
 
@@ -499,63 +337,20 @@ export default function BackgroundSurvey() {
                     <FormLabel className="text-base font-medium text-gray-900">
                       9. On average, how often do you use AI chatbots per week? <span className="text-red-500">*</span>
                     </FormLabel>
-                    <div className="flex flex-wrap gap-4 mt-2">
-                      <label className="flex items-center gap-2">
-                        <input 
-                          type="radio" 
-                          name="search_frequency" 
-                          value="0-times" 
-                          checked={field.value === "0-times"} 
-                          onChange={field.onChange} 
-                          className="w-4 h-4" 
-                        />
-                        <span className="text-sm">0 times</span>
-                      </label>
-                      <label className="flex items-center gap-2">
-                        <input 
-                          type="radio" 
-                          name="search_frequency" 
-                          value="1-2-times" 
-                          checked={field.value === "1-2-times"} 
-                          onChange={field.onChange} 
-                          className="w-4 h-4" 
-                        />
-                        <span className="text-sm">1-2 times</span>
-                      </label>
-                      <label className="flex items-center gap-2">
-                        <input 
-                          type="radio" 
-                          name="search_frequency" 
-                          value="3-5-times" 
-                          checked={field.value === "3-5-times"} 
-                          onChange={field.onChange} 
-                          className="w-4 h-4" 
-                        />
-                        <span className="text-sm">3-5 times</span>
-                      </label>
-                      <label className="flex items-center gap-2">
-                        <input 
-                          type="radio" 
-                          name="search_frequency" 
-                          value="6-10-times" 
-                          checked={field.value === "6-10-times"} 
-                          onChange={field.onChange} 
-                          className="w-4 h-4" 
-                        />
-                        <span className="text-sm">6-10 times</span>
-                      </label>
-                      <label className="flex items-center gap-2">
-                        <input 
-                          type="radio" 
-                          name="search_frequency" 
-                          value="more-than-10" 
-                          checked={field.value === "more-than-10"} 
-                          onChange={field.onChange} 
-                          className="w-4 h-4" 
-                        />
-                        <span className="text-sm">More than 10 times</span>
-                      </label>
-                    </div>
+                    <FormControl>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select frequency" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="0-times">0 times</SelectItem>
+                          <SelectItem value="1-2-times">1-2 times</SelectItem>
+                          <SelectItem value="3-5-times">3-5 times</SelectItem>
+                          <SelectItem value="6-10-times">6-10 times</SelectItem>
+                          <SelectItem value="more-than-10">More than 10 times</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 } />
