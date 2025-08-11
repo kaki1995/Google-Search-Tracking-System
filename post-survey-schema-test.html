@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post Survey Table Structure Check</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        button { margin: 10px; padding: 10px 20px; background: #007cba; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        .success { color: green; }
+        .error { color: red; }
+        pre { background: #f5f5f5; padding: 10px; border-radius: 3px; overflow-x: auto; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Post Survey Table Structure Diagnosis</h1>
+    
+    <div class="section">
+        <h3>Step 1: Check Table Existence</h3>
+        <button onclick="checkTableExists()">Check if post_survey exists</button>
+        <div id="table-exists-result"></div>
+    </div>
+
+    <div class="section">
+        <h3>Step 2: Test Current Schema (JSONB)</h3>
+        <button onclick="testCurrentSchema()">Test JSONB Insert</button>
+        <div id="current-schema-result"></div>
+    </div>
+
+    <div class="section">
+        <h3>Step 3: Test New Schema (Individual Columns)</h3>
+        <button onclick="testNewSchema()">Test Individual Columns Insert</button>
+        <div id="new-schema-result"></div>
+    </div>
+
+    <div class="section">
+        <h3>Step 4: Check Recent Records</h3>
+        <button onclick="checkRecentRecords()">Check Recent Records</button>
+        <div id="recent-records-result"></div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = "https://wbguuipoggeamyzrfvbv.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndieHVpaXBwZ2dlYW15enJmdmJ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzMzNjE3MzUsImV4cCI6MjA0ODkzNzczNX0.PvWfN1fTf2cJfNcCB8_m8l2M_SX2T7E6CX7yOYgLaL8";
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        let testSessionId = null;
+
+        // Create a test session first
+        async function createTestSession() {
+            try {
+                const { data, error } = await supabase
+                    .from('sessions')
+                    .insert({
+                        user_id: 'test-user-' + Date.now(),
+                        platform: 'Google'
+                    })
+                    .select('id')
+                    .single();
+
+                if (error) throw error;
+                testSessionId = data.id;
+                console.log('Test session created:', testSessionId);
+                return testSessionId;
+            } catch (error) {
+                console.error('Failed to create test session:', error);
+                return null;
+            }
+        }
+
+        async function checkTableExists() {
+            const resultDiv = document.getElementById('table-exists-result');
+            resultDiv.innerHTML = '<div>Checking table existence...</div>';
+            
+            try {
+                const { data, error } = await supabase
+                    .from('post_survey')
+                    .select('*')
+                    .limit(1);
+
+                if (error) {
+                    resultDiv.innerHTML = `<div class="error">❌ Table check failed: ${error.message}</div>`;
+                } else {
+                    resultDiv.innerHTML = `<div class="success">✅ post_survey table exists and is accessible</div>`;
+                }
+            } catch (err) {
+                resultDiv.innerHTML = `<div class="error">❌ Exception: ${err.message}</div>`;
+            }
+        }
+
+        async function testCurrentSchema() {
+            if (!testSessionId) {
+                testSessionId = await createTestSession();
+                if (!testSessionId) {
+                    document.getElementById('current-schema-result').innerHTML = '<div class="error">❌ Failed to create test session</div>';
+                    return;
+                }
+            }
+
+            const resultDiv = document.getElementById('current-schema-result');
+            resultDiv.innerHTML = '<div>Testing JSONB schema...</div>';
+            
+            try {
+                const surveyData = {
+                    google_satisfaction: 5,
+                    google_ease: 4,
+                    google_relevance: 6,
+                    google_trust: 5,
+                    google_query_modifications: "2",
+                    attention_check: 3,
+                    google_open_feedback: "Test feedback",
+                    task_duration: "10-15 minutes",
+                    search_tool_type: "Google"
+                };
+
+                const { data, error } = await supabase
+                    .from('post_survey')
+                    .insert({
+                        session_id: testSessionId,
+                        survey_data: surveyData
+                    })
+                    .select('id')
+                    .single();
+
+                if (error) {
+                    resultDiv.innerHTML = `<div class="error">❌ JSONB insert failed: ${error.message}</div>`;
+                } else {
+                    resultDiv.innerHTML = `<div class="success">✅ JSONB insert successful: ${data.id}</div>`;
+                }
+            } catch (err) {
+                resultDiv.innerHTML = `<div class="error">❌ Exception: ${err.message}</div>`;
+            }
+        }
+
+        async function testNewSchema() {
+            if (!testSessionId) {
+                testSessionId = await createTestSession();
+                if (!testSessionId) {
+                    document.getElementById('new-schema-result').innerHTML = '<div class="error">❌ Failed to create test session</div>';
+                    return;
+                }
+            }
+
+            const resultDiv = document.getElementById('new-schema-result');
+            resultDiv.innerHTML = '<div>Testing individual columns schema...</div>';
+            
+            try {
+                const { data, error } = await supabase
+                    .from('post_survey')
+                    .insert({
+                        session_id: testSessionId,
+                        google_satisfaction: 5,
+                        google_ease: 4,
+                        google_relevance: 6,
+                        google_trust: 5,
+                        google_query_modifications: "2",
+                        attention_check: 3,
+                        google_open_feedback: "Test feedback",
+                        task_duration: "10-15 minutes",
+                        search_tool_type: "Google"
+                    })
+                    .select('id')
+                    .single();
+
+                if (error) {
+                    resultDiv.innerHTML = `<div class="error">❌ Individual columns insert failed: ${error.message}</div>`;
+                } else {
+                    resultDiv.innerHTML = `<div class="success">✅ Individual columns insert successful: ${data.id}</div>`;
+                }
+            } catch (err) {
+                resultDiv.innerHTML = `<div class="error">❌ Exception: ${err.message}</div>`;
+            }
+        }
+
+        async function checkRecentRecords() {
+            const resultDiv = document.getElementById('recent-records-result');
+            resultDiv.innerHTML = '<div>Checking recent records...</div>';
+            
+            try {
+                const { data, error } = await supabase
+                    .from('post_survey')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(5);
+
+                if (error) {
+                    resultDiv.innerHTML = `<div class="error">❌ Records check failed: ${error.message}</div>`;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="success">✅ Found ${data.length} recent records</div>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                }
+            } catch (err) {
+                resultDiv.innerHTML = `<div class="error">❌ Exception: ${err.message}</div>`;
+            }
+        }
+
+        // Auto-create test session on load
+        window.onload = () => {
+            createTestSession();
+        };
+    </script>
+</body>
+</html>

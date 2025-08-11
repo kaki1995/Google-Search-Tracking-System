@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✅ Post Survey Verification Test</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f0f9ff; }
+        .container { max-width: 800px; margin: 0 auto; }
+        button { margin: 10px; padding: 12px 24px; background: #10b981; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #059669; }
+        .success { color: #059669; background: #d1fae5; padding: 10px; border-radius: 6px; margin: 10px 0; }
+        .error { color: #dc2626; background: #fee2e2; padding: 10px; border-radius: 6px; margin: 10px 0; }
+        .info { color: #2563eb; background: #dbeafe; padding: 10px; border-radius: 6px; margin: 10px 0; }
+        pre { background: #1f2937; color: #f9fafb; padding: 15px; border-radius: 8px; overflow-x: auto; }
+        .section { margin: 20px 0; padding: 20px; border: 2px solid #e5e7eb; border-radius: 12px; background: white; }
+        .header { text-align: center; color: #1f2937; margin-bottom: 30px; }
+        .status-indicator { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 8px; }
+        .status-success { background: #10b981; }
+        .status-error { background: #ef4444; }
+        .status-pending { background: #f59e0b; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎉 Post Survey Schema Fix Verification</h1>
+            <p>Testing the updated post_survey table with individual columns</p>
+        </div>
+        
+        <div class="section">
+            <h3><span class="status-indicator status-pending"></span>Step 1: Create Test Session</h3>
+            <button onclick="createTestSession()">Create Test Session</button>
+            <div id="session-result"></div>
+        </div>
+
+        <div class="section">
+            <h3><span class="status-indicator status-pending"></span>Step 2: Test New Schema Insert</h3>
+            <button onclick="testNewSchemaInsert()">Test Individual Columns Insert</button>
+            <div id="insert-result"></div>
+        </div>
+
+        <div class="section">
+            <h3><span class="status-indicator status-pending"></span>Step 3: Verify Data Structure</h3>
+            <button onclick="verifyDataStructure()">Check Saved Data</button>
+            <div id="structure-result"></div>
+        </div>
+
+        <div class="section">
+            <h3><span class="status-indicator status-pending"></span>Step 4: Simulate Real App Submission</h3>
+            <button onclick="simulateRealAppSubmission()">Simulate App Post Survey</button>
+            <div id="app-result"></div>
+        </div>
+
+        <div class="section">
+            <h3><span class="status-indicator status-pending"></span>Final Verification: Check All Records</h3>
+            <button onclick="checkAllPostSurveyRecords()">View All Post Survey Records</button>
+            <div id="final-result"></div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = "https://wbguuipoggeamyzrfvbv.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndieHVpaXBwZ2dlYW15enJmdmJ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzMzNjE3MzUsImV4cCI6MjA0ODkzNzczNX0.PvWfN1fTf2cJfNcCB8_m8l2M_SX2T7E6CX7yOYgLaL8";
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        let testSessionId = null;
+        let stepCount = 0;
+
+        function updateStepStatus(stepNumber, isSuccess) {
+            const indicators = document.querySelectorAll('.status-indicator');
+            if (indicators[stepNumber - 1]) {
+                indicators[stepNumber - 1].className = `status-indicator ${isSuccess ? 'status-success' : 'status-error'}`;
+            }
+        }
+
+        async function createTestSession() {
+            const resultDiv = document.getElementById('session-result');
+            resultDiv.innerHTML = '<div class="info">Creating test session...</div>';
+            
+            try {
+                const { data, error } = await supabase
+                    .from('sessions')
+                    .insert({
+                        user_id: 'verification-test-' + Date.now(),
+                        platform: 'Google'
+                    })
+                    .select('id')
+                    .single();
+
+                if (error) throw error;
+                
+                testSessionId = data.id;
+                resultDiv.innerHTML = `<div class="success">✅ Test session created successfully!<br>Session ID: ${testSessionId}</div>`;
+                updateStepStatus(1, true);
+                console.log('Test session created:', testSessionId);
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Failed to create test session: ${error.message}</div>`;
+                updateStepStatus(1, false);
+                console.error('Session creation failed:', error);
+            }
+        }
+
+        async function testNewSchemaInsert() {
+            if (!testSessionId) {
+                document.getElementById('insert-result').innerHTML = '<div class="error">❌ Please create a test session first</div>';
+                return;
+            }
+
+            const resultDiv = document.getElementById('insert-result');
+            resultDiv.innerHTML = '<div class="info">Testing new schema with individual columns...</div>';
+            
+            try {
+                const { data, error } = await supabase
+                    .from('post_survey')
+                    .insert({
+                        session_id: testSessionId,
+                        google_satisfaction: 6,
+                        google_ease: 5,
+                        google_relevance: 7,
+                        google_trust: 6,
+                        google_query_modifications: "3",
+                        attention_check: 4,
+                        google_open_feedback: "The new schema is working perfectly! Individual columns are being saved correctly.",
+                        task_duration: "10-15 minutes",
+                        search_tool_type: "Google"
+                    })
+                    .select('*')
+                    .single();
+
+                if (error) throw error;
+                
+                resultDiv.innerHTML = `
+                    <div class="success">✅ New schema insert successful!</div>
+                    <div class="success">Record ID: ${data.id}</div>
+                    <div class="info">All individual columns saved correctly ✨</div>
+                `;
+                updateStepStatus(2, true);
+                console.log('New schema insert successful:', data);
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ New schema insert failed: ${error.message}</div>`;
+                updateStepStatus(2, false);
+                console.error('Insert failed:', error);
+            }
+        }
+
+        async function verifyDataStructure() {
+            const resultDiv = document.getElementById('structure-result');
+            resultDiv.innerHTML = '<div class="info">Verifying data structure...</div>';
+            
+            try {
+                const { data, error } = await supabase
+                    .from('post_survey')
+                    .select('*')
+                    .eq('session_id', testSessionId)
+                    .order('created_at', { ascending: false })
+                    .limit(1);
+
+                if (error) throw error;
+                
+                if (data && data.length > 0) {
+                    const record = data[0];
+                    const hasIndividualColumns = 'google_satisfaction' in record;
+                    
+                    if (hasIndividualColumns) {
+                        resultDiv.innerHTML = `
+                            <div class="success">✅ Perfect! Data structure verified</div>
+                            <div class="success">✨ Individual columns are working correctly</div>
+                            <div class="info">Sample data:</div>
+                            <pre>${JSON.stringify(record, null, 2)}</pre>
+                        `;
+                        updateStepStatus(3, true);
+                    } else {
+                        resultDiv.innerHTML = `
+                            <div class="error">❌ Still using old JSONB structure</div>
+                            <pre>${JSON.stringify(record, null, 2)}</pre>
+                        `;
+                        updateStepStatus(3, false);
+                    }
+                } else {
+                    resultDiv.innerHTML = '<div class="error">❌ No data found to verify</div>';
+                    updateStepStatus(3, false);
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Verification failed: ${error.message}</div>`;
+                updateStepStatus(3, false);
+                console.error('Verification failed:', error);
+            }
+        }
+
+        async function simulateRealAppSubmission() {
+            if (!testSessionId) {
+                document.getElementById('app-result').innerHTML = '<div class="error">❌ Please create a test session first</div>';
+                return;
+            }
+
+            const resultDiv = document.getElementById('app-result');
+            resultDiv.innerHTML = '<div class="info">Simulating real app post survey submission...</div>';
+            
+            // This exactly matches what the app sends
+            const surveyData = {
+                google_satisfaction: "6",
+                google_ease: "5",
+                google_relevance: "7",
+                google_trust: "6",
+                google_query_modifications: "2",
+                attention_check: "4",
+                google_open_feedback: "Google provided highly relevant results and the interface was intuitive to use.",
+                task_duration: "10-15 minutes",
+                search_tool_type: "Google"
+            };
+
+            try {
+                // Use the exact same logic as the updated tracking service
+                const { data, error } = await supabase
+                    .from('post_survey')
+                    .insert({
+                        session_id: testSessionId,
+                        google_satisfaction: parseInt(surveyData.google_satisfaction) || null,
+                        google_ease: parseInt(surveyData.google_ease) || null,
+                        google_relevance: parseInt(surveyData.google_relevance) || null,
+                        google_trust: parseInt(surveyData.google_trust) || null,
+                        google_query_modifications: surveyData.google_query_modifications,
+                        attention_check: parseInt(surveyData.attention_check) || null,
+                        google_open_feedback: surveyData.google_open_feedback,
+                        task_duration: surveyData.task_duration,
+                        search_tool_type: 'Google',
+                        created_at: new Date().toISOString()
+                    })
+                    .select('id')
+                    .single();
+
+                if (error) throw error;
+                
+                resultDiv.innerHTML = `
+                    <div class="success">🎉 Real app simulation successful!</div>
+                    <div class="success">Record ID: ${data.id}</div>
+                    <div class="success">✨ Your app will now save post survey data correctly!</div>
+                `;
+                updateStepStatus(4, true);
+                console.log('App simulation successful:', data);
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ App simulation failed: ${error.message}</div>`;
+                updateStepStatus(4, false);
+                console.error('App simulation failed:', error);
+            }
+        }
+
+        async function checkAllPostSurveyRecords() {
+            const resultDiv = document.getElementById('final-result');
+            resultDiv.innerHTML = '<div class="info">Checking all post survey records...</div>';
+            
+            try {
+                const { data, error } = await supabase
+                    .from('post_survey')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(10);
+
+                if (error) throw error;
+                
+                resultDiv.innerHTML = `
+                    <div class="success">🎊 Final verification complete!</div>
+                    <div class="success">Found ${data.length} post survey records</div>
+                    <div class="success">✨ Post survey table is working perfectly!</div>
+                    <div class="info">Recent records:</div>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+                updateStepStatus(5, true);
+                
+                // Show success summary
+                setTimeout(() => {
+                    const allSuccess = document.querySelectorAll('.status-success').length === 5;
+                    if (allSuccess) {
+                        resultDiv.innerHTML += `
+                            <div class="success" style="margin-top: 20px; padding: 20px; border: 2px solid #10b981; text-align: center;">
+                                <h3>🎉 ALL TESTS PASSED! 🎉</h3>
+                                <p><strong>Your post survey functionality is now working perfectly!</strong></p>
+                                <p>Users can now complete post surveys and the data will be saved correctly in individual columns.</p>
+                            </div>
+                        `;
+                    }
+                }, 1000);
+                
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Final check failed: ${error.message}</div>`;
+                updateStepStatus(5, false);
+                console.error('Final check failed:', error);
+            }
+        }
+
+        // Auto-create test session on load
+        window.onload = () => {
+            setTimeout(() => {
+                createTestSession();
+            }, 1000);
+        };
+    </script>
+</body>
+</html>

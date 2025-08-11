@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 Complete User Journey Test</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .container { max-width: 900px; margin: 0 auto; }
+        .card { background: white; padding: 25px; border-radius: 15px; margin: 20px 0; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        button { margin: 10px; padding: 12px 24px; background: #4f46e5; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: all 0.3s; }
+        button:hover { background: #3730a3; transform: translateY(-2px); }
+        .success { color: #059669; background: #ecfdf5; padding: 15px; border-radius: 8px; border-left: 4px solid #059669; }
+        .error { color: #dc2626; background: #fef2f2; padding: 15px; border-radius: 8px; border-left: 4px solid #dc2626; }
+        .info { color: #2563eb; background: #eff6ff; padding: 15px; border-radius: 8px; border-left: 4px solid #2563eb; }
+        .warning { color: #d97706; background: #fffbeb; padding: 15px; border-radius: 8px; border-left: 4px solid #d97706; }
+        pre { background: #1f2937; color: #f9fafb; padding: 15px; border-radius: 8px; overflow-x: auto; font-size: 12px; }
+        .header { text-align: center; color: white; margin-bottom: 30px; }
+        .progress { width: 100%; height: 6px; background: #e5e7eb; border-radius: 3px; margin: 15px 0; }
+        .progress-bar { height: 100%; background: #10b981; border-radius: 3px; transition: width 0.5s; }
+        .step { display: flex; align-items: center; margin: 10px 0; }
+        .step-number { width: 30px; height: 30px; background: #6b7280; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px; font-weight: bold; }
+        .step-number.completed { background: #10b981; }
+        .step-number.current { background: #3b82f6; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Complete User Journey Test</h1>
+            <p>Simulating the full research study flow with post survey data recording</p>
+            <div class="progress">
+                <div class="progress-bar" id="progress-bar" style="width: 0%"></div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h3>📋 Test Checklist</h3>
+            <div class="step">
+                <div class="step-number" id="step1">1</div>
+                <span>Create research session</span>
+            </div>
+            <div class="step">
+                <div class="step-number" id="step2">2</div>
+                <span>Submit background survey</span>
+            </div>
+            <div class="step">
+                <div class="step-number" id="step3">3</div>
+                <span>Record search interactions</span>
+            </div>
+            <div class="step">
+                <div class="step-number" id="step4">4</div>
+                <span>Submit post survey with new schema</span>
+            </div>
+            <div class="step">
+                <div class="step-number" id="step5">5</div>
+                <span>Verify all data saved correctly</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>🚀 Start Complete Journey Test</h3>
+            <button onclick="startCompleteJourney()">Start Full User Journey Simulation</button>
+            <div id="journey-result"></div>
+        </div>
+
+        <div class="card">
+            <h3>📊 Final Database Verification</h3>
+            <button onclick="verifyFinalDatabase()">Check All Tables & Data</button>
+            <div id="final-verification"></div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = "https://wbguuipoggeamyzrfvbv.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndieHVpaXBwZ2dlYW15enJmdmJ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzMzNjE3MzUsImV4cCI6MjA0ODkzNzczNX0.PvWfN1fTf2cJfNcCB8_m8l2M_SX2T7E6CX7yOYgLaL8";
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        let testSessionId = null;
+        let testQueryId = null;
+        let currentStep = 0;
+
+        function updateProgress(step) {
+            currentStep = step;
+            const progress = (step / 5) * 100;
+            document.getElementById('progress-bar').style.width = progress + '%';
+            
+            // Update step indicators
+            for (let i = 1; i <= 5; i++) {
+                const stepEl = document.getElementById(`step${i}`);
+                if (i < step) {
+                    stepEl.className = 'step-number completed';
+                } else if (i === step) {
+                    stepEl.className = 'step-number current';
+                } else {
+                    stepEl.className = 'step-number';
+                }
+            }
+        }
+
+        async function startCompleteJourney() {
+            const resultDiv = document.getElementById('journey-result');
+            resultDiv.innerHTML = '<div class="info">Starting complete user journey simulation...</div>';
+            
+            try {
+                // Step 1: Create Session
+                updateProgress(1);
+                resultDiv.innerHTML += '<div class="info">Step 1: Creating research session...</div>';
+                
+                const { data: sessionData, error: sessionError } = await supabase
+                    .from('sessions')
+                    .insert({
+                        user_id: 'journey-test-' + Date.now(),
+                        platform: 'Google'
+                    })
+                    .select('id')
+                    .single();
+
+                if (sessionError) throw sessionError;
+                testSessionId = sessionData.id;
+                
+                resultDiv.innerHTML += `<div class="success">✅ Session created: ${testSessionId}</div>`;
+                
+                // Step 2: Background Survey
+                updateProgress(2);
+                resultDiv.innerHTML += '<div class="info">Step 2: Submitting background survey...</div>';
+                
+                const { error: backgroundError } = await supabase
+                    .from('background_surveys')
+                    .insert({
+                        session_id: testSessionId,
+                        survey_data: {
+                            age_group: '25-34',
+                            gender: 'non-binary',
+                            education: 'bachelors',
+                            country: 'US',
+                            native_language: 'English',
+                            shopping_experience: 6,
+                            product_research_familiarity: 5,
+                            google_search_frequency: 'daily'
+                        }
+                    });
+
+                if (backgroundError) throw backgroundError;
+                resultDiv.innerHTML += '<div class="success">✅ Background survey saved</div>';
+                
+                // Step 3: Search Interactions
+                updateProgress(3);
+                resultDiv.innerHTML += '<div class="info">Step 3: Recording search interactions...</div>';
+                
+                const { data: queryData, error: queryError } = await supabase
+                    .from('experiment_queries')
+                    .insert({
+                        session_id: testSessionId,
+                        query_text: 'best smartphone 2025',
+                        result_count: 10,
+                        reformulation_count: 0
+                    })
+                    .select('id')
+                    .single();
+
+                if (queryError) throw queryError;
+                testQueryId = queryData.id;
+                
+                const { error: interactionError } = await supabase
+                    .from('interactions')
+                    .insert({
+                        query_id: testQueryId,
+                        clicked_url: 'https://example.com/smartphone-review',
+                        clicked_rank: 1,
+                        interaction_type: 'click',
+                        session_time_ms: 15000
+                    });
+
+                if (interactionError) throw interactionError;
+                resultDiv.innerHTML += '<div class="success">✅ Search interactions recorded</div>';
+                
+                // Step 4: Post Survey (THE CRITICAL TEST!)
+                updateProgress(4);
+                resultDiv.innerHTML += '<div class="info">Step 4: Submitting post survey with NEW SCHEMA...</div>';
+                
+                const { data: postSurveyData, error: postSurveyError } = await supabase
+                    .from('post_survey')
+                    .insert({
+                        session_id: testSessionId,
+                        google_satisfaction: 6,
+                        google_ease: 7,
+                        google_relevance: 6,
+                        google_trust: 5,
+                        google_query_modifications: "1",
+                        attention_check: 4,
+                        google_open_feedback: "The Google search interface was intuitive and provided highly relevant results for my smartphone research. The ranking seemed accurate and I found what I was looking for quickly.",
+                        task_duration: "10-15 minutes",
+                        search_tool_type: "Google"
+                    })
+                    .select('*')
+                    .single();
+
+                if (postSurveyError) throw postSurveyError;
+                resultDiv.innerHTML += `<div class="success">🎉 POST SURVEY SAVED SUCCESSFULLY with NEW SCHEMA!</div>`;
+                resultDiv.innerHTML += `<div class="success">Record ID: ${postSurveyData.id}</div>`;
+                
+                // Step 5: Verification
+                updateProgress(5);
+                resultDiv.innerHTML += '<div class="info">Step 5: Verifying all data...</div>';
+                
+                const { data: allData, error: verifyError } = await supabase
+                    .from('post_survey')
+                    .select('*')
+                    .eq('id', postSurveyData.id)
+                    .single();
+
+                if (verifyError) throw verifyError;
+                
+                const hasCorrectSchema = 'google_satisfaction' in allData && typeof allData.google_satisfaction === 'number';
+                
+                if (hasCorrectSchema) {
+                    resultDiv.innerHTML += `
+                        <div class="success">
+                            <h4>🎊 COMPLETE SUCCESS! 🎊</h4>
+                            <p><strong>All 5 steps completed successfully!</strong></p>
+                            <p>✅ Session created</p>
+                            <p>✅ Background survey saved</p>
+                            <p>✅ Interactions recorded</p>
+                            <p>✅ Post survey saved with NEW SCHEMA</p>
+                            <p>✅ Data verification passed</p>
+                            <p><strong>Your app is now fully functional!</strong></p>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML += '<div class="error">❌ Schema verification failed</div>';
+                }
+                
+            } catch (error) {
+                resultDiv.innerHTML += `<div class="error">❌ Journey failed at step ${currentStep}: ${error.message}</div>`;
+                console.error('Journey failed:', error);
+            }
+        }
+
+        async function verifyFinalDatabase() {
+            const resultDiv = document.getElementById('final-verification');
+            resultDiv.innerHTML = '<div class="info">Checking all database tables...</div>';
+            
+            try {
+                const tables = [
+                    'sessions',
+                    'background_surveys', 
+                    'experiment_queries',
+                    'interactions',
+                    'post_survey'
+                ];
+                
+                const counts = {};
+                
+                for (const table of tables) {
+                    const { count, error } = await supabase
+                        .from(table)
+                        .select('*', { count: 'exact', head: true });
+                    
+                    if (error) {
+                        counts[table] = `Error: ${error.message}`;
+                    } else {
+                        counts[table] = count || 0;
+                    }
+                }
+                
+                // Get recent post survey records to verify schema
+                const { data: recentSurveys, error: surveyError } = await supabase
+                    .from('post_survey')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(3);
+                
+                let schemaStatus = 'Unknown';
+                if (!surveyError && recentSurveys && recentSurveys.length > 0) {
+                    const hasNewSchema = 'google_satisfaction' in recentSurveys[0];
+                    schemaStatus = hasNewSchema ? '✅ New Schema (Individual Columns)' : '❌ Old Schema (JSONB)';
+                }
+                
+                resultDiv.innerHTML = `
+                    <div class="success">
+                        <h4>📊 Database Status Summary</h4>
+                        <p><strong>Post Survey Schema:</strong> ${schemaStatus}</p>
+                        <p><strong>Table Record Counts:</strong></p>
+                        <ul>
+                            <li>Sessions: ${counts.sessions}</li>
+                            <li>Background Surveys: ${counts.background_surveys}</li>
+                            <li>Experiment Queries: ${counts.experiment_queries}</li>
+                            <li>Interactions: ${counts.interactions}</li>
+                            <li>Post Surveys: ${counts.post_survey}</li>
+                        </ul>
+                        <p><strong>Recent Post Survey Records:</strong></p>
+                        <pre>${JSON.stringify(recentSurveys, null, 2)}</pre>
+                    </div>
+                `;
+                
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Database verification failed: ${error.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>

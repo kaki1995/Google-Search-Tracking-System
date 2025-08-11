@@ -14,23 +14,43 @@ export default function Welcome() {
       try {
         const token = searchParams.get('token');
         
-        // Initialize both tracking services
-        const sessionId = await trackingService.initSession(token);
-        const enhancedSessionId = await enhancedTrackingService.initializeSession(
-          token || 'anonymous',
-          undefined, // budget_range
-          undefined, // location
-          undefined  // device_type
-        );
+        // Initialize both tracking services with error handling
+        let sessionId, enhancedSessionId;
+        
+        try {
+          sessionId = await trackingService.initSession(token);
+          console.log('Basic tracking initialized:', sessionId);
+        } catch (error) {
+          console.error('Basic tracking failed:', error);
+        }
+        
+        try {
+          enhancedSessionId = await enhancedTrackingService.initializeSession(
+            token || 'anonymous',
+            undefined, // budget_range
+            undefined, // location
+            undefined  // device_type
+          );
+          console.log('Enhanced tracking initialized:', enhancedSessionId);
+        } catch (error) {
+          console.error('Enhanced tracking failed:', error);
+        }
         
         console.log('Sessions initialized:', { sessionId, enhancedSessionId });
         
-        // Track that user is on welcome page
-        await trackingService.trackWelcomePageAction('in_progress');
+        // Track that user is on welcome page (try-catch to not block UI)
+        try {
+          await trackingService.trackWelcomePageAction('in_progress');
+        } catch (error) {
+          console.error('Failed to track welcome page action:', error);
+        }
         
+        // Always allow the session to be considered initialized
         setSessionInitialized(true);
       } catch (error) {
         console.error('Failed to initialize session:', error);
+        // Still set as initialized to not block the UI
+        setSessionInitialized(true);
       }
     };
     initializeSession();
@@ -46,9 +66,13 @@ export default function Welcome() {
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [searchParams, agreed]);
   const handleContinue = async () => {
-    if (agreed === true && sessionInitialized) {
-      // Track consent given (final consent action)
-      await trackingService.trackConsent(true);
+    if (agreed === true) {
+      try {
+        // Track consent given (final consent action)
+        await trackingService.trackConsent(true);
+      } catch (error) {
+        console.error('Failed to track consent:', error);
+      }
       navigate("/background-survey");
     }
   };
@@ -146,7 +170,7 @@ export default function Welcome() {
             <button onClick={handleExit} className="px-8 py-2 text-sm font-medium border-2 border-gray-300 text-gray-700 bg-white rounded-lg hover:bg-gray-50 transition-colors">
               Exit Study
             </button>
-            <button onClick={handleContinue} disabled={agreed !== true || !sessionInitialized} className="px-8 py-2 text-sm font-medium text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed bg-blue-600 hover:bg-blue-700">
+            <button onClick={handleContinue} disabled={agreed !== true} className="px-8 py-2 text-sm font-medium text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed bg-blue-600 hover:bg-blue-700">
               Continue to Study
             </button>
           </div>

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post Survey Debug & Fix</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        button { margin: 10px; padding: 10px 20px; background: #007cba; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        .success { color: green; }
+        .error { color: red; }
+        .warning { color: orange; }
+        .info { color: blue; }
+        pre { background: #f5f5f5; padding: 10px; border-radius: 3px; overflow-x: auto; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .sql-code { background: #2d3748; color: #e2e8f0; padding: 15px; border-radius: 5px; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Post Survey Database Fix</h1>
+    
+    <div class="section">
+        <h3>❗ Manual Database Fix Required</h3>
+        <div class="info">
+            The post_survey table needs to be updated manually in Supabase Dashboard.
+            Copy and run this SQL in the Supabase SQL Editor:
+        </div>
+        <div class="sql-code">
+-- Fix post_survey table schema
+DROP TABLE IF EXISTS public.post_survey CASCADE;
+
+CREATE TABLE public.post_survey (
+    id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+    session_id UUID NOT NULL REFERENCES public.sessions(id) ON DELETE CASCADE,
+    
+    -- Google-focused Likert Scale Questions (1-7)
+    google_satisfaction INTEGER CHECK (google_satisfaction >= 1 AND google_satisfaction <= 7),
+    google_ease INTEGER CHECK (google_ease >= 1 AND google_ease <= 7),
+    google_relevance INTEGER CHECK (google_relevance >= 1 AND google_relevance <= 7),
+    google_trust INTEGER CHECK (google_trust >= 1 AND google_trust <= 7),
+    
+    -- Query modification count
+    google_query_modifications TEXT,
+    
+    -- Attention check (1-7)
+    attention_check INTEGER CHECK (attention_check >= 1 AND attention_check <= 7),
+    
+    -- Open feedback
+    google_open_feedback TEXT,
+    
+    -- Additional fields
+    task_duration TEXT,
+    search_tool_type TEXT,
+    
+    -- Timestamps
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
+);
+
+-- Enable Row Level Security
+ALTER TABLE public.post_survey ENABLE ROW LEVEL SECURITY;
+
+-- Create RLS policy for public access
+CREATE POLICY "Allow public access to post_survey" ON public.post_survey FOR ALL USING (true);
+
+-- Create index for performance
+CREATE INDEX idx_post_survey_session_id ON public.post_survey(session_id);
+        </div>
+        <div class="info">
+            <strong>Steps:</strong><br>
+            1. Go to <a href="https://supabase.com/dashboard/project/wbguuipoggeamyzrfvbv/sql" target="_blank">Supabase SQL Editor</a><br>
+            2. Copy the SQL above<br>
+            3. Paste and run it<br>
+            4. Come back and test below
+        </div>
+    </div>
+
+    <div class="section">
+        <h3>Step 1: Test Current Schema</h3>
+        <button onclick="testCurrentSchema()">Test Current Post Survey Insert</button>
+        <div id="current-test-result"></div>
+    </div>
+
+    <div class="section">
+        <h3>Step 2: Check Recent Records</h3>
+        <button onclick="checkRecords()">Check Recent Post Survey Records</button>
+        <div id="records-result"></div>
+    </div>
+
+    <div class="section">
+        <h3>Step 3: Simulate App Post Survey Submission</h3>
+        <button onclick="simulateAppSubmission()">Simulate Real App Submission</button>
+        <div id="app-test-result"></div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = "https://wbguuipoggeamyzrfvbv.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndieHVpaXBwZ2dlYW15enJmdmJ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzMzNjE3MzUsImV4cCI6MjA0ODkzNzczNX0.PvWfN1fTf2cJfNcCB8_m8l2M_SX2T7E6CX7yOYgLaL8";
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        let testSessionId = null;
+
+        async function createTestSession() {
+            try {
+                const { data, error } = await supabase
+                    .from('sessions')
+                    .insert({
+                        user_id: 'test-user-' + Date.now(),
+                        platform: 'Google'
+                    })
+                    .select('id')
+                    .single();
+
+                if (error) throw error;
+                testSessionId = data.id;
+                console.log('Test session created:', testSessionId);
+                return testSessionId;
+            } catch (error) {
+                console.error('Failed to create test session:', error);
+                return null;
+            }
+        }
+
+        async function testCurrentSchema() {
+            if (!testSessionId) {
+                testSessionId = await createTestSession();
+                if (!testSessionId) {
+                    document.getElementById('current-test-result').innerHTML = '<div class="error">❌ Failed to create test session</div>';
+                    return;
+                }
+            }
+
+            const resultDiv = document.getElementById('current-test-result');
+            resultDiv.innerHTML = '<div>Testing current schema...</div>';
+            
+            try {
+                // Try new schema first (individual columns)
+                const { data, error } = await supabase
+                    .from('post_survey')
+                    .insert({
+                        session_id: testSessionId,
+                        google_satisfaction: 5,
+                        google_ease: 4,
+                        google_relevance: 6,
+                        google_trust: 5,
+                        google_query_modifications: "2",
+                        attention_check: 3,
+                        google_open_feedback: "Test feedback - new schema",
+                        task_duration: "10-15 minutes",
+                        search_tool_type: "Google"
+                    })
+                    .select('id')
+                    .single();
+
+                if (error) {
+                    console.warn('New schema failed, trying JSONB fallback:', error.message);
+                    
+                    // Try JSONB fallback
+                    const surveyData = {
+                        google_satisfaction: 5,
+                        google_ease: 4,
+                        google_relevance: 6,
+                        google_trust: 5,
+                        google_query_modifications: "2",
+                        attention_check: 3,
+                        google_open_feedback: "Test feedback - JSONB schema",
+                        task_duration: "10-15 minutes",
+                        search_tool_type: "Google"
+                    };
+
+                    const { data: fallbackData, error: fallbackError } = await supabase
+                        .from('post_survey')
+                        .insert({
+                            session_id: testSessionId,
+                            survey_data: surveyData
+                        })
+                        .select('id')
+                        .single();
+
+                    if (fallbackError) {
+                        resultDiv.innerHTML = `<div class="error">❌ Both schemas failed:<br>New: ${error.message}<br>JSONB: ${fallbackError.message}</div>`;
+                    } else {
+                        resultDiv.innerHTML = `<div class="warning">⚠️ Using JSONB fallback schema. Record ID: ${fallbackData.id}<br>Please apply the SQL fix above.</div>`;
+                    }
+                } else {
+                    resultDiv.innerHTML = `<div class="success">✅ New schema working! Record ID: ${data.id}</div>`;
+                }
+            } catch (err) {
+                resultDiv.innerHTML = `<div class="error">❌ Exception: ${err.message}</div>`;
+            }
+        }
+
+        async function checkRecords() {
+            const resultDiv = document.getElementById('records-result');
+            resultDiv.innerHTML = '<div>Checking records...</div>';
+            
+            try {
+                const { data, error } = await supabase
+                    .from('post_survey')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(5);
+
+                if (error) {
+                    resultDiv.innerHTML = `<div class="error">❌ Query failed: ${error.message}</div>`;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="success">✅ Found ${data.length} records</div>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                }
+            } catch (err) {
+                resultDiv.innerHTML = `<div class="error">❌ Exception: ${err.message}</div>`;
+            }
+        }
+
+        async function simulateAppSubmission() {
+            if (!testSessionId) {
+                testSessionId = await createTestSession();
+                if (!testSessionId) {
+                    document.getElementById('app-test-result').innerHTML = '<div class="error">❌ Failed to create test session</div>';
+                    return;
+                }
+            }
+
+            const resultDiv = document.getElementById('app-test-result');
+            resultDiv.innerHTML = '<div>Simulating app submission...</div>';
+            
+            // This matches exactly what the app sends
+            const surveyData = {
+                google_satisfaction: "5",
+                google_ease: "4", 
+                google_relevance: "6",
+                google_trust: "5",
+                google_query_modifications: "2",
+                attention_check: "3",
+                google_open_feedback: "Google provided relevant results quickly",
+                task_duration: "10-15 minutes",
+                search_tool_type: "Google"
+            };
+
+            try {
+                // First, try the new schema (matching the tracking service)
+                const { data, error } = await supabase
+                    .from('post_survey')
+                    .insert({
+                        session_id: testSessionId,
+                        google_satisfaction: parseInt(surveyData.google_satisfaction) || null,
+                        google_ease: parseInt(surveyData.google_ease) || null,
+                        google_relevance: parseInt(surveyData.google_relevance) || null,
+                        google_trust: parseInt(surveyData.google_trust) || null,
+                        google_query_modifications: surveyData.google_query_modifications,
+                        attention_check: parseInt(surveyData.attention_check) || null,
+                        google_open_feedback: surveyData.google_open_feedback,
+                        task_duration: surveyData.task_duration,
+                        search_tool_type: 'Google',
+                        created_at: new Date().toISOString()
+                    })
+                    .select('id')
+                    .single();
+
+                if (error) {
+                    console.warn('New schema failed, trying JSONB fallback:', error.message);
+                    
+                    // Fallback to JSONB (matching enhanced tracking service)
+                    const { data: fallbackData, error: fallbackError } = await supabase
+                        .from('post_survey')
+                        .insert({
+                            session_id: testSessionId,
+                            survey_data: surveyData,
+                            created_at: new Date().toISOString()
+                        })
+                        .select('id')
+                        .single();
+
+                    if (fallbackError) {
+                        resultDiv.innerHTML = `<div class="error">❌ App simulation failed:<br>Primary: ${error.message}<br>Fallback: ${fallbackError.message}</div>`;
+                    } else {
+                        resultDiv.innerHTML = `<div class="warning">⚠️ App working with JSONB fallback. Record ID: ${fallbackData.id}<br>Apply SQL fix for optimal performance.</div>`;
+                    }
+                } else {
+                    resultDiv.innerHTML = `<div class="success">✅ App simulation successful! Record ID: ${data.id}<br>New schema is working perfectly!</div>`;
+                }
+            } catch (err) {
+                resultDiv.innerHTML = `<div class="error">❌ Exception: ${err.message}</div>`;
+            }
+        }
+
+        // Auto-create test session on load
+        window.onload = () => {
+            createTestSession();
+        };
+    </script>
+</body>
+</html>

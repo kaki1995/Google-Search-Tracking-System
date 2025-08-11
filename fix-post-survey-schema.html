@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fix Post Survey Schema</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        button { margin: 10px; padding: 10px 20px; background: #007cba; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        .success { color: green; }
+        .error { color: red; }
+        .warning { color: orange; }
+        pre { background: #f5f5f5; padding: 10px; border-radius: 3px; overflow-x: auto; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Fix Post Survey Database Schema</h1>
+    
+    <div class="section">
+        <h3>Step 1: Check Current Schema</h3>
+        <button onclick="checkCurrentSchema()">Check Current Schema</button>
+        <div id="current-schema-result"></div>
+    </div>
+
+    <div class="section">
+        <h3>Step 2: Apply Schema Fix</h3>
+        <button onclick="applySchemaFix()">Apply Schema Fix</button>
+        <div id="schema-fix-result"></div>
+    </div>
+
+    <div class="section">
+        <h3>Step 3: Test New Schema</h3>
+        <button onclick="testNewSchema()">Test Insert with New Schema</button>
+        <div id="test-result"></div>
+    </div>
+
+    <div class="section">
+        <h3>Step 4: Verify Records</h3>
+        <button onclick="verifyRecords()">Check Recent Records</button>
+        <div id="verify-result"></div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = "https://wbguuipoggeamyzrfvbv.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndieHVpaXBwZ2dlYW15enJmdmJ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzMzNjE3MzUsImV4cCI6MjA0ODkzNzczNX0.PvWfN1fTf2cJfNcCB8_m8l2M_SX2T7E6CX7yOYgLaL8";
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        let testSessionId = null;
+
+        async function createTestSession() {
+            try {
+                const { data, error } = await supabase
+                    .from('sessions')
+                    .insert({
+                        user_id: 'test-user-' + Date.now(),
+                        platform: 'Google'
+                    })
+                    .select('id')
+                    .single();
+
+                if (error) throw error;
+                testSessionId = data.id;
+                return testSessionId;
+            } catch (error) {
+                console.error('Failed to create test session:', error);
+                return null;
+            }
+        }
+
+        async function checkCurrentSchema() {
+            const resultDiv = document.getElementById('current-schema-result');
+            resultDiv.innerHTML = '<div>Checking current schema...</div>';
+            
+            try {
+                // Try to get table columns using a SQL query
+                const { data, error } = await supabase
+                    .rpc('check_post_survey_columns');
+                
+                if (error) {
+                    // Fallback: try a simple select to see what columns exist
+                    const { data: selectData, error: selectError } = await supabase
+                        .from('post_survey')
+                        .select('*')
+                        .limit(1);
+                    
+                    if (selectError) {
+                        resultDiv.innerHTML = `<div class="error">❌ Cannot access post_survey table: ${selectError.message}</div>`;
+                    } else {
+                        const columns = selectData.length > 0 ? Object.keys(selectData[0]) : ['No data to analyze'];
+                        resultDiv.innerHTML = `
+                            <div class="warning">⚠️ Using fallback method to check schema</div>
+                            <div>Detected columns: ${columns.join(', ')}</div>
+                            <div>Schema type: ${columns.includes('survey_data') ? 'JSONB (Old)' : 'Individual Columns (New)'}</div>
+                        `;
+                    }
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="success">✅ Schema check successful</div>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                }
+            } catch (err) {
+                resultDiv.innerHTML = `<div class="error">❌ Exception: ${err.message}</div>`;
+            }
+        }
+
+        async function applySchemaFix() {
+            const resultDiv = document.getElementById('schema-fix-result');
+            resultDiv.innerHTML = '<div>Applying schema fix...</div>';
+            
+            try {
+                // Execute the schema migration SQL
+                const migrationSQL = `
+                    -- Check if the table has the new columns
+                    DO $$
+                    BEGIN
+                        -- Check if google_satisfaction column exists
+                        IF NOT EXISTS (
+                            SELECT 1 
+                            FROM information_schema.columns 
+                            WHERE table_name = 'post_survey' 
+                            AND column_name = 'google_satisfaction'
+                        ) THEN
+                            -- Drop existing table
+                            DROP TABLE IF EXISTS public.post_survey CASCADE;
+                            
+                            -- Create updated post_survey table
+                            CREATE TABLE public.post_survey (
+                                id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+                                session_id UUID NOT NULL REFERENCES public.sessions(id) ON DELETE CASCADE,
+                                
+                                google_satisfaction INTEGER CHECK (google_satisfaction >= 1 AND google_satisfaction <= 7),
+                                google_ease INTEGER CHECK (google_ease >= 1 AND google_ease <= 7),
+                                google_relevance INTEGER CHECK (google_relevance >= 1 AND google_relevance <= 7),
+                                google_trust INTEGER CHECK (google_trust >= 1 AND google_trust <= 7),
+                                google_query_modifications TEXT,
+                                attention_check INTEGER CHECK (attention_check >= 1 AND attention_check <= 7),
+                                google_open_feedback TEXT,
+                                task_duration TEXT,
+                                search_tool_type TEXT,
+                                
+                                created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+                                updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
+                            );
+                            
+                            ALTER TABLE public.post_survey ENABLE ROW LEVEL SECURITY;
+                            CREATE POLICY "Allow public access to post_survey" ON public.post_survey FOR ALL USING (true);
+                            CREATE INDEX idx_post_survey_session_id ON public.post_survey(session_id);
+                            
+                            RAISE NOTICE 'post_survey table updated successfully!';
+                        ELSE
+                            RAISE NOTICE 'post_survey table already has correct schema.';
+                        END IF;
+                    END $$;
+                `;
+
+                const { data, error } = await supabase.rpc('exec_sql', { sql: migrationSQL });
+                
+                if (error) {
+                    resultDiv.innerHTML = `<div class="error">❌ Schema fix failed: ${error.message}</div>`;
+                } else {
+                    resultDiv.innerHTML = `<div class="success">✅ Schema fix applied successfully!</div>`;
+                }
+            } catch (err) {
+                resultDiv.innerHTML = `<div class="error">❌ Exception: ${err.message}</div>`;
+            }
+        }
+
+        async function testNewSchema() {
+            if (!testSessionId) {
+                testSessionId = await createTestSession();
+                if (!testSessionId) {
+                    document.getElementById('test-result').innerHTML = '<div class="error">❌ Failed to create test session</div>';
+                    return;
+                }
+            }
+
+            const resultDiv = document.getElementById('test-result');
+            resultDiv.innerHTML = '<div>Testing new schema...</div>';
+            
+            try {
+                const { data, error } = await supabase
+                    .from('post_survey')
+                    .insert({
+                        session_id: testSessionId,
+                        google_satisfaction: 5,
+                        google_ease: 4,
+                        google_relevance: 6,
+                        google_trust: 5,
+                        google_query_modifications: "2",
+                        attention_check: 3,
+                        google_open_feedback: "This is a test feedback",
+                        task_duration: "10-15 minutes",
+                        search_tool_type: "Google"
+                    })
+                    .select('id')
+                    .single();
+
+                if (error) {
+                    resultDiv.innerHTML = `<div class="error">❌ Insert failed: ${error.message}</div>`;
+                } else {
+                    resultDiv.innerHTML = `<div class="success">✅ Insert successful! Record ID: ${data.id}</div>`;
+                }
+            } catch (err) {
+                resultDiv.innerHTML = `<div class="error">❌ Exception: ${err.message}</div>`;
+            }
+        }
+
+        async function verifyRecords() {
+            const resultDiv = document.getElementById('verify-result');
+            resultDiv.innerHTML = '<div>Checking recent records...</div>';
+            
+            try {
+                const { data, error } = await supabase
+                    .from('post_survey')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(3);
+
+                if (error) {
+                    resultDiv.innerHTML = `<div class="error">❌ Query failed: ${error.message}</div>`;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="success">✅ Found ${data.length} records</div>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                }
+            } catch (err) {
+                resultDiv.innerHTML = `<div class="error">❌ Exception: ${err.message}</div>`;
+            }
+        }
+
+        // Auto-create test session on load
+        window.onload = () => {
+            createTestSession();
+        };
+    </script>
+</body>
+</html>

@@ -1255,16 +1255,15 @@ class TrackingService {
         .from('post_survey')
         .insert({
           session_id: this.sessionData.sessionId,
-          search_satisfaction: parseInt(surveyData.google_satisfaction) || null,
-          interface_ease: parseInt(surveyData.google_ease) || null,
-          results_relevance: parseInt(surveyData.google_relevance) || null,
-          results_trust: parseInt(surveyData.google_trust) || null,
-          query_modifications: surveyData.google_query_modifications,
+          google_satisfaction: parseInt(surveyData.google_satisfaction) || null,
+          google_ease: parseInt(surveyData.google_ease) || null,
+          google_relevance: parseInt(surveyData.google_relevance) || null,
+          google_trust: parseInt(surveyData.google_trust) || null,
+          google_query_modifications: surveyData.google_query_modifications,
           attention_check: parseInt(surveyData.attention_check) || null,
-          free_feedback: surveyData.google_open_feedback,
+          google_open_feedback: surveyData.google_open_feedback,
           task_duration: surveyData.task_duration,
-          search_tool_type: 'Google',
-          created_at: new Date().toISOString()
+          search_tool_type: 'Google'
         })
         .select('id')
         .single();
