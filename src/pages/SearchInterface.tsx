@@ -222,7 +222,7 @@ export default function SearchInterface() {
 
       // Track the click using the tracking service
       if (queryId) {
-        await trackingService.trackClick(result.link, result.title, result.rank, queryId);
+        await trackingService.trackClickWithDetails(result.link, result.title, result.rank, queryId);
         console.log('Click tracked successfully');
       } else {
         console.warn('No query ID available for click tracking');

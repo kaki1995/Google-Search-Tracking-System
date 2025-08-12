@@ -198,9 +198,10 @@ class TrackingService {
         })
         .select('id')
         .single();
-
+ 
       if (interactionError) throw interactionError;
-
+ 
+ 
       // 2. Create interaction details record
       await supabase
         .from('interaction_details')
@@ -242,6 +243,11 @@ class TrackingService {
     } catch (error) {
       console.error('Failed to track click with details:', error);
     }
+  }
+
+  // Compatibility wrapper for simple click tracking
+  async trackClick(url: string, title: string, position: number, queryId: string): Promise<void> {
+    return this.trackClickWithDetails(url, title, position, queryId);
   }
 
   /**
@@ -340,137 +346,9 @@ class TrackingService {
     }
   }
 
-  /**
-   * Track query abandonment with timing
-   */
-  async trackQueryAbandonment(queryId: string, reason?: string): Promise<void> {
-    try {
-      await supabase
-        .from('query_timing_metrics')
-        .update({
-          query_abandoned: true,
-          query_end_time: new Date().toISOString()
-        })
-        .eq('query_id', queryId);
-    } catch (error) {
-      console.error('Failed to track query abandonment:', error);
-    }
-  }
 
-  /**
-   * Track time to first result when search results load
-   */
-  async trackTimeToFirstResult(queryId: string): Promise<void> {
-    if (!this.queryStartTime) return;
 
-    const timeToFirstResult = Date.now() - this.queryStartTime;
-    
-    try {
-      await supabase
-        .from('query_timing_metrics')
-        .update({ time_to_first_result: timeToFirstResult })
-        .eq('query_id', queryId);
-    } catch (error) {
-      console.error('Failed to track time to first result:', error);
-    }
-  }
 
-  /**
-   * Track hover events with timing
-   */
-  async trackHover(
-    element: string,
-    duration: number,
-    coordinates?: { x: number; y: number }
-  ): Promise<void> {
-    if (!this.sessionData) return;
-
-    const hoverTimestamp = Date.now();
-
-    try {
-      const { data: interaction, error: interactionError } = await supabase
-        .from('interactions')
-        .insert({
-          interaction_type: 'hover',
-          element_id: element,
-          session_time_ms: hoverTimestamp - this.sessionData.startTime,
-          interaction_time: new Date(hoverTimestamp).toISOString(),
-          page_coordinates: coordinates ? `(${coordinates.x},${coordinates.y})` : null,
-          interaction_metadata: {
-            hover_duration: duration,
-            element_type: element,
-            viewport_height: window.innerHeight
-          }
-        })
-        .select('id')
-        .single();
-
-      if (interactionError) throw interactionError;
-
-      await supabase
-        .from('interaction_details')
-        .insert({
-          interaction_id: interaction.id,
-          interaction_type: 'hover',
-          action_type: 'element_hover',
-          element_id: element,
-          value: duration.toString(),
-          metadata: {
-            hover_duration_ms: duration,
-            coordinates: coordinates || {},
-            timestamp_action: hoverTimestamp
-          }
-        });
-
-    } catch (error) {
-      console.error('Failed to track hover:', error);
-    }
-  }
-
-  /**
-   * Track focus events
-   */
-  async trackFocus(elementId: string, elementType: string): Promise<void> {
-    if (!this.sessionData) return;
-
-    const focusTimestamp = Date.now();
-
-    try {
-      const { data: interaction, error: interactionError } = await supabase
-        .from('interactions')
-        .insert({
-          interaction_type: 'focus',
-          element_id: elementId,
-          session_time_ms: focusTimestamp - this.sessionData.startTime,
-          interaction_time: new Date(focusTimestamp).toISOString(),
-          interaction_metadata: {
-            element_type: elementType,
-            focus_timestamp: focusTimestamp
-          }
-        })
-        .select('id')
-        .single();
-
-      if (interactionError) throw interactionError;
-
-      await supabase
-        .from('interaction_details')
-        .insert({
-          interaction_id: interaction.id,
-          interaction_type: 'focus',
-          action_type: 'element_focus',
-          element_id: elementId,
-          value: elementType,
-          metadata: {
-            element_type: elementType,
-            timestamp_action: focusTimestamp
-          }
-        });
-
-    } catch (error) {
-      console.error('Failed to track focus:', error);
-    }
-  }
 
   /**
    * Finalize session with comprehensive metrics update
@@ -483,13 +361,7 @@ class TrackingService {
 
     try {
       // Update sessions table with final metrics
-      await supabase
-        .from('sessions')
-        .update({
-          end_time: new Date(endTime).toISOString(),
-          status: 'completed'
-        })
-        .eq('id', this.sessionData.sessionId);
+      // Skipping sessions table update due to schema constraints
 
       // Update session timing summary with final metrics
       await this.updateSessionTimingSummary();
@@ -579,12 +451,6 @@ class TrackingService {
       data: { checked }
     });
   }
-  private sessionData: SessionData | null = null;
-  private sessionStartTime: number | null = null;
-  private queryStartTime: number | null = null;
-  private firstClickRecorded: boolean = false;
-  private firstInteractionRecorded: boolean = false;
-  private isTracking: boolean = false;
     /**
      * Returns the current session data (for use in UI and tracking)
      */
@@ -606,13 +472,12 @@ class TrackingService {
       try {
         const { data: interaction, error } = await supabase
           .from('interactions')
-          .insert({
-            query_id: queryId,
-            interaction_type: 'scroll',
-            scroll_depth: Math.min(scrollData.scroll_percentage, 100),
-            interaction_metadata: scrollData,
-            session_time_ms: Date.now() - this.sessionData!.startTime
-          })
+        .insert({
+          query_id: queryId,
+          interaction_type: 'scroll',
+          scroll_depth: Math.min(scrollData.scroll_percentage, 100),
+          session_time_ms: Date.now() - this.sessionData!.startTime
+        })
           .select('id')
           .single();
         if (!error && interaction) {

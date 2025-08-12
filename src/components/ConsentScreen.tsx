@@ -17,10 +17,7 @@ const ConsentScreen = () => {
     setIsSubmitting(true);
     
     try {
-      await trackingService.trackConsent(true, {
-        timestamp: Date.now(),
-        userAgent: navigator.userAgent
-      });
+      await trackingService.trackConsent(true);
       
       navigate('/background-survey');
     } catch (error) {
