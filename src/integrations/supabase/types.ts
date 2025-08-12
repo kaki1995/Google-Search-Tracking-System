@@ -14,7 +14,275 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      background_survey: {
+        Row: {
+          id: string
+          participant_id: string
+          responses: Json
+          submitted_at: string
+        }
+        Insert: {
+          id?: string
+          participant_id: string
+          responses: Json
+          submitted_at?: string
+        }
+        Update: {
+          id?: string
+          participant_id?: string
+          responses?: Json
+          submitted_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "background_survey_participant_id_fkey"
+            columns: ["participant_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["participant_id"]
+          },
+        ]
+      }
+      participants: {
+        Row: {
+          created_at: string
+          device_type: string | null
+          ip_address: string | null
+          participant_id: string
+        }
+        Insert: {
+          created_at?: string
+          device_type?: string | null
+          ip_address?: string | null
+          participant_id?: string
+        }
+        Update: {
+          created_at?: string
+          device_type?: string | null
+          ip_address?: string | null
+          participant_id?: string
+        }
+        Relationships: []
+      }
+      post_task_survey: {
+        Row: {
+          id: string
+          participant_id: string
+          responses: Json
+          submitted_at: string
+        }
+        Insert: {
+          id?: string
+          participant_id: string
+          responses: Json
+          submitted_at?: string
+        }
+        Update: {
+          id?: string
+          participant_id?: string
+          responses?: Json
+          submitted_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_task_survey_participant_id_fkey"
+            columns: ["participant_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["participant_id"]
+          },
+        ]
+      }
+      queries: {
+        Row: {
+          click_count: number | null
+          created_at: string
+          end_time: string | null
+          id: string
+          query_duration_sec: number | null
+          query_order: number | null
+          query_structure: string | null
+          query_text: string | null
+          session_id: string
+          start_time: string | null
+        }
+        Insert: {
+          click_count?: number | null
+          created_at?: string
+          end_time?: string | null
+          id?: string
+          query_duration_sec?: number | null
+          query_order?: number | null
+          query_structure?: string | null
+          query_text?: string | null
+          session_id: string
+          start_time?: string | null
+        }
+        Update: {
+          click_count?: number | null
+          created_at?: string
+          end_time?: string | null
+          id?: string
+          query_duration_sec?: number | null
+          query_order?: number | null
+          query_structure?: string | null
+          query_text?: string | null
+          session_id?: string
+          start_time?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "queries_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "search_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      query_clicks: {
+        Row: {
+          click_order: number | null
+          click_time: string | null
+          clicked_rank: number | null
+          clicked_url: string | null
+          created_at: string
+          id: string
+          query_id: string
+        }
+        Insert: {
+          click_order?: number | null
+          click_time?: string | null
+          clicked_rank?: number | null
+          clicked_url?: string | null
+          created_at?: string
+          id?: string
+          query_id: string
+        }
+        Update: {
+          click_order?: number | null
+          click_time?: string | null
+          clicked_rank?: number | null
+          clicked_url?: string | null
+          created_at?: string
+          id?: string
+          query_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "query_clicks_query_id_fkey"
+            columns: ["query_id"]
+            isOneToOne: false
+            referencedRelation: "queries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      scroll_events: {
+        Row: {
+          created_at: string
+          id: string
+          query_id: string
+          scroll_depth_percent: number | null
+          timestamp: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          query_id: string
+          scroll_depth_percent?: number | null
+          timestamp?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          query_id?: string
+          scroll_depth_percent?: number | null
+          timestamp?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scroll_events_query_id_fkey"
+            columns: ["query_id"]
+            isOneToOne: false
+            referencedRelation: "queries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      search_sessions: {
+        Row: {
+          created_at: string
+          id: string
+          participant_id: string
+          query_count: number | null
+          query_reformulation_count: number | null
+          scroll_depth_max: number | null
+          session_end_time: string | null
+          session_start_time: string | null
+          total_clicked_results_count: number | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          participant_id: string
+          query_count?: number | null
+          query_reformulation_count?: number | null
+          scroll_depth_max?: number | null
+          session_end_time?: string | null
+          session_start_time?: string | null
+          total_clicked_results_count?: number | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          participant_id?: string
+          query_count?: number | null
+          query_reformulation_count?: number | null
+          scroll_depth_max?: number | null
+          session_end_time?: string | null
+          session_start_time?: string | null
+          total_clicked_results_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "search_sessions_participant_id_fkey"
+            columns: ["participant_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["participant_id"]
+          },
+        ]
+      }
+      task_instruction: {
+        Row: {
+          id: string
+          participant_id: string
+          q10_response: string | null
+          timestamp: string
+        }
+        Insert: {
+          id?: string
+          participant_id: string
+          q10_response?: string | null
+          timestamp?: string
+        }
+        Update: {
+          id?: string
+          participant_id?: string
+          q10_response?: string | null
+          timestamp?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_instruction_participant_id_fkey"
+            columns: ["participant_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["participant_id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
