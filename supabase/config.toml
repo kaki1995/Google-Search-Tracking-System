@@ -8,3 +8,12 @@ verify_jwt = false
 
 [functions.secure-google-search]
 verify_jwt = false
+
+[functions.submit-background-survey]
+verify_jwt = false
+
+[functions.submit-post-task-survey]
+verify_jwt = false
+
+[functions.log-consent-event]
+verify_jwt = false

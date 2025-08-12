@@ -43,6 +43,35 @@ export type Database = {
           },
         ]
       }
+      consent_logs: {
+        Row: {
+          event_type: string
+          id: string
+          participant_id: string
+          timestamp: string
+        }
+        Insert: {
+          event_type: string
+          id?: string
+          participant_id: string
+          timestamp?: string
+        }
+        Update: {
+          event_type?: string
+          id?: string
+          participant_id?: string
+          timestamp?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "consent_logs_participant_fk"
+            columns: ["participant_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["participant_id"]
+          },
+        ]
+      }
       participants: {
         Row: {
           created_at: string

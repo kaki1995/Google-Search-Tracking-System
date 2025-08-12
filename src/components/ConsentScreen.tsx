@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { trackingService } from "@/lib/tracking";
+import { supabase } from "@/integrations/supabase/client";
 
 const ConsentScreen = () => {
   const [consent, setConsent] = useState(false);
@@ -13,15 +14,24 @@ const ConsentScreen = () => {
 
   const handleSubmit = async () => {
     if (!consent) return;
-    
     setIsSubmitting(true);
-    
     try {
+      // Ensure participant id exists in localStorage
+      let participant_id = localStorage.getItem('participant_id');
+      if (!participant_id) {
+        participant_id = (crypto as any).randomUUID ? (crypto as any).randomUUID() : Math.random().toString(36).slice(2) + Date.now();
+        localStorage.setItem('participant_id', participant_id);
+      }
+      // Log consent event via Edge Function
+      await supabase.functions.invoke('log-consent-event', {
+        body: { participant_id, event_type: 'consent_given' }
+      });
+
       await trackingService.trackConsent(true);
-      
       navigate('/background-survey');
     } catch (error) {
-      console.error('Error tracking consent:', error);
+      console.error('Error tracking/logging consent:', error);
+      navigate('/background-survey');
     } finally {
       setIsSubmitting(false);
     }

@@ -9,6 +9,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import LikertScale from "./LikertScale";
 import { trackingService } from "@/lib/tracking";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 interface PostTaskSurveyForm {
   google_satisfaction: string;
   google_ease: string;

@@ -7,6 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { FormControl, FormField, FormItem, FormLabel, FormMessage, Form } from "@/components/ui/form";
 import { trackingService } from "@/lib/tracking";
 import LikertScale from "./LikertScale";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 interface SurveyForm {
   age: string;
   gender: string;
@@ -58,27 +60,41 @@ export default function BackgroundSurvey() {
   const onSubmit = async (data: SurveyForm) => {
     setIsSubmitting(true);
     try {
-      // Check if session exists, if not initialize one
-      let session = trackingService.loadSession();
-      if (!session) {
-        console.log('No session found, initializing new session');
-        await trackingService.initSession();
-        session = trackingService.loadSession();
+      // Participant id from localStorage or create one
+      let participant_id = localStorage.getItem('participant_id');
+      if (!participant_id) {
+        participant_id = (crypto as any).randomUUID ? (crypto as any).randomUUID() : Math.random().toString(36).slice(2) + Date.now();
+        localStorage.setItem('participant_id', participant_id);
       }
-      
-      console.log('Submitting background survey:', data);
-      await trackingService.trackBackgroundSurvey(data);
-      console.log('Background survey submitted successfully');
-      
+
+      const responses = {
+        q1_age_group: data.age,
+        q2_gender: data.gender,
+        q3_education: data.education,
+        q4_employment_status: data.employment,
+        q5_nationality: data.nationality,
+        q6_country_residence: data.country,
+        q7_ai_familiarity: Number(data.experience_scale_q7 || 0),
+        q8_attention_check: Number(data.familiarity_scale_q8 || 0),
+        q9_ai_usage_frequency: data.search_frequency,
+      };
+
+      const { data: resp, error } = await supabase.functions.invoke('submit-background-survey', {
+        body: { participant_id, responses }
+      });
+
+      if (error || !resp?.ok) {
+        const msg = error?.message || resp?.error || 'Failed to submit background survey';
+        throw new Error(msg);
+      }
+
       // Clear saved form data after successful submission
       localStorage.removeItem('background_survey_data');
-      
       navigate('/task-instructions');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error submitting survey:', error);
-      // Show error to user but still allow navigation
-      alert('There was an issue saving your survey data, but you can continue with the study.');
-      navigate('/task-instructions');
+      toast({ title: 'Submission failed', description: error?.message || 'Please try again.', variant: 'destructive' });
+      // Keep data for retry
     } finally {
       setIsSubmitting(false);
     }

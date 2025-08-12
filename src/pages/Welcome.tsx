@@ -4,6 +4,7 @@ import BrowserBar from "@/components/BrowserBar";
 import StudyButton from "@/components/StudyButton";
 import { trackingService } from "@/lib/tracking";
 import { enhancedTrackingService } from "@/lib/tracking_enhanced";
+import { supabase } from "@/integrations/supabase/client";
 export default function Welcome() {
   const [agreed, setAgreed] = useState<boolean | null>(null);
   const [sessionInitialized, setSessionInitialized] = useState(false);
@@ -65,18 +66,42 @@ export default function Welcome() {
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [searchParams, agreed]);
+  // Retrieve or create a participant_id
+  const getParticipantId = () => {
+    let pid = localStorage.getItem('participant_id');
+    if (!pid) {
+      // Generate a UUID (browser crypto)
+      pid = (crypto as any).randomUUID ? (crypto as any).randomUUID() : Math.random().toString(36).slice(2) + Date.now();
+      localStorage.setItem('participant_id', pid);
+    }
+    return pid;
+  };
+
   const handleContinue = async () => {
     if (agreed === true) {
       try {
+        // Log consent continue event via Edge Function
+        const participant_id = getParticipantId();
+        await supabase.functions.invoke('log-consent-event', {
+          body: { participant_id, event_type: 'continue_study' }
+        });
         // Track consent given (final consent action)
         await trackingService.trackConsent(true);
       } catch (error) {
-        console.error('Failed to track consent:', error);
+        console.error('Failed to log/track consent:', error);
       }
       navigate("/background-survey");
     }
   };
   const handleExit = async () => {
+    try {
+      const participant_id = getParticipantId();
+      await supabase.functions.invoke('log-consent-event', {
+        body: { participant_id, event_type: 'exit_study' }
+      });
+    } catch (e) {
+      console.error('Failed to log exit_study', e);
+    }
     // Track exit button click specifically
     await trackingService.trackExitButtonClick();
     // Also mark as final exit action
@@ -85,7 +110,6 @@ export default function Welcome() {
     await trackingService.trackExitStudy('user_clicked_exit_study');
     navigate("/exit-study");
   };
-
   const handleConsentChange = async (checked: boolean) => {
     setAgreed(checked);
     // Track checkbox interaction
