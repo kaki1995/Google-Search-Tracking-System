@@ -5,6 +5,21 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+function getClientInfo(req: Request) {
+  const fwd = req.headers.get('x-forwarded-for') || '';
+  const ip_address = (fwd.split(',')[0] || '').trim() ||
+    req.headers.get('cf-connecting-ip') ||
+    req.headers.get('x-real-ip') ||
+    req.headers.get('x-client-ip') || null;
+  const ua = (req.headers.get('user-agent') || '').toLowerCase();
+  const device_type = /mobile|iphone|android/.test(ua)
+    ? 'mobile'
+    : /ipad|tablet/.test(ua)
+    ? 'tablet'
+    : 'desktop';
+  return { ip_address, device_type };
+}
+
 Deno.serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -34,6 +49,7 @@ Deno.serve(async (req) => {
       );
     }
 
+    const { ip_address, device_type } = getClientInfo(req);
     console.log(`Logging click: query_id=${query_id}, url=${clicked_url}, rank=${clicked_rank}`);
 
     // Log to interactions table
@@ -42,7 +58,9 @@ Deno.serve(async (req) => {
       .insert({
         query_id,
         clicked_url,
-        clicked_rank
+        clicked_rank,
+        ip_address,
+        device_type
       })
       .select('id')
       .single();

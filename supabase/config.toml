@@ -20,3 +20,6 @@ verify_jwt = false
 
 [functions.submit-task-instruction]
 verify_jwt = false
+
+[functions.log-scroll-event]
+verify_jwt = false

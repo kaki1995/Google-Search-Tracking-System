@@ -6,6 +6,21 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+function getClientInfo(req: Request) {
+  const fwd = req.headers.get('x-forwarded-for') || '';
+  const ip_address = (fwd.split(',')[0] || '').trim() ||
+    req.headers.get('cf-connecting-ip') ||
+    req.headers.get('x-real-ip') ||
+    req.headers.get('x-client-ip') || null;
+  const ua = (req.headers.get('user-agent') || '').toLowerCase();
+  const device_type = /mobile|iphone|android/.test(ua)
+    ? 'mobile'
+    : /ipad|tablet/.test(ua)
+    ? 'tablet'
+    : 'desktop';
+  return { ip_address, device_type };
+}
+
 // SECURITY: Use environment variables instead of hardcoded credentials
 const GOOGLE_API_KEY = Deno.env.get('GOOGLE_API_KEY');
 const GOOGLE_SEARCH_ENGINE_ID = Deno.env.get('GOOGLE_SEARCH_ENGINE_ID');
@@ -127,6 +142,8 @@ Deno.serve(async (req) => {
     // Generate query ID and timestamp
     const queryId = crypto.randomUUID();
     const timestamp = new Date().toISOString();
+    
+    const { ip_address, device_type } = getClientInfo(req);
 
     // First, ensure session exists or create it
     console.log('Checking/creating session...');
@@ -144,8 +161,9 @@ Deno.serve(async (req) => {
           id: session_id,
           user_id: session_id, // Using session_id as user_id for now
           platform: 'web',
-          device_type: 'unknown',
-          browser: 'unknown'
+          device_type,
+          browser: 'unknown',
+          ip_address
         });
 
       if (sessionCreateError) {
@@ -170,7 +188,9 @@ Deno.serve(async (req) => {
       .from('experiment_queries')
       .insert({
         session_id,
-        query_text
+        query_text,
+        ip_address,
+        device_type
       })
       .select('id')
       .single();
