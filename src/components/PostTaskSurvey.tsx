@@ -172,7 +172,7 @@ export default function PostTaskSurvey() {
                 required: "This field is required"
               }} render={({
                 field
-              }) => <LikertScale field={field} question="The Google search results were relevant to my query." leftLabel="Not relevant at all" rightLabel="Very relevant" questionNumber="18" />} />
+              }) => <LikertScale field={field} question="The search results were relevant to my query." leftLabel="Not relevant at all" rightLabel="Very relevant" questionNumber="18" />} />
 
                 {/* Question 19: Google Search Trust */}
                 <FormField control={form.control} name="google_trust" rules={{

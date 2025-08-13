@@ -16,19 +16,25 @@ export type Database = {
     Tables: {
       background_survey: {
         Row: {
+          device_type: string | null
           id: string
+          ip_address: string | null
           participant_id: string
           responses: Json
           submitted_at: string
         }
         Insert: {
+          device_type?: string | null
           id?: string
+          ip_address?: string | null
           participant_id: string
           responses: Json
           submitted_at?: string
         }
         Update: {
+          device_type?: string | null
           id?: string
+          ip_address?: string | null
           participant_id?: string
           responses?: Json
           submitted_at?: string
@@ -45,20 +51,26 @@ export type Database = {
       }
       consent_logs: {
         Row: {
+          device_type: string | null
           event_type: string
           id: string
+          ip_address: string | null
           participant_id: string
           timestamp: string
         }
         Insert: {
+          device_type?: string | null
           event_type: string
           id?: string
+          ip_address?: string | null
           participant_id: string
           timestamp?: string
         }
         Update: {
+          device_type?: string | null
           event_type?: string
           id?: string
+          ip_address?: string | null
           participant_id?: string
           timestamp?: string
         }
@@ -95,19 +107,25 @@ export type Database = {
       }
       post_task_survey: {
         Row: {
+          device_type: string | null
           id: string
+          ip_address: string | null
           participant_id: string
           responses: Json
           submitted_at: string
         }
         Insert: {
+          device_type?: string | null
           id?: string
+          ip_address?: string | null
           participant_id: string
           responses: Json
           submitted_at?: string
         }
         Update: {
+          device_type?: string | null
           id?: string
+          ip_address?: string | null
           participant_id?: string
           responses?: Json
           submitted_at?: string
@@ -126,8 +144,10 @@ export type Database = {
         Row: {
           click_count: number | null
           created_at: string
+          device_type: string | null
           end_time: string | null
           id: string
+          ip_address: string | null
           query_duration_sec: number | null
           query_order: number | null
           query_structure: string | null
@@ -138,8 +158,10 @@ export type Database = {
         Insert: {
           click_count?: number | null
           created_at?: string
+          device_type?: string | null
           end_time?: string | null
           id?: string
+          ip_address?: string | null
           query_duration_sec?: number | null
           query_order?: number | null
           query_structure?: string | null
@@ -150,8 +172,10 @@ export type Database = {
         Update: {
           click_count?: number | null
           created_at?: string
+          device_type?: string | null
           end_time?: string | null
           id?: string
+          ip_address?: string | null
           query_duration_sec?: number | null
           query_order?: number | null
           query_structure?: string | null
@@ -176,7 +200,9 @@ export type Database = {
           clicked_rank: number | null
           clicked_url: string | null
           created_at: string
+          device_type: string | null
           id: string
+          ip_address: string | null
           query_id: string
         }
         Insert: {
@@ -185,7 +211,9 @@ export type Database = {
           clicked_rank?: number | null
           clicked_url?: string | null
           created_at?: string
+          device_type?: string | null
           id?: string
+          ip_address?: string | null
           query_id: string
         }
         Update: {
@@ -194,7 +222,9 @@ export type Database = {
           clicked_rank?: number | null
           clicked_url?: string | null
           created_at?: string
+          device_type?: string | null
           id?: string
+          ip_address?: string | null
           query_id?: string
         }
         Relationships: [
@@ -210,21 +240,27 @@ export type Database = {
       scroll_events: {
         Row: {
           created_at: string
+          device_type: string | null
           id: string
+          ip_address: string | null
           query_id: string
           scroll_depth_percent: number | null
           timestamp: string | null
         }
         Insert: {
           created_at?: string
+          device_type?: string | null
           id?: string
+          ip_address?: string | null
           query_id: string
           scroll_depth_percent?: number | null
           timestamp?: string | null
         }
         Update: {
           created_at?: string
+          device_type?: string | null
           id?: string
+          ip_address?: string | null
           query_id?: string
           scroll_depth_percent?: number | null
           timestamp?: string | null
@@ -242,7 +278,9 @@ export type Database = {
       search_sessions: {
         Row: {
           created_at: string
+          device_type: string | null
           id: string
+          ip_address: string | null
           participant_id: string
           query_count: number | null
           query_reformulation_count: number | null
@@ -253,7 +291,9 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          device_type?: string | null
           id?: string
+          ip_address?: string | null
           participant_id: string
           query_count?: number | null
           query_reformulation_count?: number | null
@@ -264,7 +304,9 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          device_type?: string | null
           id?: string
+          ip_address?: string | null
           participant_id?: string
           query_count?: number | null
           query_reformulation_count?: number | null
@@ -285,19 +327,25 @@ export type Database = {
       }
       task_instruction: {
         Row: {
+          device_type: string | null
           id: string
+          ip_address: string | null
           participant_id: string
           q10_response: string | null
           timestamp: string
         }
         Insert: {
+          device_type?: string | null
           id?: string
+          ip_address?: string | null
           participant_id: string
           q10_response?: string | null
           timestamp?: string
         }
         Update: {
+          device_type?: string | null
           id?: string
+          ip_address?: string | null
           participant_id?: string
           q10_response?: string | null
           timestamp?: string

@@ -17,3 +17,6 @@ verify_jwt = false
 
 [functions.log-consent-event]
 verify_jwt = false
+
+[functions.submit-task-instruction]
+verify_jwt = false

@@ -4,7 +4,8 @@ import { useForm } from "react-hook-form";
 import BrowserBar from "@/components/BrowserBar";
 import StudyButton from "@/components/StudyButton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { trackingService } from "@/lib/tracking";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 interface TaskForm {
   budget: string;
 }
@@ -38,10 +39,19 @@ const TaskInstructions = () => {
     try {
       console.log("Budget range selected:", budgetRange);
       
-      // Track the budget range selection
       if (budgetRange) {
-        await trackingService.trackBudgetRange(budgetRange);
-        // Store budget range in sessionStorage for later use
+        let participant_id = localStorage.getItem('participant_id');
+        if (!participant_id) {
+          participant_id = (crypto as any).randomUUID ? (crypto as any).randomUUID() : Math.random().toString(36).slice(2) + Date.now();
+          localStorage.setItem('participant_id', participant_id);
+        }
+        const { data: resp, error } = await supabase.functions.invoke('submit-task-instruction', {
+          body: { participant_id, q10_response: budgetRange }
+        });
+        if (error || !resp?.ok) {
+          const msg = error?.message || resp?.error || 'Failed to save your answer';
+          throw new Error(msg);
+        }
         sessionStorage.setItem('selectedBudgetRange', budgetRange);
       }
       
