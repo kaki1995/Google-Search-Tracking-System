@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import BrowserBar from "@/components/BrowserBar";
@@ -13,6 +13,25 @@ const TaskInstructions = () => {
   const [budgetRange, setBudgetRange] = useState<string>("");
   const navigate = useNavigate();
   const form = useForm<TaskForm>();
+  
+  // Load saved budget on mount
+  useEffect(() => {
+    const saved = localStorage.getItem('preparatory_question');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed?.budget) setBudgetRange(parsed.budget);
+      } catch {}
+    } else {
+      const ss = sessionStorage.getItem('selectedBudgetRange');
+      if (ss) setBudgetRange(ss);
+    }
+  }, []);
+
+  // Persist budget on change
+  useEffect(() => {
+    localStorage.setItem('preparatory_question', JSON.stringify({ budget: budgetRange }));
+  }, [budgetRange]);
   
   const onSubmit = async (data: TaskForm) => {
     setIsSubmitting(true);
@@ -34,6 +53,7 @@ const TaskInstructions = () => {
     }
   };
   const handlePreviousPage = () => {
+    localStorage.setItem('preparatory_question', JSON.stringify({ budget: budgetRange }));
     navigate('/background-survey');
   };
   
@@ -103,7 +123,7 @@ const TaskInstructions = () => {
             </div>
 
             <p className="text-base text-gray-700 font-medium">
-              Before beginning your search, please answer the following two preparatory questions:
+              Before beginning your search, please answer the following preparatory question:
             </p>
 
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">

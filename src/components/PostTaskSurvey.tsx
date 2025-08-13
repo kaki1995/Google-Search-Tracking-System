@@ -8,7 +8,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import LikertScale from "./LikertScale";
-import { trackingService } from "@/lib/tracking";
+
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 interface PostTaskSurveyForm {
@@ -66,24 +66,60 @@ export default function PostTaskSurvey() {
   const handleConfirmSubmission = async () => {
     setIsSubmitting(true);
     try {
-      const formData = form.getValues();
-      console.log('Submitting post-task survey:', formData);
-      
-      // Call the correct tracking function for post-task survey
-      await trackingService.trackPostTaskSurvey(formData);
-      
-      console.log('Post-task survey submitted successfully');
-      
+      const values = form.getValues();
+      const participant_id = localStorage.getItem('participant_id');
+
+      if (!participant_id) {
+        toast({
+          title: 'Missing participant',
+          description: 'Participant ID not found. Please start the study from the beginning.',
+          variant: 'destructive',
+        });
+        setShowConfirmDialog(false);
+        return;
+      }
+
+      const att = Number(values.attention_check || 0);
+      if (att !== 3) {
+        toast({
+          title: 'Attention check failed',
+          description: "For Q22, please select 3 as instructed.",
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      const responses = {
+        q16_satisfaction: Number(values.google_satisfaction || 0),
+        q17_ease_of_use: Number(values.google_ease || 0),
+        q18_relevance_google: Number(values.google_relevance || 0),
+        q19_trust: Number(values.google_trust || 0),
+        q20_familiarity: Number(values.topic_familiarity || 0),
+        q21_effectiveness: Number(values.tool_effectiveness || 0),
+        q22_attention_check: att,
+        q23_duration: String(values.task_duration || ''),
+        q24_additional_details: String(values.google_open_feedback || ''),
+      };
+
+      const { data: resp, error } = await supabase.functions.invoke('submit-post-task-survey', {
+        body: { participant_id, responses },
+      });
+
+      if (error || !resp?.ok) {
+        const msg = error?.message || resp?.error || 'Failed to submit post-task survey';
+        throw new Error(msg);
+      }
+
       // Clear saved form data after successful submission
       localStorage.removeItem('post_task_survey_data');
-      
+      toast({ title: 'Thank you!', description: 'Your feedback has been submitted.' });
+
       setShowConfirmDialog(false);
       navigate('/thank-you');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error submitting survey:', error);
-      // Still allow navigation even if tracking fails
+      toast({ title: 'Submission failed', description: error?.message || 'Please try again.', variant: 'destructive' });
       setShowConfirmDialog(false);
-      navigate('/thank-you');
     } finally {
       setIsSubmitting(false);
     }
