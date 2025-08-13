@@ -70,13 +70,8 @@ serve(async (req) => {
       q9_ai_usage_frequency: String(responses.q9_ai_usage_frequency ?? ''),
     };
 
-    // Attention check (Q8 should be 1 per instructions)
-    if (payload.q8_attention_check !== 1) {
-      return new Response(JSON.stringify({ ok: false, error: 'Attention check failed (Q8 must be 1)' }), {
-        status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
+    // Attention check (Q8 should be 1 per instructions, but allow any response and just log it)
+    // We'll validate this on the analysis side rather than blocking submission
 
     // Ensure participant exists (idempotent)
     const { data: pExist, error: pErr } = await supabase

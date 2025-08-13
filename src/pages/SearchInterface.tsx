@@ -55,7 +55,12 @@ export default function SearchInterface() {
         let session = trackingService.getSessionData();
         if (!session) {
           console.log('No tracking session found, initializing...');
-          await trackingService.initSession();
+          // Initialize session with participant data
+          const participant_id = localStorage.getItem('participant_id') || 
+            (crypto as any).randomUUID?.() || Math.random().toString(36).slice(2);
+          localStorage.setItem('participant_id', participant_id);
+          
+          await trackingService.initializeSession(participant_id, 'Google', 'desktop', 'Chrome', 'Unknown');
           session = trackingService.getSessionData();
         }
         
