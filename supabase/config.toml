@@ -1,5 +1,23 @@
 project_id = "wbguuipoggeamyzrfvbv"
 
+[functions.session-start]
+verify_jwt = false
+
+[functions.query-start]
+verify_jwt = false
+
+[functions.query-end]
+verify_jwt = false
+
+[functions.log-click]
+verify_jwt = false
+
+[functions.log-scroll]
+verify_jwt = false
+
+[functions.session-end]
+verify_jwt = false
+
 [functions.query]
 verify_jwt = false
 

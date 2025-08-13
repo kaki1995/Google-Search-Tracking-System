@@ -5,7 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Copy, Search, ArrowRight, ChevronLeft, ChevronRight, Mic, Camera } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import { trackingService } from "@/lib/tracking";
+import { trackingAPI } from "@/lib/trackingApi";
+import { useScrollTracking } from "@/hooks/useScrollTracking";
+import { ResultItem } from "@/components/ResultItem";
 import { performGoogleSearch, performGoogleSearchLegacy } from "@/lib/googleSearch";
 
 interface SearchResult {
@@ -43,51 +45,29 @@ export default function SearchInterface() {
   });
   const [currentQuery, setCurrentQuery] = useState("");
 
-  // Track scroll events
+  // Initialize tracking and scroll tracking
+  useScrollTracking(window.location.pathname);
+
   useEffect(() => {
-    let maxScrollDepth = 0;
-    let scrollTimeout: NodeJS.Timeout;
-
-    const handleScroll = () => {
-      const scrollY = window.scrollY;
-      const windowHeight = window.innerHeight;
-      const documentHeight = document.documentElement.scrollHeight;
-      const scrollPercent = Math.round((scrollY / (documentHeight - windowHeight)) * 100);
-      
-      if (scrollPercent > maxScrollDepth) {
-        maxScrollDepth = scrollPercent;
-      }
-
-      // Debounce scroll tracking
-      clearTimeout(scrollTimeout);
-      scrollTimeout = setTimeout(async () => {
-        const queryId = sessionStorage.getItem("current_query_id");
-        if (queryId && scrollPercent > 0) {
-          try {
-            await fetch(`https://wbguuipoggeamyzrfvbv.supabase.co/functions/v1/log-scroll-event`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndiZ3V1aXBvZ2dlYW15enJmdmJ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3Nzc2OTksImV4cCI6MjA2OTM1MzY5OX0.ddgmJnxg6hipRZ8_r9WyQpvsM-pkhBlRoybPdtGPEtY'
-              },
-              body: JSON.stringify({
-                query_id: queryId,
-                scroll_depth_percent: Math.min(scrollPercent, 100)
-              })
-            });
-          } catch (error) {
-            console.error('Failed to track scroll:', error);
+    // Initialize tracking API from storage
+    trackingAPI.initFromStorage();
+    
+    // Initialize session if participant_id exists
+    const participantId = localStorage.getItem('participant_id');
+    if (participantId && !trackingAPI.getSessionId()) {
+      trackingAPI.startSession(participantId)
+        .then(sessionId => {
+          if (sessionId) {
+            console.log('Tracking session initialized:', sessionId);
+          } else {
+            console.error('Failed to initialize tracking session');
           }
-        }
-      }, 500);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      clearTimeout(scrollTimeout);
-    };
+        })
+        .catch(error => console.error('Session initialization error:', error));
+    }
   }, []);
+
+  // Scroll tracking is now handled by useScrollTracking hook
 
   const handleSearch = async (startIndex: number = 1) => {
     const queryToSearch = startIndex === 1 ? searchQuery.trim() : currentQuery;
@@ -97,72 +77,25 @@ export default function SearchInterface() {
       try {
         console.log('Starting search for:', queryToSearch, 'at start index:', startIndex);
         
-        // Create or get session for tracking
-        let sessionId = sessionStorage.getItem('current_session_id');
-        if (!sessionId) {
-          console.log('No session found, creating new session...');
-          sessionId = (crypto as any).randomUUID?.() || Math.random().toString(36).slice(2);
-          const participant_id = localStorage.getItem('participant_id') || sessionId;
-          localStorage.setItem('participant_id', participant_id);
-          sessionStorage.setItem('current_session_id', sessionId);
+        // Start query tracking for new searches
+        let queryId = trackingAPI.getCurrentQueryId();
+        if (startIndex === 1) {
+          // Classify query structure
+          const queryStructure = classifyQuery(queryToSearch);
+          queryId = await trackingAPI.startQuery(queryToSearch, queryStructure);
+          if (!queryId) {
+            console.error('Failed to start query tracking');
+          }
+          setCurrentQuery(queryToSearch);
         }
-        
-        console.log('Using session ID:', sessionId);
 
         // Perform Google search using client-side API with pagination
         const searchResult = await performGoogleSearch(queryToSearch, startIndex);
         console.log('Google search results:', searchResult);
 
-        // Create search session record if needed for new search
-        if (startIndex === 1) {
-          try {
-            const participant_id = localStorage.getItem('participant_id') || sessionId;
-            await fetch(`https://wbguuipoggeamyzrfvbv.supabase.co/rest/v1/search_sessions`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndiZ3V1aXBvZ2dlYW15enJmdmJ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3Nzc2OTksImV4cCI6MjA2OTM1MzY5OX0.ddgmJnxg6hipRZ8_r9WyQpvsM-pkhBlRoybPdtGPEtY',
-                'Prefer': 'resolution=merge-duplicates'
-              },
-              body: JSON.stringify({
-                id: sessionId,
-                participant_id: participant_id,
-                session_start_time: new Date().toISOString(),
-                query_count: 1
-              })
-            });
-          } catch (error) {
-            console.error('Failed to create search session:', error);
-          }
-        }
-
-        // Track the query using edge function (only for new searches)
-        let queryId = sessionStorage.getItem("current_query_id");
-        if (startIndex === 1) {
-          try {
-            const response = await fetch(`https://wbguuipoggeamyzrfvbv.supabase.co/functions/v1/query`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndiZ3V1aXBvZ2dlYW15enJmdmJ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3Nzc2OTksImV4cCI6MjA2OTM1MzY5OX0.ddgmJnxg6hipRZ8_r9WyQpvsM-pkhBlRoybPdtGPEtY'
-              },
-              body: JSON.stringify({
-                session_id: sessionId,
-                query_text: queryToSearch,
-                results_count: searchResult.totalResults
-              })
-            });
-            
-            if (response.ok) {
-              const data = await response.json();
-              queryId = data.query_id;
-              console.log('Query tracked with ID:', queryId);
-              sessionStorage.setItem("current_query_id", queryId || '');
-            }
-          } catch (error) {
-            console.error('Failed to track query:', error);
-          }
-          setCurrentQuery(queryToSearch);
+        // End query tracking to mark results as loaded
+        if (queryId && startIndex === 1) {
+          await trackingAPI.endQuery();
         }
 
         // Convert Google results to our format with proper ranking for pagination
@@ -200,8 +133,6 @@ export default function SearchInterface() {
           resultsPerPage: 10
         });
 
-        sessionStorage.setItem("session_id", sessionId);
-        
         toast({
           title: "Search completed",
           description: `Found ${searchResult.totalResults} total results for "${queryToSearch}" (showing ${searchResults.length} on this page)`
@@ -218,6 +149,18 @@ export default function SearchInterface() {
       } finally {
         setIsLoading(false);
       }
+    }
+  };
+
+  // Query classification helper
+  const classifyQuery = (query: string): string => {
+    const lowerQuery = query.toLowerCase();
+    if (/^(how|what|when|where|why|who)/.test(lowerQuery)) {
+      return 'question';
+    } else if (/\b(vs|versus|compare|better|best|worse)\b/.test(lowerQuery)) {
+      return 'comparative';
+    } else {
+      return 'keyword';
     }
   };
   const [allResults, setAllResults] = useState<SearchResult[]>([]);
@@ -292,46 +235,7 @@ export default function SearchInterface() {
     }
   };
 
-  const handleResultClick = async (result: SearchResult) => {
-    try {
-      // Get current query ID and session
-      const queryId = sessionStorage.getItem("current_query_id");
-      
-      console.log('Logging click:', {
-        queryId,
-        url: result.link,
-        rank: result.rank
-      });
-
-      // Track the click using edge function
-      if (queryId) {
-        try {
-          await fetch(`https://wbguuipoggeamyzrfvbv.supabase.co/functions/v1/log_click`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndiZ3V1aXBvZ2dlYW15enJmdmJ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3Nzc2OTksImV4cCI6MjA2OTM1MzY5OX0.ddgmJnxg6hipRZ8_r9WyQpvsM-pkhBlRoybPdtGPEtY'
-            },
-            body: JSON.stringify({
-              query_id: queryId,
-              clicked_url: result.link,
-              clicked_rank: result.rank
-            })
-          });
-          console.log('Click tracked successfully');
-        } catch (error) {
-          console.error('Failed to track click:', error);
-        }
-      } else {
-        console.warn('No query ID available for click tracking');
-      }
-    } catch (error) {
-      console.error("Failed to log click:", error);
-    }
-
-    // SECURITY: Open link with security attributes
-    window.open(result.link, "_blank", "noopener,noreferrer");
-  };
+  // Click handling is now done in ResultItem component
   const handleCopyLink = (link: string) => {
     navigator.clipboard.writeText(link);
     toast({
@@ -339,7 +243,9 @@ export default function SearchInterface() {
       description: "Link has been copied to clipboard"
     });
   };
-  const handleFinishTask = () => {
+  const handleFinishTask = async () => {
+    // End the tracking session before navigating
+    await trackingAPI.endSession();
     navigate("/search-result-log");
   };
   const handleLuckySearch = () => {
@@ -436,25 +342,16 @@ export default function SearchInterface() {
             </div>
 
             {/* Results List */}
-            {currentResults.map(result => <div key={result.rank} className="py-3 border-b border-gray-200 last:border-b-0">
-                <div className="mb-1">
-                  <a href="#" onClick={e => {
-              e.preventDefault();
-              handleResultClick(result);
-            }} className="text-lg text-[#1a0dab] hover:underline cursor-pointer">
-                    {result.title}
-                  </a>
-                </div>
-                <div className="text-sm text-[#006621] mb-1">
-                  {result.link}
-                  <Button variant="ghost" size="sm" onClick={() => handleCopyLink(result.link)} className="ml-2 p-1 h-auto text-xs">
-                    <Copy className="w-3 h-3" />
-                  </Button>
-                </div>
-                <div className="text-sm text-[#4d5156]">
-                  {result.snippet}
-                </div>
-              </div>)}
+            {currentResults.map(result => 
+              <ResultItem
+                key={result.rank}
+                rank={result.rank}
+                title={result.title}
+                url={result.link}
+                snippet={result.snippet}
+                onCopyLink={handleCopyLink}
+              />
+            )}
 
             {/* Pagination Controls */}
             {pagination.totalResults > pagination.resultsPerPage && (
