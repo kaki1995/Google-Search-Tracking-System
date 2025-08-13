@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,6 +43,52 @@ export default function SearchInterface() {
   });
   const [currentQuery, setCurrentQuery] = useState("");
 
+  // Track scroll events
+  useEffect(() => {
+    let maxScrollDepth = 0;
+    let scrollTimeout: NodeJS.Timeout;
+
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+      const scrollPercent = Math.round((scrollY / (documentHeight - windowHeight)) * 100);
+      
+      if (scrollPercent > maxScrollDepth) {
+        maxScrollDepth = scrollPercent;
+      }
+
+      // Debounce scroll tracking
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(async () => {
+        const queryId = sessionStorage.getItem("current_query_id");
+        if (queryId && scrollPercent > 0) {
+          try {
+            await fetch(`https://wbguuipoggeamyzrfvbv.supabase.co/functions/v1/log-scroll-event`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndiZ3V1aXBvZ2dlYW15enJmdmJ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3Nzc2OTksImV4cCI6MjA2OTM1MzY5OX0.ddgmJnxg6hipRZ8_r9WyQpvsM-pkhBlRoybPdtGPEtY'
+              },
+              body: JSON.stringify({
+                query_id: queryId,
+                scroll_depth_percent: Math.min(scrollPercent, 100)
+              })
+            });
+          } catch (error) {
+            console.error('Failed to track scroll:', error);
+          }
+        }
+      }, 500);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      clearTimeout(scrollTimeout);
+    };
+  }, []);
+
   const handleSearch = async (startIndex: number = 1) => {
     const queryToSearch = startIndex === 1 ? searchQuery.trim() : currentQuery;
     
@@ -51,39 +97,71 @@ export default function SearchInterface() {
       try {
         console.log('Starting search for:', queryToSearch, 'at start index:', startIndex);
         
-        // Ensure tracking session exists
-        let session = trackingService.getSessionData();
-        if (!session) {
-          console.log('No tracking session found, initializing...');
-          // Initialize session with participant data
-          const participant_id = localStorage.getItem('participant_id') || 
-            (crypto as any).randomUUID?.() || Math.random().toString(36).slice(2);
+        // Create or get session for tracking
+        let sessionId = sessionStorage.getItem('current_session_id');
+        if (!sessionId) {
+          console.log('No session found, creating new session...');
+          sessionId = (crypto as any).randomUUID?.() || Math.random().toString(36).slice(2);
+          const participant_id = localStorage.getItem('participant_id') || sessionId;
           localStorage.setItem('participant_id', participant_id);
-          
-          await trackingService.initializeSession(participant_id, 'Google', 'desktop', 'Chrome', 'Unknown');
-          session = trackingService.getSessionData();
+          sessionStorage.setItem('current_session_id', sessionId);
         }
         
-        if (!session) {
-          throw new Error('Failed to initialize tracking session');
-        }
-        
-        console.log('Using tracking session:', session.sessionId);
+        console.log('Using session ID:', sessionId);
 
         // Perform Google search using client-side API with pagination
         const searchResult = await performGoogleSearch(queryToSearch, startIndex);
         console.log('Google search results:', searchResult);
 
-        if (searchResult.results.length === 0) {
-          throw new Error('No search results found');
+        // Create search session record if needed for new search
+        if (startIndex === 1) {
+          try {
+            const participant_id = localStorage.getItem('participant_id') || sessionId;
+            await fetch(`https://wbguuipoggeamyzrfvbv.supabase.co/rest/v1/search_sessions`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndiZ3V1aXBvZ2dlYW15enJmdmJ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3Nzc2OTksImV4cCI6MjA2OTM1MzY5OX0.ddgmJnxg6hipRZ8_r9WyQpvsM-pkhBlRoybPdtGPEtY',
+                'Prefer': 'resolution=merge-duplicates'
+              },
+              body: JSON.stringify({
+                id: sessionId,
+                participant_id: participant_id,
+                session_start_time: new Date().toISOString(),
+                query_count: 1
+              })
+            });
+          } catch (error) {
+            console.error('Failed to create search session:', error);
+          }
         }
 
-        // Track the query using the tracking service (only for new searches)
+        // Track the query using edge function (only for new searches)
         let queryId = sessionStorage.getItem("current_query_id");
         if (startIndex === 1) {
-          queryId = await trackingService.trackQuery(queryToSearch, searchResult.totalResults);
-          console.log('Query tracked with ID:', queryId);
-          sessionStorage.setItem("current_query_id", queryId || '');
+          try {
+            const response = await fetch(`https://wbguuipoggeamyzrfvbv.supabase.co/functions/v1/query`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndiZ3V1aXBvZ2dlYW15enJmdmJ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3Nzc2OTksImV4cCI6MjA2OTM1MzY5OX0.ddgmJnxg6hipRZ8_r9WyQpvsM-pkhBlRoybPdtGPEtY'
+              },
+              body: JSON.stringify({
+                session_id: sessionId,
+                query_text: queryToSearch,
+                results_count: searchResult.totalResults
+              })
+            });
+            
+            if (response.ok) {
+              const data = await response.json();
+              queryId = data.query_id;
+              console.log('Query tracked with ID:', queryId);
+              sessionStorage.setItem("current_query_id", queryId || '');
+            }
+          } catch (error) {
+            console.error('Failed to track query:', error);
+          }
           setCurrentQuery(queryToSearch);
         }
 
@@ -122,7 +200,7 @@ export default function SearchInterface() {
           resultsPerPage: 10
         });
 
-        sessionStorage.setItem("session_id", session.sessionId);
+        sessionStorage.setItem("session_id", sessionId);
         
         toast({
           title: "Search completed",
@@ -225,10 +303,25 @@ export default function SearchInterface() {
         rank: result.rank
       });
 
-      // Track the click using the tracking service
+      // Track the click using edge function
       if (queryId) {
-        await trackingService.trackClickWithDetails(result.link, result.title, result.rank, queryId);
-        console.log('Click tracked successfully');
+        try {
+          await fetch(`https://wbguuipoggeamyzrfvbv.supabase.co/functions/v1/log_click`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndiZ3V1aXBvZ2dlYW15enJmdmJ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3Nzc2OTksImV4cCI6MjA2OTM1MzY5OX0.ddgmJnxg6hipRZ8_r9WyQpvsM-pkhBlRoybPdtGPEtY'
+            },
+            body: JSON.stringify({
+              query_id: queryId,
+              clicked_url: result.link,
+              clicked_rank: result.rank
+            })
+          });
+          console.log('Click tracked successfully');
+        } catch (error) {
+          console.error('Failed to track click:', error);
+        }
       } else {
         console.warn('No query ID available for click tracking');
       }

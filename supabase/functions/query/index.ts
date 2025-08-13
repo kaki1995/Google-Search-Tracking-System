@@ -145,25 +145,25 @@ Deno.serve(async (req) => {
     
     const { ip_address, device_type } = getClientInfo(req);
 
-    // First, ensure session exists or create it
-    console.log('Checking/creating session...');
+    // First, ensure search session exists or create it
+    console.log('Checking/creating search session...');
     const { data: existingSession, error: sessionCheckError } = await supabase
-      .from('sessions')
+      .from('search_sessions')
       .select('id')
       .eq('id', session_id)
       .single();
 
     if (sessionCheckError && sessionCheckError.code === 'PGRST116') {
-      // Session doesn't exist, create it
+      // Search session doesn't exist, create it
+      const participant_id = session_id; // Use session_id as participant for now
       const { error: sessionCreateError } = await supabase
-        .from('sessions')
+        .from('search_sessions')
         .insert({
           id: session_id,
-          user_id: session_id, // Using session_id as user_id for now
-          platform: 'web',
-          device_type,
-          browser: 'unknown',
-          ip_address
+          participant_id: participant_id,
+          session_start_time: new Date().toISOString(),
+          ip_address,
+          device_type
         });
 
       if (sessionCreateError) {
@@ -182,13 +182,14 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Log to Supabase experiment_queries table
+    // Log to Supabase queries table
     console.log('Logging query to Supabase...');
     const { data: insertData, error: insertError } = await supabase
-      .from('experiment_queries')
+      .from('queries')
       .insert({
         session_id,
         query_text,
+        start_time: new Date().toISOString(),
         ip_address,
         device_type
       })

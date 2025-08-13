@@ -40,54 +40,55 @@ Deno.serve(async (req) => {
       );
     }
 
-    const { query_id, clicked_url, clicked_rank } = await req.json();
+  const { query_id, clicked_url, clicked_rank } = await req.json();
 
-    if (!query_id || !clicked_url || clicked_rank === undefined) {
-      return new Response(
-        JSON.stringify({ error: 'Missing query_id, clicked_url, or clicked_rank' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    const { ip_address, device_type } = getClientInfo(req);
-    console.log(`Logging click: query_id=${query_id}, url=${clicked_url}, rank=${clicked_rank}`);
-
-    // Log to interactions table
-    const { data: insertData, error: insertError } = await supabase
-      .from('interactions')
-      .insert({
-        query_id,
-        clicked_url,
-        clicked_rank,
-        ip_address,
-        device_type
-      })
-      .select('id')
-      .single();
-
-    if (insertError) {
-      console.error('Supabase insert error:', insertError);
-      return new Response(
-        JSON.stringify({ error: 'Failed to log click' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    console.log(`Click logged successfully with ID: ${insertData?.id}`);
-
-    // Return success response
+  if (!query_id || !clicked_url || clicked_rank === undefined) {
     return new Response(
-      JSON.stringify({
-        success: true,
-        query_id,
-        clicked_url,
-        clicked_rank
-      }),
-      { 
-        status: 200, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-      }
+      JSON.stringify({ error: 'Missing query_id, clicked_url, or clicked_rank' }),
+      { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
+  }
+
+  const { ip_address, device_type } = getClientInfo(req);
+  console.log(`Logging click: query_id=${query_id}, url=${clicked_url}, rank=${clicked_rank}`);
+
+  // Log to query_clicks table
+  const { data: insertData, error: insertError } = await supabase
+    .from('query_clicks')
+    .insert({
+      query_id,
+      clicked_url,
+      clicked_rank,
+      click_time: new Date().toISOString(),
+      ip_address,
+      device_type
+    })
+    .select('id')
+    .single();
+
+  if (insertError) {
+    console.error('Supabase insert error:', insertError);
+    return new Response(
+      JSON.stringify({ error: 'Failed to log click' }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  }
+
+  console.log(`Click logged successfully with ID: ${insertData?.id}`);
+
+  // Return success response
+  return new Response(
+    JSON.stringify({
+      success: true,
+      query_id,
+      clicked_url,
+      clicked_rank
+    }),
+    { 
+      status: 200, 
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+    }
+  );
 
   } catch (error) {
     console.error('Log click endpoint error:', error);
