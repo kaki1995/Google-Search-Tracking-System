@@ -1,51 +1,43 @@
 project_id = "wbguuipoggeamyzrfvbv"
 
-[api]
-enabled = true
-port = 54321
-schemas = ["public", "storage", "graphql_public"]
-extra_search_path = ["public", "extensions"]
-max_rows = 1000
-
-[auth]
-site_url = "http://localhost:3000"
-additional_redirect_urls = ["https://localhost:3000"]
-jwt_expiry = 3600
-enable_signup = true
-
-[auth.email]
-enable_signup = true
-double_confirm_email = true
-enable_confirmations = false
-
-[storage]
-file_size_limit = "50MiB"
-
-[functions.session-ensure]
+[functions.session-start]
 verify_jwt = false
-[functions.consent-confirm]
-verify_jwt = false
-[functions.survey-save]
-verify_jwt = false
-[functions.result-log]
-verify_jwt = false
+
 [functions.query-start]
 verify_jwt = false
+
 [functions.query-end]
 verify_jwt = false
+
 [functions.log-click]
 verify_jwt = false
+
 [functions.log-scroll]
 verify_jwt = false
-[functions.session-end-new]
+
+[functions.session-end]
 verify_jwt = false
+
+[functions.query]
+verify_jwt = false
+
+[functions.log_click]
+verify_jwt = false
+
+[functions.secure-google-search]
+verify_jwt = false
+
 [functions.submit-background-survey]
 verify_jwt = false
+
 [functions.submit-post-task-survey]
 verify_jwt = false
-[functions.submit-task-instruction]
-verify_jwt = false
+
 [functions.log-consent-event]
 verify_jwt = false
-[functions.secure-google-search]
+
+[functions.submit-task-instruction]
+verify_jwt = false
+
+[functions.log-scroll-event]
 verify_jwt = false

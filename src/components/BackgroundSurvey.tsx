@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage, Form } from "@/components/ui/form";
-import { sessionManager } from "@/lib/sessionManager";
+import { trackingService } from "@/lib/tracking";
 import LikertScale from "./LikertScale";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
@@ -39,30 +39,33 @@ export default function BackgroundSurvey() {
 
   // Load saved form data on component mount
   useEffect(() => {
-    const savedData = sessionManager.loadPage('background_survey');
+    const savedData = localStorage.getItem('background_survey_data');
     if (savedData) {
-      form.reset(savedData);
+      try {
+        const parsedData = JSON.parse(savedData);
+        form.reset(parsedData);
+      } catch (error) {
+        console.error('Error parsing saved form data:', error);
+      }
     }
   }, [form]);
 
   // Save form data whenever form values change
   useEffect(() => {
     const subscription = form.watch((value) => {
-      sessionManager.savePage('background_survey', value);
+      localStorage.setItem('background_survey_data', JSON.stringify(value));
     });
     return () => subscription.unsubscribe();
   }, [form]);
-  const handlePrevious = () => {
-    // Save current form data before navigating
-    const currentData = form.getValues();
-    sessionManager.savePage('background_survey', currentData);
-    navigate('/');
-  };
-
   const onSubmit = async (data: SurveyForm) => {
     setIsSubmitting(true);
     try {
-      const participant_id = sessionManager.getParticipantId();
+      // Participant id from localStorage or create one
+      let participant_id = localStorage.getItem('participant_id');
+      if (!participant_id) {
+        participant_id = (crypto as any).randomUUID ? (crypto as any).randomUUID() : Math.random().toString(36).slice(2) + Date.now();
+        localStorage.setItem('participant_id', participant_id);
+      }
 
       const responses = {
         q1_age_group: data.age,
@@ -85,7 +88,8 @@ export default function BackgroundSurvey() {
         throw new Error(msg);
       }
 
-      // Don't clear saved data here - let consent confirm handle it
+      // Clear saved form data after successful submission
+      localStorage.removeItem('background_survey_data');
       navigate('/task-instructions');
     } catch (error: any) {
       console.error('Error submitting survey:', error);
@@ -137,7 +141,7 @@ export default function BackgroundSurvey() {
                     <FormControl>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select your age group" />
+                          <SelectValue placeholder="Select age group" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="under-18">Under 18</SelectItem>
@@ -164,7 +168,7 @@ export default function BackgroundSurvey() {
                     <FormControl>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select your gender" />
+                          <SelectValue placeholder="Select gender" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="female">Female</SelectItem>
@@ -369,7 +373,7 @@ export default function BackgroundSurvey() {
 
               {/* Buttons */}
               <div className="flex justify-between pt-8 px-4 md:px-8 lg:px-12">
-                <Button type="button" variant="outline" onClick={handlePrevious} className="px-8 py-2 text-sm font-medium border-2">
+                <Button type="button" variant="outline" onClick={() => navigate('/')} className="px-8 py-2 text-sm font-medium border-2">
                   Previous Page
                 </Button>
                 <Button type="submit" disabled={isSubmitting} className="px-8 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">

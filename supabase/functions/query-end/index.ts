@@ -24,11 +24,11 @@ Deno.serve(async (req) => {
     }
 
     const body = await req.json();
-    const { participant_id, query_id } = body;
+    const { query_id } = body;
 
-    if (!participant_id || !query_id) {
+    if (!query_id) {
       return new Response(
-        JSON.stringify({ ok: false, error: 'participant_id and query_id are required' }),
+        JSON.stringify({ ok: false, error: 'query_id is required' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
