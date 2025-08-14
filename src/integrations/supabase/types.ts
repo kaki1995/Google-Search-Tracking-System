@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "13.0.4"
@@ -148,6 +148,7 @@ export type Database = {
           end_time: string | null
           id: string
           ip_address: string | null
+          query_duration_ms: number | null
           query_duration_sec: number | null
           query_order: number | null
           query_structure: string | null
@@ -162,6 +163,7 @@ export type Database = {
           end_time?: string | null
           id?: string
           ip_address?: string | null
+          query_duration_ms?: number | null
           query_duration_sec?: number | null
           query_order?: number | null
           query_structure?: string | null
@@ -176,6 +178,7 @@ export type Database = {
           end_time?: string | null
           id?: string
           ip_address?: string | null
+          query_duration_ms?: number | null
           query_duration_sec?: number | null
           query_order?: number | null
           query_structure?: string | null
@@ -239,38 +242,95 @@ export type Database = {
       }
       scroll_events: {
         Row: {
+          device_type: string | null
+          id: string
+          ip_address: string | null
+          max_scroll_pct: number
+          path: string
+          recorded_at: string
+          session_id: string
+        }
+        Insert: {
+          device_type?: string | null
+          id?: string
+          ip_address?: string | null
+          max_scroll_pct: number
+          path: string
+          recorded_at?: string
+          session_id: string
+        }
+        Update: {
+          device_type?: string | null
+          id?: string
+          ip_address?: string | null
+          max_scroll_pct?: number
+          path?: string
+          recorded_at?: string
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scroll_events_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "search_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      search_result_log: {
+        Row: {
           created_at: string
           device_type: string | null
           id: string
           ip_address: string | null
-          query_id: string
-          scroll_depth_percent: number | null
-          timestamp: string | null
+          participant_id: string
+          q11_answer: string | null
+          q12_answer: string | null
+          q13_answer: string | null
+          q14_answer: string | null
+          q15_answer: string | null
+          session_id: string
         }
         Insert: {
           created_at?: string
           device_type?: string | null
           id?: string
           ip_address?: string | null
-          query_id: string
-          scroll_depth_percent?: number | null
-          timestamp?: string | null
+          participant_id: string
+          q11_answer?: string | null
+          q12_answer?: string | null
+          q13_answer?: string | null
+          q14_answer?: string | null
+          q15_answer?: string | null
+          session_id: string
         }
         Update: {
           created_at?: string
           device_type?: string | null
           id?: string
           ip_address?: string | null
-          query_id?: string
-          scroll_depth_percent?: number | null
-          timestamp?: string | null
+          participant_id?: string
+          q11_answer?: string | null
+          q12_answer?: string | null
+          q13_answer?: string | null
+          q14_answer?: string | null
+          q15_answer?: string | null
+          session_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "scroll_events_query_id_fkey"
-            columns: ["query_id"]
+            foreignKeyName: "search_result_log_participant_id_fkey"
+            columns: ["participant_id"]
             isOneToOne: false
-            referencedRelation: "queries"
+            referencedRelation: "participants"
+            referencedColumns: ["participant_id"]
+          },
+          {
+            foreignKeyName: "search_result_log_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "search_sessions"
             referencedColumns: ["id"]
           },
         ]
@@ -285,6 +345,7 @@ export type Database = {
           query_count: number | null
           query_reformulation_count: number | null
           scroll_depth_max: number | null
+          session_duration_ms: number | null
           session_end_time: string | null
           session_start_time: string | null
           total_clicked_results_count: number | null
@@ -298,6 +359,7 @@ export type Database = {
           query_count?: number | null
           query_reformulation_count?: number | null
           scroll_depth_max?: number | null
+          session_duration_ms?: number | null
           session_end_time?: string | null
           session_start_time?: string | null
           total_clicked_results_count?: number | null
@@ -311,13 +373,56 @@ export type Database = {
           query_count?: number | null
           query_reformulation_count?: number | null
           scroll_depth_max?: number | null
+          session_duration_ms?: number | null
           session_end_time?: string | null
           session_start_time?: string | null
           total_clicked_results_count?: number | null
         }
         Relationships: [
           {
+            foreignKeyName: "search_sessions_participant_fk"
+            columns: ["participant_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["participant_id"]
+          },
+          {
             foreignKeyName: "search_sessions_participant_id_fkey"
+            columns: ["participant_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["participant_id"]
+          },
+        ]
+      }
+      session_timing: {
+        Row: {
+          id: string
+          participant_id: string
+          record_created_at: string
+          session_duration_ms: number | null
+          session_end_time: string | null
+          session_start_time: string
+        }
+        Insert: {
+          id?: string
+          participant_id: string
+          record_created_at?: string
+          session_duration_ms?: number | null
+          session_end_time?: string | null
+          session_start_time?: string
+        }
+        Update: {
+          id?: string
+          participant_id?: string
+          record_created_at?: string
+          session_duration_ms?: number | null
+          session_end_time?: string | null
+          session_start_time?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_timing_participant_id_fkey"
             columns: ["participant_id"]
             isOneToOne: false
             referencedRelation: "participants"
@@ -384,16 +489,16 @@ export type Database = {
       create_enhanced_session: {
         Args:
           | {
-              p_user_agent?: string
-              p_screen_resolution?: string
-              p_timezone?: string
+              p_browser?: string
+              p_device_type?: string
+              p_location?: string
+              p_platform?: string
+              p_user_id: string
             }
           | {
-              p_user_id: string
-              p_platform?: string
-              p_device_type?: string
-              p_browser?: string
-              p_location?: string
+              p_screen_resolution?: string
+              p_timezone?: string
+              p_user_agent?: string
             }
         Returns: string
       }
@@ -403,32 +508,32 @@ export type Database = {
       }
       log_enhanced_interaction: {
         Args: {
-          p_query_id: string
-          p_interaction_type: string
           p_clicked_rank?: number
           p_clicked_url?: string
-          p_scroll_position?: number
-          p_page_scroll_y?: number
-          p_viewport_height?: number
           p_follow_up_prompt?: string
+          p_interaction_type: string
+          p_page_scroll_y?: number
+          p_query_id: string
+          p_scroll_position?: number
+          p_viewport_height?: number
         }
         Returns: string
       }
       log_enhanced_query: {
         Args:
           | {
-              p_session_id: string
-              p_query_text: string
-              p_query_order: number
-              p_previous_query_id?: string
-              p_structure_type?: string
               p_complexity?: number
+              p_previous_query_id?: string
+              p_query_order: number
+              p_query_text: string
+              p_session_id: string
+              p_structure_type?: string
             }
           | {
-              p_session_id: string
               p_query_text: string
               p_results_count?: number
               p_results_loaded_count?: number
+              p_session_id: string
             }
         Returns: string
       }

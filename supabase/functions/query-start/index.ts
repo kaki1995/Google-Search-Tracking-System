@@ -39,11 +39,24 @@ Deno.serve(async (req) => {
     }
 
     const body = await req.json();
-    const { session_id, query_text, query_order, query_structure } = body;
+    const { participant_id, session_id, query_text, query_order, query_structure } = body;
 
-    if (!session_id || !query_text) {
+    // If participant_id is provided, resolve/ensure active session
+    let actualSessionId = session_id;
+    if (participant_id && !session_id) {
+      const { data: activeSession } = await supabase
+        .from('search_sessions')
+        .select('id')
+        .eq('participant_id', participant_id)
+        .is('session_end_time', null)
+        .single();
+      
+      actualSessionId = activeSession?.id;
+    }
+
+    if (!actualSessionId || !query_text) {
       return new Response(
-        JSON.stringify({ ok: false, error: 'session_id and query_text are required' }),
+        JSON.stringify({ ok: false, error: 'session_id/participant_id and query_text are required' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -51,7 +64,7 @@ Deno.serve(async (req) => {
     const { ip_address, device_type } = getClientInfo(req);
     const nowUtc = new Date();
 
-    console.log(`Starting query for session: ${session_id}, query: ${query_text}`);
+    console.log(`Starting query for session: ${actualSessionId}, query: ${query_text}`);
 
     // Compute query_order if not provided
     let finalQueryOrder = query_order;
@@ -59,7 +72,7 @@ Deno.serve(async (req) => {
       const { data: existingQueries } = await supabase
         .from('queries')
         .select('query_order')
-        .eq('session_id', session_id)
+        .eq('session_id', actualSessionId)
         .order('query_order', { ascending: false })
         .limit(1);
       
@@ -72,7 +85,7 @@ Deno.serve(async (req) => {
     const { data: query, error: queryError } = await supabase
       .from('queries')
       .insert({
-        session_id,
+        session_id: actualSessionId,
         query_order: finalQueryOrder,
         query_text,
         query_structure: query_structure || null,
@@ -99,7 +112,7 @@ Deno.serve(async (req) => {
       JSON.stringify({
         ok: true,
         query_id: queryId,
-        session_id,
+        session_id: actualSessionId,
         query_order: finalQueryOrder
       }),
       { 

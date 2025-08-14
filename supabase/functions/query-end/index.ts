@@ -24,7 +24,7 @@ Deno.serve(async (req) => {
     }
 
     const body = await req.json();
-    const { query_id } = body;
+    const { query_id, participant_id } = body;
 
     if (!query_id) {
       return new Response(

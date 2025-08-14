@@ -80,14 +80,7 @@ export default function PostTaskSurvey() {
       }
 
       const att = Number(values.attention_check || 0);
-      if (att !== 3) {
-        toast({
-          title: 'Attention check failed',
-          description: "For Q22, please select 3 as instructed.",
-          variant: 'destructive',
-        });
-        return;
-      }
+      // Remove blocking for attention check - just store the value
 
       const responses = {
         q16_satisfaction: Number(values.google_satisfaction || 0),
@@ -153,6 +146,13 @@ export default function PostTaskSurvey() {
 
             <Form {...form}>
               <form className="space-y-8">
+                {/* Question 20: Topic Familiarity - MOVED TO FIRST */}
+                <FormField control={form.control} name="topic_familiarity" rules={{
+                required: "This field is required"
+              }} render={({
+                field
+              }) => <LikertScale field={field} question="I was familiar with the topic of this task before starting." leftLabel="Strongly disagree" rightLabel="Strongly agree" questionNumber="20" />} />
+
                 {/* Question 16: Google Search Satisfaction */}
                 <FormField control={form.control} name="google_satisfaction" rules={{
                 required: "This field is required"
@@ -180,13 +180,6 @@ export default function PostTaskSurvey() {
               }} render={({
                 field
               }) => <LikertScale field={field} question="I trusted the information provided by the tool in the search results." leftLabel="Do not trust at all" rightLabel="Trust completely" questionNumber="19" />} />
-
-                {/* Question 20: Topic Familiarity */}
-                <FormField control={form.control} name="topic_familiarity" rules={{
-                required: "This field is required"
-              }} render={({
-                field
-              }) => <LikertScale field={field} question="I was familiar with the topic of this task before starting." leftLabel="Strongly disagree" rightLabel="Strongly agree" questionNumber="20" />} />
 
                 {/* Question 21: Tool Effectiveness */}
                 <FormField control={form.control} name="tool_effectiveness" rules={{

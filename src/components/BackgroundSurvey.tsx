@@ -141,7 +141,7 @@ export default function BackgroundSurvey() {
                     <FormControl>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select age group" />
+                          <SelectValue placeholder="Select your age group" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="under-18">Under 18</SelectItem>
@@ -168,7 +168,7 @@ export default function BackgroundSurvey() {
                     <FormControl>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select gender" />
+                          <SelectValue placeholder="Select your gender" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="female">Female</SelectItem>
