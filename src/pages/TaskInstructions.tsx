@@ -23,21 +23,36 @@ export default function TaskInstructions() {
 
   // Load saved form data on component mount
   useEffect(() => {
-    const savedData = localStorage.getItem('task_instruction_data');
-    if (savedData) {
-      try {
-        const parsedData = JSON.parse(savedData);
-        form.reset(parsedData);
-      } catch (error) {
-        console.error('Error parsing saved task instruction data:', error);
+    const loadSavedData = async () => {
+      // Try to load from sessionManager first
+      const savedData = await sessionManager.loadPage('task_instruction');
+      if (savedData) {
+        form.reset(savedData);
+      } else {
+        // Fallback to localStorage
+        const localData = localStorage.getItem('task_instruction_data');
+        if (localData) {
+          try {
+            const parsedData = JSON.parse(localData);
+            form.reset(parsedData);
+          } catch (error) {
+            console.error('Error parsing saved task instruction data:', error);
+          }
+        }
       }
-    }
+    };
+    loadSavedData();
   }, [form]);
 
   // Save form data whenever form values change
   useEffect(() => {
-    const subscription = form.watch((value) => {
+    const subscription = form.watch(async (value) => {
+      // Save to both localStorage and sessionManager
       localStorage.setItem('task_instruction_data', JSON.stringify(value));
+      const participantId = localStorage.getItem('participant_id');
+      if (participantId) {
+        await sessionManager.savePage('task_instruction', value);
+      }
     });
     return () => subscription.unsubscribe();
   }, [form]);
@@ -142,9 +157,9 @@ export default function TaskInstructions() {
                     </FormLabel>
                     <FormControl>
                       <Select onValueChange={field.onChange} value={field.value}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select your budget range" />
-                        </SelectTrigger>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select your budget range" />
+                    </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="under-500">Under $500</SelectItem>
                           <SelectItem value="500-1000">$500 - $1,000</SelectItem>

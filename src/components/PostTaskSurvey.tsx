@@ -11,6 +11,7 @@ import LikertScale from "./LikertScale";
 
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { sessionManager } from "@/lib/sessionManager";
 interface PostTaskSurveyForm {
   google_satisfaction: string;
   google_ease: string;
@@ -42,21 +43,36 @@ export default function PostTaskSurvey() {
 
   // Load saved form data on component mount
   useEffect(() => {
-    const savedData = localStorage.getItem('post_task_survey_data');
-    if (savedData) {
-      try {
-        const parsedData = JSON.parse(savedData);
-        form.reset(parsedData);
-      } catch (error) {
-        console.error('Error parsing saved post-task survey data:', error);
+    const loadSavedData = async () => {
+      // Try to load from sessionManager first
+      const savedData = await sessionManager.loadPage('post_task_survey');
+      if (savedData) {
+        form.reset(savedData);
+      } else {
+        // Fallback to localStorage
+        const localData = localStorage.getItem('post_task_survey_data');
+        if (localData) {
+          try {
+            const parsedData = JSON.parse(localData);
+            form.reset(parsedData);
+          } catch (error) {
+            console.error('Error parsing saved post-task survey data:', error);
+          }
+        }
       }
-    }
+    };
+    loadSavedData();
   }, [form]);
 
   // Save form data whenever form values change
   useEffect(() => {
-    const subscription = form.watch((value) => {
+    const subscription = form.watch(async (value) => {
+      // Save to both localStorage and sessionManager
       localStorage.setItem('post_task_survey_data', JSON.stringify(value));
+      const participantId = localStorage.getItem('participant_id');
+      if (participantId) {
+        await sessionManager.savePage('post_task_survey', value);
+      }
     });
     return () => subscription.unsubscribe();
   }, [form]);
@@ -240,7 +256,19 @@ export default function PostTaskSurvey() {
 
                 {/* Buttons */}
                 <div className="flex justify-between pt-8">
-                  <Button type="button" variant="outline" onClick={() => navigate('/search-result-log')} className="px-8 py-2 text-sm font-medium border-2">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={async () => {
+                      const values = form.getValues();
+                      const participantId = localStorage.getItem('participant_id');
+                      if (participantId) {
+                        await sessionManager.savePage('post_task_survey', values);
+                      }
+                      navigate('/search-result-log');
+                    }} 
+                    className="px-8 py-2 text-sm font-medium border-2"
+                  >
                     Previous Page
                   </Button>
                   <Button type="button" onClick={form.handleSubmit(handleSubmit)} className="px-8 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">

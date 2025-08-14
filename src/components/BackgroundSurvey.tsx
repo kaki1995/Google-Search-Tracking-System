@@ -9,6 +9,7 @@ import { trackingService } from "@/lib/tracking";
 import LikertScale from "./LikertScale";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { sessionManager } from "@/lib/sessionManager";
 interface SurveyForm {
   age: string;
   gender: string;
@@ -373,7 +374,19 @@ export default function BackgroundSurvey() {
 
               {/* Buttons */}
               <div className="flex justify-between pt-8 px-4 md:px-8 lg:px-12">
-                <Button type="button" variant="outline" onClick={() => navigate('/')} className="px-8 py-2 text-sm font-medium border-2">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={async () => {
+                    const values = form.getValues();
+                    const participantId = localStorage.getItem('participant_id');
+                    if (participantId) {
+                      await sessionManager.savePage('background_survey', values);
+                    }
+                    navigate('/');
+                  }} 
+                  className="px-8 py-2 text-sm font-medium border-2"
+                >
                   Previous Page
                 </Button>
                 <Button type="submit" disabled={isSubmitting} className="px-8 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">

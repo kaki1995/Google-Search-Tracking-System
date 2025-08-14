@@ -31,21 +31,36 @@ export default function SearchResultLog() {
 
   // Load saved form data on component mount
   useEffect(() => {
-    const savedData = localStorage.getItem('search_result_log_data');
-    if (savedData) {
-      try {
-        const parsedData = JSON.parse(savedData);
-        form.reset(parsedData);
-      } catch (error) {
-        console.error('Error parsing saved search result log data:', error);
+    const loadSavedData = async () => {
+      // Try to load from sessionManager first
+      const savedData = await sessionManager.loadPage('search_result_log');
+      if (savedData) {
+        form.reset(savedData);
+      } else {
+        // Fallback to localStorage
+        const localData = localStorage.getItem('search_result_log_data');
+        if (localData) {
+          try {
+            const parsedData = JSON.parse(localData);
+            form.reset(parsedData);
+          } catch (error) {
+            console.error('Error parsing saved search result log data:', error);
+          }
+        }
       }
-    }
+    };
+    loadSavedData();
   }, [form]);
 
   // Save form data whenever form values change
   useEffect(() => {
-    const subscription = form.watch((value) => {
+    const subscription = form.watch(async (value) => {
+      // Save to both localStorage and sessionManager
       localStorage.setItem('search_result_log_data', JSON.stringify(value));
+      const participantId = localStorage.getItem('participant_id');
+      if (participantId) {
+        await sessionManager.savePage('search_result_log', value);
+      }
     });
     return () => subscription.unsubscribe();
   }, [form]);
@@ -65,11 +80,11 @@ export default function SearchResultLog() {
       
       // Save to search_result_log table
       const success = await sessionManager.saveResultLog(
-        data.q11_answer,
-        data.q12_answer,
-        data.q13_answer,
-        data.q14_answer,
-        data.q15_answer
+        data.q11_answer || '',
+        data.q12_answer || '',
+        data.q13_answer || '',
+        data.q14_answer || '',
+        data.q15_answer || ''
       );
 
       if (!success) {

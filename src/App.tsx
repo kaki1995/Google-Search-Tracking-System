@@ -45,7 +45,7 @@ const App = () => <QueryClientProvider client={queryClient}>
               <div className="text-4xl mb-4">🎉</div>
               <h1 className="text-3xl font-semibold text-gray-900 mb-6">Thank You for Participating!</h1>
               <p className="text-lg text-gray-700 mb-4">We truly appreciate your time and input. If you have any questions or feedback, feel free to contact us at:</p>
-              <p className="text-lg font-medium text-primary">📧 research@yourproject.com</p>
+              <p className="text-lg font-medium text-primary">📧 SearchBehaviorTeam@outlook.com</p>
             </div>
           </div>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
