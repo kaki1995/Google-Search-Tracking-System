@@ -1,23 +1,16 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { getReqContext } from '../_shared/context.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-function getClientInfo(req: Request) {
-  const fwd = req.headers.get('x-forwarded-for') || '';
-  const ip_address = (fwd.split(',')[0] || '').trim() ||
-    req.headers.get('cf-connecting-ip') ||
-    req.headers.get('x-real-ip') ||
-    req.headers.get('x-client-ip') || null;
-  const ua = (req.headers.get('user-agent') || '').toLowerCase();
-  const device_type = /mobile|iphone|android/.test(ua)
-    ? 'mobile'
-    : /ipad|tablet/.test(ua)
-    ? 'tablet'
-    : 'desktop';
-  return { ip_address, device_type };
+interface QueryStartRequest {
+  participant_id: string;
+  query_text: string;
+  query_order?: number;
+  query_structure?: string;
 }
 
 Deno.serve(async (req) => {

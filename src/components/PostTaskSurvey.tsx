@@ -8,7 +8,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import LikertScale from "./LikertScale";
-
+import { sessionManager } from "@/lib/sessionManager";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 interface PostTaskSurveyForm {
@@ -42,24 +42,26 @@ export default function PostTaskSurvey() {
 
   // Load saved form data on component mount
   useEffect(() => {
-    const savedData = localStorage.getItem('post_task_survey_data');
+    const savedData = sessionManager.loadPage('post_task_survey');
     if (savedData) {
-      try {
-        const parsedData = JSON.parse(savedData);
-        form.reset(parsedData);
-      } catch (error) {
-        console.error('Error parsing saved post-task survey data:', error);
-      }
+      form.reset(savedData);
     }
   }, [form]);
 
   // Save form data whenever form values change
   useEffect(() => {
     const subscription = form.watch((value) => {
-      localStorage.setItem('post_task_survey_data', JSON.stringify(value));
+      sessionManager.savePage('post_task_survey', value);
     });
     return () => subscription.unsubscribe();
   }, [form]);
+  const handlePrevious = () => {
+    // Save current form data before navigating
+    const currentData = form.getValues();
+    sessionManager.savePage('post_task_survey', currentData);
+    navigate('/search-result-log');
+  };
+
   const handleSubmit = () => {
     setShowConfirmDialog(true);
   };
@@ -67,7 +69,7 @@ export default function PostTaskSurvey() {
     setIsSubmitting(true);
     try {
       const values = form.getValues();
-      const participant_id = localStorage.getItem('participant_id');
+      const participant_id = sessionManager.getParticipantId();
 
       if (!participant_id) {
         toast({
@@ -80,14 +82,7 @@ export default function PostTaskSurvey() {
       }
 
       const att = Number(values.attention_check || 0);
-      if (att !== 3) {
-        toast({
-          title: 'Attention check failed',
-          description: "For Q22, please select 3 as instructed.",
-          variant: 'destructive',
-        });
-        return;
-      }
+      // Store attention check result but don't block submission
 
       const responses = {
         q16_satisfaction: Number(values.google_satisfaction || 0),
@@ -110,8 +105,8 @@ export default function PostTaskSurvey() {
         throw new Error(msg);
       }
 
-      // Clear saved form data after successful submission
-      localStorage.removeItem('post_task_survey_data');
+      // End the session
+      await sessionManager.endSession();
       toast({ title: 'Thank you!', description: 'Your feedback has been submitted.' });
 
       setShowConfirmDialog(false);
@@ -247,7 +242,7 @@ export default function PostTaskSurvey() {
 
                 {/* Buttons */}
                 <div className="flex justify-between pt-8">
-                  <Button type="button" variant="outline" onClick={() => navigate('/search-result-log')} className="px-8 py-2 text-sm font-medium border-2">
+                  <Button type="button" variant="outline" onClick={handlePrevious} className="px-8 py-2 text-sm font-medium border-2">
                     Previous Page
                   </Button>
                   <Button type="button" onClick={form.handleSubmit(handleSubmit)} className="px-8 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">

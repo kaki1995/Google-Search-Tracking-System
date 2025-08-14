@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { trackingService } from "@/lib/tracking";
+import { sessionManager } from "@/lib/sessionManager";
 import { supabase } from "@/integrations/supabase/client";
 
 const ConsentScreen = () => {
@@ -16,21 +16,18 @@ const ConsentScreen = () => {
     if (!consent) return;
     setIsSubmitting(true);
     try {
-      // Ensure participant id exists in localStorage
-      let participant_id = localStorage.getItem('participant_id');
-      if (!participant_id) {
-        participant_id = (crypto as any).randomUUID ? (crypto as any).randomUUID() : Math.random().toString(36).slice(2) + Date.now();
-        localStorage.setItem('participant_id', participant_id);
-      }
+      const participant_id = sessionManager.getParticipantId();
+      
       // Log consent event via Edge Function
       await supabase.functions.invoke('log-consent-event', {
         body: { participant_id, event_type: 'consent_given' }
       });
 
-      await trackingService.trackConsent(true);
+      // Confirm consent and get fresh session (clears saved forms)
+      await sessionManager.confirmConsent();
       navigate('/background-survey');
     } catch (error) {
-      console.error('Error tracking/logging consent:', error);
+      console.error('Error logging consent:', error);
       navigate('/background-survey');
     } finally {
       setIsSubmitting(false);
@@ -38,9 +35,15 @@ const ConsentScreen = () => {
   };
 
   const handleDecline = async () => {
-    await trackingService.trackConsent(false);
-    // Redirect to a thank you page or close the study
-    alert('Thank you for your time. You have declined to participate in this study.');
+    try {
+      const participant_id = sessionManager.getParticipantId();
+      await supabase.functions.invoke('log-consent-event', {
+        body: { participant_id, event_type: 'consent_declined' }
+      });
+    } catch (error) {
+      console.error('Error logging consent decline:', error);
+    }
+    navigate('/exit-study');
   };
 
   return (

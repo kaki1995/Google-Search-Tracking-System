@@ -1,0 +1,100 @@
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { getReqContext } from '../_shared/context.ts';
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+interface ConsentConfirmRequest {
+  participant_id: string;
+}
+
+Deno.serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+
+    if (req.method !== 'POST') {
+      return new Response(
+        JSON.stringify({ ok: false, error: 'Method not allowed' }),
+        { status: 405, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const body: ConsentConfirmRequest = await req.json();
+    const { participant_id } = body;
+
+    if (!participant_id) {
+      return new Response(
+        JSON.stringify({ ok: false, error: 'participant_id is required' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const { ipAddress, deviceType, nowUtc } = getReqContext(req);
+
+    console.log(`Confirming consent for participant: ${participant_id}`);
+
+    // End any active session
+    const { error: endSessionError } = await supabase
+      .from('search_sessions')
+      .update({ session_end_time: nowUtc.toISOString() })
+      .eq('participant_id', participant_id)
+      .is('session_end_time', null);
+
+    if (endSessionError) {
+      console.error('Error ending active session:', endSessionError);
+    }
+
+    // Create fresh session
+    const { data: newSession, error: createError } = await supabase
+      .from('search_sessions')
+      .insert({
+        participant_id,
+        session_start_time: nowUtc.toISOString(),
+        ip_address: ipAddress,
+        device_type: deviceType,
+        query_count: 0,
+        query_reformulation_count: 0,
+        total_clicked_results_count: 0,
+        scroll_depth_max: 0
+      })
+      .select('id')
+      .single();
+
+    if (createError) {
+      console.error('Session creation error:', createError);
+      return new Response(
+        JSON.stringify({ ok: false, error: 'Failed to create fresh session' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    console.log(`Created fresh session after consent: ${newSession.id}`);
+
+    return new Response(
+      JSON.stringify({
+        ok: true,
+        session_id: newSession.id
+      }),
+      { 
+        status: 200, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      }
+    );
+
+  } catch (error) {
+    console.error('Consent confirm endpoint error:', error);
+    return new Response(
+      JSON.stringify({ ok: false, error: 'Internal server error' }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  }
+});

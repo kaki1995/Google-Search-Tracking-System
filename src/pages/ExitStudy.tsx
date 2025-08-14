@@ -18,7 +18,8 @@ export default function ExitStudy() {
           Thank you for your time.
         </h1>
         <p className="text-lg text-gray-700 leading-relaxed">
-          You have exited the study, and no data has been collected.
+          You have exited the study, and no data has been collected.<br/>
+          If you have any questions, please contact us at <a href="mailto:SearchBehaviorTeam@outlook.com" className="text-blue-600 underline">SearchBehaviorTeam@outlook.com</a>.
         </p>
       </div>
     </div>
