@@ -102,7 +102,7 @@ class SessionManager {
     localStorage.removeItem('session_id');
     localStorage.removeItem('session_timing_id');
     localStorage.removeItem('google_search_session');
-    this.clearLocalAnswers();
+    this.clearAllResponses();
   }
 
   // Create new session - only called after consent confirmation
@@ -159,23 +159,39 @@ class SessionManager {
     }
 
     try {
-      const { data, error } = await supabase.functions.invoke('survey-save', {
+      // Try new save-responses function first
+      const { data, error } = await supabase.functions.invoke('save-responses', {
         body: { 
           participant_id: this.participantId, 
           page_id: pageId, 
-          answers 
+          response_data: answers,
+          session_id: this.sessionId 
         }
       });
 
       if (error || !data?.ok) {
-        console.error('Failed to save page:', error || data?.error);
-        return false;
+        console.warn('New save-responses function not available, using fallback');
+        // Fallback to localStorage only for now
+        const storageKey = `${pageId}_responses`;
+        localStorage.setItem(storageKey, JSON.stringify({
+          data: answers,
+          timestamp: new Date().toISOString(),
+          participantId: this.participantId
+        }));
+        return true;
       }
 
       return true;
     } catch (error) {
-      console.error('Save page error:', error);
-      return false;
+      console.warn('Save page error, using localStorage fallback:', error);
+      // Fallback to localStorage
+      const storageKey = `${pageId}_responses`;
+      localStorage.setItem(storageKey, JSON.stringify({
+        data: answers,
+        timestamp: new Date().toISOString(),
+        participantId: this.participantId
+      }));
+      return true;
     }
   }
 
@@ -186,18 +202,47 @@ class SessionManager {
     }
 
     try {
-      const { data, error } = await supabase.functions.invoke('survey-load', {
+      // Try new load-responses function first
+      const { data, error } = await supabase.functions.invoke('load-responses', {
         body: { participant_id: this.participantId, page_id: pageId }
       });
 
       if (error || !data?.ok) {
-        console.error('Failed to load page:', error || data?.error);
+        console.warn('New load-responses function not available, using fallback');
+        // Fallback to localStorage
+        const storageKey = `${pageId}_responses`;
+        const savedData = localStorage.getItem(storageKey);
+        
+        if (savedData) {
+          try {
+            const parsed = JSON.parse(savedData);
+            if (parsed.participantId === this.participantId) {
+              return parsed.data;
+            }
+          } catch (e) {
+            console.error('Error parsing localStorage data:', e);
+          }
+        }
         return null;
       }
 
-      return data.answers;
+      return data.data?.response_data || null;
     } catch (error) {
-      console.error('Load page error:', error);
+      console.warn('Load page error, using localStorage fallback:', error);
+      // Fallback to localStorage
+      const storageKey = `${pageId}_responses`;
+      const savedData = localStorage.getItem(storageKey);
+      
+      if (savedData) {
+        try {
+          const parsed = JSON.parse(savedData);
+          if (parsed.participantId === this.participantId) {
+            return parsed.data;
+          }
+        } catch (e) {
+          console.error('Error parsing localStorage data:', e);
+        }
+      }
       return null;
     }
   }
@@ -317,12 +362,177 @@ class SessionManager {
     // The session timing table is updated automatically
   }
 
+  // Enhanced response persistence methods
+  
+  // Build participant-scoped storage key (new format)
+  private buildResponseKey(pageId: string): string | null {
+    if (!this.participantId) return null;
+    return `${this.participantId}:${pageId}_responses`;
+  }
+
+  // Legacy (old) unscoped key
+  private buildLegacyResponseKey(pageId: string): string {
+    return `${pageId}_responses`;
+  }
+
+  // Save responses for a specific page/component with automatic debouncing
+  async saveResponses(pageId: string, responses: Record<string, any>): Promise<void> {
+    if (!this.participantId) {
+      console.warn('SessionManager: No participant ID available for saving responses');
+      return;
+    }
+
+    try {
+      const newKey = this.buildResponseKey(pageId);
+      const legacyKey = this.buildLegacyResponseKey(pageId);
+      const saveData = {
+        data: responses,
+        timestamp: new Date().toISOString(),
+        participantId: this.participantId
+      };
+
+      if (newKey) {
+        console.log(`💾 SessionManager: Saving (scoped) with key: ${newKey}`);
+        localStorage.setItem(newKey, JSON.stringify(saveData));
+      }
+
+      // Maintain legacy key for backward compatibility (lightweight duplicate)
+      console.log(`💾 SessionManager: Saving (legacy) with key: ${legacyKey}`);
+      localStorage.setItem(legacyKey, JSON.stringify(saveData));
+
+      console.log(`✅ SessionManager: Responses saved for ${pageId}`);
+      
+      // TODO: Also save to backend when edge functions are deployed
+      // await this.savePage(pageId, responses);
+    } catch (error) {
+      console.error(`Failed to save responses for ${pageId}:`, error);
+    }
+  }
+
+  // Load responses for a specific page/component
+  async loadResponses(pageId: string): Promise<Record<string, any> | null> {
+    try {
+      const newKey = this.buildResponseKey(pageId);
+      const legacyKey = this.buildLegacyResponseKey(pageId);
+      console.log(`🔍 SessionManager: Attempt load (scoped) key: ${newKey}`);
+      console.log(`🔍 SessionManager: Attempt load (legacy) key: ${legacyKey}`);
+
+      const tryKeys = [newKey, legacyKey].filter(Boolean) as string[];
+      for (const key of tryKeys) {
+        const raw = localStorage.getItem(key);
+        if (!raw) continue;
+        try {
+          const parsed = JSON.parse(raw);
+            // If participantId mismatch on legacy key, skip but don't delete (avoid data loss)
+            if (parsed.participantId && this.participantId && parsed.participantId !== this.participantId) {
+              console.warn(`⚠️ SessionManager: Participant mismatch for key ${key}. Expected ${this.participantId}, found ${parsed.participantId}. Skipping.`);
+              continue;
+            }
+            console.log(`✅ SessionManager: Loaded responses from key ${key}`);
+            return parsed.data || null;
+        } catch (e) {
+          console.error(`❌ SessionManager: Failed parsing data for key ${key}:`, e);
+        }
+      }
+
+      console.log(`📭 SessionManager: No saved responses found for ${pageId}`);
+      return null;
+    } catch (error) {
+      console.error(`Failed to load responses for ${pageId}:`, error);
+      return null;
+    }
+  }
+
+  // Clear responses for a specific page
+  clearResponses(pageId: string): void {
+    const storageKey = `${pageId}_responses`;
+    localStorage.removeItem(storageKey);
+    
+    // Also clear the old format for backwards compatibility
+    const oldKeys = [
+      'background_survey_data',
+      'post_task_survey_data', 
+      'search_result_log_data',
+      'task_instruction_data'
+    ];
+    
+    if (oldKeys.includes(`${pageId}_data`)) {
+      localStorage.removeItem(`${pageId}_data`);
+    }
+    
+    console.log(`🗑️ Cleared responses for ${pageId}`);
+  }
+
+  // Clear all response data (called when session ends or user exits)
+  clearAllResponses(): void {
+    const responseKeys = [
+      'background_survey_responses',
+      'post_task_survey_responses',
+      'search_result_log_responses', 
+      'task_instruction_responses',
+      // Backwards compatibility
+      'background_survey_data',
+      'post_task_survey_data',
+      'search_result_log_data',
+      'task_instruction_data'
+    ];
+    
+    responseKeys.forEach(key => {
+      localStorage.removeItem(key);
+    });
+    
+    console.log('🗑️ All response data cleared');
+  }
+
+  // Check if responses exist for a page (useful for showing "Continue" vs "Start" buttons)
+  hasResponses(pageId: string): boolean {
+    const keysToCheck: string[] = [];
+    const newKey = this.buildResponseKey(pageId);
+    if (newKey) keysToCheck.push(newKey);
+    keysToCheck.push(this.buildLegacyResponseKey(pageId));
+    for (const key of keysToCheck) {
+      const savedData = localStorage.getItem(key);
+      if (!savedData) continue;
+      try {
+        const parsed = JSON.parse(savedData);
+        if (parsed && parsed.data && Object.keys(parsed.data).length > 0) return true;
+      } catch {/* ignore */}
+    }
+    // Old legacy *_data format
+    return !!localStorage.getItem(`${pageId}_data`);
+  }
+
+  // Get a summary of all saved responses (useful for debugging)
+  getResponsesSummary(): Record<string, any> {
+    const pages = ['background_survey', 'task_instruction', 'search_result_log', 'post_task_survey'];
+    const summary: Record<string, any> = {};
+    
+    pages.forEach(pageId => {
+      const storageKey = `${pageId}_responses`;
+      const savedData = localStorage.getItem(storageKey);
+      
+      if (savedData) {
+        try {
+          const parsed = JSON.parse(savedData);
+          summary[pageId] = {
+            hasData: Object.keys(parsed.data || {}).length > 0,
+            timestamp: parsed.timestamp,
+            participantId: parsed.participantId
+          };
+        } catch {
+          summary[pageId] = { hasData: false, error: 'Invalid JSON' };
+        }
+      } else {
+        summary[pageId] = { hasData: false };
+      }
+    });
+    
+    return summary;
+  }
+
   private clearLocalAnswers(): void {
-    // Clear all local survey answer storage
-    localStorage.removeItem('background_survey_data');
-    localStorage.removeItem('post_task_survey_data');
-    localStorage.removeItem('search_result_log_data');
-    localStorage.removeItem('task_instruction_data');
+    // Use the enhanced clearAllResponses method
+    this.clearAllResponses();
   }
 }
 

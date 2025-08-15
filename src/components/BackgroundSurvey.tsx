@@ -10,6 +10,8 @@ import LikertScale from "./LikertScale";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { sessionManager } from "@/lib/sessionManager";
+import useResponsePersistence from "@/hooks/useResponsePersistence";
+
 interface SurveyForm {
   age: string;
   gender: string;
@@ -21,9 +23,12 @@ interface SurveyForm {
   familiarity_scale_q8: string;
   search_frequency: string;
 }
+
 export default function BackgroundSurvey() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const navigate = useNavigate();
+
   const form = useForm<SurveyForm>({
     defaultValues: {
       age: "",
@@ -38,45 +43,112 @@ export default function BackgroundSurvey() {
     }
   });
 
-  // Load saved form data on component mount
+  // On mount, load saved values and reset the form
   useEffect(() => {
-    const loadSavedData = async () => {
-      // Try to load from sessionManager first (supports navigation back/forward)
-      const savedData = await sessionManager.loadPage('background_survey');
-      if (savedData) {
-        form.reset(savedData);
-      } else {
-        // Fallback to localStorage for backwards compatibility
-        const localData = localStorage.getItem('background_survey_data');
-        if (localData) {
-          try {
-            const parsedData = JSON.parse(localData);
-            form.reset(parsedData);
-          } catch (error) {
-            console.error('Error parsing saved background survey data:', error);
-          }
+    const loadAndRestoreData = async () => {
+      try {
+        let participantId = sessionManager.getParticipantId();
+        if (!participantId) {
+          participantId = sessionManager.createNewSession();
+          console.log('🆕 Created new participant ID:', participantId);
+        } else {
+          console.log('🔍 Using existing participant ID:', participantId);
         }
+        
+        console.log('🔍 Loading responses for background_survey...');
+        const saved = await sessionManager.loadResponses('background_survey');
+        console.log('📋 Loaded saved data:', saved);
+        
+        if (saved && Object.keys(saved).length > 0) {
+          console.log('✅ Restoring form with saved data');
+          // Create new object with saved values merged with defaults
+          const restoredValues = {
+            age: saved.age || "",
+            gender: saved.gender || "",
+            education: saved.education || "",
+            employment: saved.employment || "",
+            nationality: saved.nationality || "",
+            country: saved.country || "",
+            experience_scale_q7: saved.experience_scale_q7 || "",
+            familiarity_scale_q8: saved.familiarity_scale_q8 || "",
+            search_frequency: saved.search_frequency || ""
+          };
+          
+          // Reset form with restored values
+          form.reset(restoredValues);
+          console.log('📊 Form restored with values:', restoredValues);
+        } else {
+          console.log('📭 No saved data found, starting with empty form');
+        }
+      } catch (error) {
+        console.error('❌ Error loading saved responses:', error);
       }
     };
-    loadSavedData();
+
+    loadAndRestoreData();
   }, [form]);
 
-  // Save form data whenever form values change (retain answers for navigation)
+  // Use the response persistence hook with auto-save enabled
+  const { saveResponses } = useResponsePersistence(form, 'background_survey', {
+    autosave: true,
+    debounceMs: 1000 // Save 1 second after user stops typing/selecting
+  });
+
+  // Track when auto-save occurs by watching form values
   useEffect(() => {
-    const subscription = form.watch(async (value) => {
-      // Save to both localStorage and sessionManager for robust answer retention
-      localStorage.setItem('background_survey_data', JSON.stringify(value));
-      const participantId = localStorage.getItem('participant_id');
-      if (participantId) {
-        await sessionManager.savePage('background_survey', value);
-      }
+    const subscription = form.watch(() => {
+      // Update last saved time when form changes (auto-save will trigger)
+      setTimeout(() => {
+        setLastSaved(new Date());
+      }, 1200); // Slightly after the debounce delay
     });
+
     return () => subscription.unsubscribe();
   }, [form]);
+
+  // Ensure session is initialized when component mounts
+  useEffect(() => {
+    const initializeSession = async () => {
+      let participantId = sessionManager.getParticipantId();
+      
+      // If no participant ID exists, create one
+      if (!participantId) {
+        console.log('BackgroundSurvey: No participant ID found, creating new session');
+        participantId = sessionManager.createNewSession();
+        console.log('BackgroundSurvey: Created new participant ID:', participantId);
+      } else {
+        console.log('BackgroundSurvey: Using existing participant ID:', participantId);
+      }
+    };
+    
+    initializeSession();
+  }, []);
+
+  // Manual save function that we can call explicitly
+  const handleSaveResponses = async (formData: any) => {
+    try {
+      const participantId = sessionManager.getParticipantId();
+      if (!participantId) {
+        console.error('No participant ID for saving');
+        return;
+      }
+
+      console.log('💾 [MANUAL SAVE] Saving responses:', formData);
+      await sessionManager.saveResponses('background_survey', formData);
+      console.log('✅ [MANUAL SAVE] Responses saved successfully');
+      setLastSaved(new Date());
+    } catch (error) {
+      console.error('❌ [MANUAL SAVE] Failed to save:', error);
+    }
+  };
+
   const onSubmit = async (data: SurveyForm) => {
     console.log('BackgroundSurvey: onSubmit called with data:', data);
     setIsSubmitting(true);
     try {
+      // Save responses locally first for persistence
+      await sessionManager.saveResponses('background_survey', data);
+      
       // Use existing participant ID from session (should be set from Welcome page)
       const participant_id = sessionManager.getParticipantId();
       if (!participant_id) {
@@ -113,7 +185,8 @@ export default function BackgroundSurvey() {
 
       console.log('BackgroundSurvey: submission successful, navigating to /task-instructions');
       // Clear saved form data after successful submission
-      localStorage.removeItem('background_survey_data');
+      sessionManager.clearResponses('background_survey');
+      setLastSaved(null); // Clear the auto-save indicator
       navigate('/task-instructions');
     } catch (error: any) {
       console.error('BackgroundSurvey: Error submitting survey:', error);
@@ -123,7 +196,7 @@ export default function BackgroundSurvey() {
       setIsSubmitting(false);
     }
   };
-  
+  // ...existing code...
   return (
     <div className="min-h-screen relative bg-background py-8 px-6 md:px-8 lg:px-12"
       style={{
@@ -134,13 +207,20 @@ export default function BackgroundSurvey() {
       }}>
       {/* Background overlay for better text readability */}
       <div className="absolute inset-0 bg-black bg-opacity-20"></div>
-      
+
       <div className="max-w-4xl mx-auto relative z-10">
         <div className="bg-white bg-opacity-95 backdrop-blur-sm shadow-lg p-8 md:p-12 lg:p-16 rounded-lg">
           <h1 className="text-2xl font-bold text-center mb-8 text-foreground">
             Your Personal Background
           </h1>
-          
+
+          {/* Auto-save status indicator */}
+          {lastSaved && (
+            <div className="text-sm text-green-600 text-center mb-4">
+              ✅ Responses auto-saved at {lastSaved.toLocaleTimeString()}
+            </div>
+          )}
+
           {/* Information Box with Person Emoji */}
           <div className="border border-blue-200 rounded-lg p-4 mb-8 bg-sky-100">
             <div className="flex items-start gap-3">
@@ -163,7 +243,13 @@ export default function BackgroundSurvey() {
                       1. What is your age group? <span className="text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
-                      <Select onValueChange={field.onChange} value={field.value}>
+                      <Select onValueChange={(value) => {
+                        field.onChange(value);
+                        // Trigger manual save after selection
+                        setTimeout(() => {
+                          handleSaveResponses(form.getValues());
+                        }, 100);
+                      }} value={field.value}>
                         <SelectTrigger>
                           <SelectValue placeholder="Select your age group" />
                         </SelectTrigger>
@@ -190,7 +276,12 @@ export default function BackgroundSurvey() {
                       2. What is your gender? <span className="text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
-                      <Select onValueChange={field.onChange} value={field.value}>
+                      <Select onValueChange={(value) => {
+                        field.onChange(value);
+                        setTimeout(() => {
+                          handleSaveResponses(form.getValues());
+                        }, 100);
+                      }} value={field.value}>
                         <SelectTrigger>
                           <SelectValue placeholder="Select your gender" />
                         </SelectTrigger>
@@ -215,7 +306,12 @@ export default function BackgroundSurvey() {
                       3. What is your highest level of education? <span className="text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
-                      <Select onValueChange={field.onChange} value={field.value}>
+                      <Select onValueChange={(value) => {
+                        field.onChange(value);
+                        setTimeout(() => {
+                          handleSaveResponses(form.getValues());
+                        }, 100);
+                      }} value={field.value}>
                         <SelectTrigger>
                           <SelectValue placeholder="Select education level" />
                         </SelectTrigger>
@@ -240,7 +336,12 @@ export default function BackgroundSurvey() {
                       4. What is your current employment status? <span className="text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
-                      <Select onValueChange={field.onChange} value={field.value}>
+                      <Select onValueChange={(value) => {
+                        field.onChange(value);
+                        setTimeout(() => {
+                          handleSaveResponses(form.getValues());
+                        }, 100);
+                      }} value={field.value}>
                         <SelectTrigger>
                           <SelectValue placeholder="Select employment status" />
                         </SelectTrigger>
@@ -266,7 +367,14 @@ export default function BackgroundSurvey() {
                       5. What is your nationality? <span className="text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="" className="border-b border-t-0 border-l-0 border-r-0 rounded-none" />
+                      <Input {...field} 
+                        placeholder="" 
+                        className="border-b border-t-0 border-l-0 border-r-0 rounded-none"
+                        onBlur={(e) => {
+                          field.onBlur(e);
+                          handleSaveResponses(form.getValues());
+                        }}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>} />
@@ -281,7 +389,14 @@ export default function BackgroundSurvey() {
                       6. What is your current country of residence? <span className="text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="" className="border-b border-t-0 border-l-0 border-r-0 rounded-none" />
+                      <Input {...field} 
+                        placeholder="" 
+                        className="border-b border-t-0 border-l-0 border-r-0 rounded-none"
+                        onBlur={(e) => {
+                          field.onBlur(e);
+                          handleSaveResponses(form.getValues());
+                        }}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>} />
@@ -309,7 +424,10 @@ export default function BackgroundSurvey() {
                                 name="experience_scale_q7" 
                                 value={value.toString()} 
                                 checked={field.value === value.toString()} 
-                                onChange={field.onChange} 
+                                onChange={(e) => {
+                                  field.onChange(e);
+                                  handleSaveResponses(form.getValues());
+                                }}
                                 className="mb-1 w-4 h-4" 
                                 id={`q7-${value}`}
                               />
@@ -350,7 +468,10 @@ export default function BackgroundSurvey() {
                                 name="familiarity_scale_q8" 
                                 value={value.toString()} 
                                 checked={field.value === value.toString()} 
-                                onChange={field.onChange} 
+                                onChange={(e) => {
+                                  field.onChange(e);
+                                  handleSaveResponses(form.getValues());
+                                }}
                                 className="mb-1 w-4 h-4" 
                                 id={`q8-${value}`}
                               />
@@ -378,7 +499,12 @@ export default function BackgroundSurvey() {
                       9. On average, how often do you use AI chatbots per week? <span className="text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
-                      <Select onValueChange={field.onChange} value={field.value}>
+                      <Select onValueChange={(value) => {
+                        field.onChange(value);
+                        setTimeout(() => {
+                          handleSaveResponses(form.getValues());
+                        }, 100);
+                      }} value={field.value}>
                         <SelectTrigger>
                           <SelectValue placeholder="Select frequency" />
                         </SelectTrigger>
@@ -401,18 +527,33 @@ export default function BackgroundSurvey() {
                   type="button" 
                   variant="outline" 
                   onClick={async () => {
-                    const values = form.getValues();
-                    const participantId = localStorage.getItem('participant_id');
-                    if (participantId) {
-                      await sessionManager.savePage('background_survey', values);
+                    try {
+                      const values = form.getValues();
+                      console.log('💾 [SAVE] Form values to save:', values);
+                      
+                      // Ensure responses are saved before navigation
+                      await sessionManager.saveResponses('background_survey', values);
+                      console.log('💾 [SAVE] Responses saved successfully before navigation');
+                      
+                      // Small delay to ensure save completes
+                      setTimeout(() => {
+                        navigate('/');
+                      }, 100);
+                    } catch (error) {
+                      console.error('❌ [SAVE] Failed to save responses:', error);
+                      // Navigate anyway to avoid blocking user
+                      navigate('/');
                     }
-                    navigate('/');
                   }} 
                   className="px-8 py-2 text-sm font-medium border-2"
                 >
                   Previous Page
                 </Button>
-                <Button type="submit" disabled={isSubmitting} className="px-8 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
+                <Button 
+                  type="submit"
+                  disabled={isSubmitting} 
+                  className="px-8 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
+                >
                   {isSubmitting ? "Loading..." : "Next Page"}
                 </Button>
               </div>

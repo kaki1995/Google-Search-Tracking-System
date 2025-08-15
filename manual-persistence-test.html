@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Manual Persistence Test</title>
+</head>
+<body>
+    <h1>Manual Response Persistence Test</h1>
+    <button onclick="saveTestData()">Save Test Data</button>
+    <button onclick="checkData()">Check Data</button>
+    <button onclick="clearData()">Clear Data</button>
+    <div id="output"></div>
+
+    <script>
+        const output = document.getElementById('output');
+        
+        function log(message) {
+            console.log(message);
+            output.innerHTML += '<p>' + message + '</p>';
+        }
+
+        function saveTestData() {
+            output.innerHTML = '';
+            log('=== Saving Test Data ===');
+            
+            const participantId = '12345678-1234-1234-1234-123456789012';
+            
+            // Set participant ID
+            localStorage.setItem('participant_id', participantId);
+            log('✅ Set participant ID: ' + participantId);
+            
+            // Create test background survey responses
+            const testResponses = {
+                age: "25-34",
+                gender: "male", 
+                education: "bachelors",
+                employment: "full-time",
+                nationality: "US",
+                country: "US",
+                experience_scale_q7: "4",
+                familiarity_scale_q8: "3",
+                search_frequency: "daily"
+            };
+            
+            // Save using sessionManager format
+            const saveData = {
+                data: testResponses,
+                timestamp: new Date().toISOString(),
+                participantId: participantId
+            };
+            
+            localStorage.setItem('background_survey_responses', JSON.stringify(saveData));
+            log('✅ Saved background survey responses');
+            log('Data: ' + JSON.stringify(testResponses, null, 2));
+        }
+
+        function checkData() {
+            output.innerHTML = '';
+            log('=== Checking Stored Data ===');
+            
+            const participantId = localStorage.getItem('participant_id');
+            log('Participant ID: ' + participantId);
+            
+            const responses = localStorage.getItem('background_survey_responses');
+            if (responses) {
+                const parsed = JSON.parse(responses);
+                log('Background Survey Data Found:');
+                log(JSON.stringify(parsed.data, null, 2));
+            } else {
+                log('❌ No background survey data found');
+            }
+        }
+
+        function clearData() {
+            localStorage.removeItem('participant_id');
+            localStorage.removeItem('background_survey_responses');
+            log('🗑️ Cleared all test data');
+        }
+        
+        // Auto-check on load
+        checkData();
+    </script>
+</body>
+</html>

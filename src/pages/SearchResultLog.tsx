@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,7 @@ import { FormControl, FormField, FormItem, FormLabel, FormMessage, Form } from "
 import { Textarea } from "@/components/ui/textarea";
 import { sessionManager } from "@/lib/sessionManager";
 import { toast } from "@/hooks/use-toast";
+import useResponsePersistence from "@/hooks/useResponsePersistence";
 
 interface SearchResultLogForm {
   q11_answer: string;
@@ -29,46 +30,16 @@ export default function SearchResultLog() {
     }
   });
 
-  // Load saved form data on component mount
-  useEffect(() => {
-    const loadSavedData = async () => {
-      // Try to load from sessionManager first
-      const savedData = await sessionManager.loadPage('search_result_log');
-      if (savedData) {
-        form.reset(savedData);
-      } else {
-        // Fallback to localStorage
-        const localData = localStorage.getItem('search_result_log_data');
-        if (localData) {
-          try {
-            const parsedData = JSON.parse(localData);
-            form.reset(parsedData);
-          } catch (error) {
-            console.error('Error parsing saved search result log data:', error);
-          }
-        }
-      }
-    };
-    loadSavedData();
-  }, [form]);
+  // Use the enhanced response persistence hook
+  const { saveResponses } = useResponsePersistence(form, 'search_result_log');
 
-  // Save form data whenever form values change
-  useEffect(() => {
-    const subscription = form.watch(async (value) => {
-      // Save to both localStorage and sessionManager
-      localStorage.setItem('search_result_log_data', JSON.stringify(value));
-      const participantId = localStorage.getItem('participant_id');
-      if (participantId) {
-        await sessionManager.savePage('search_result_log', value);
-      }
-    });
-    return () => subscription.unsubscribe();
-  }, [form]);
+  // Use the enhanced response persistence hook
+  const { saveResponses } = useResponsePersistence(form, 'search_result_log');
 
   const handlePrevious = async () => {
     // Save current form data
     const values = form.getValues();
-    await sessionManager.savePage('search_result_log', values);
+    await saveResponses(values);
     navigate('/search-interface');
   };
 
@@ -76,7 +47,7 @@ export default function SearchResultLog() {
     setIsSubmitting(true);
     try {
       // Save current form data
-      await sessionManager.savePage('search_result_log', data);
+      await saveResponses(data);
       
       // Save to search_result_log table
       const success = await sessionManager.saveResultLog(
@@ -92,7 +63,7 @@ export default function SearchResultLog() {
       }
 
       // Clear saved form data after successful submission
-      localStorage.removeItem('search_result_log_data');
+      sessionManager.clearResponses('search_result_log');
       navigate('/post-task-survey');
     } catch (error: any) {
       console.error('Error submitting search result log:', error);

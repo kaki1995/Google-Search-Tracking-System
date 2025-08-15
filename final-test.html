@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Final Persistence Test</title>
+</head>
+<body>
+    <h1>Final Response Persistence Test</h1>
+    
+    <h2>Step 1: Setup test data</h2>
+    <button onclick="setupData()">Setup Test Data</button>
+    
+    <h2>Step 2: Test in app</h2>
+    <button onclick="openApp()">Open App & Test</button>
+    
+    <h2>Instructions:</h2>
+    <ol>
+        <li>Click "Setup Test Data" above</li>
+        <li>Click "Open App & Test" to open the app</li>
+        <li>Navigate: Welcome → Background Survey</li>
+        <li>Check the browser console (F12) for debug messages</li>
+        <li>Fill out a few fields manually</li>
+        <li>Go to Task Instructions</li>
+        <li>Click "Previous Page" to return</li>
+        <li>Check if your manually entered data is restored</li>
+    </ol>
+    
+    <div id="output"></div>
+
+    <script>
+        function log(message) {
+            document.getElementById('output').innerHTML += '<div>' + message + '</div>';
+            console.log(message);
+        }
+
+        function setupData() {
+            document.getElementById('output').innerHTML = '';
+            
+            // Clear existing data
+            localStorage.clear();
+            
+            // Create participant ID
+            const participantId = crypto.randomUUID();
+            localStorage.setItem('participant_id', participantId);
+            log('✅ Set participant ID: ' + participantId);
+            
+            // Create test responses
+            const testData = {
+                age: "35-44",
+                gender: "male",
+                education: "bachelors"
+            };
+            
+            const saveData = {
+                data: testData,
+                timestamp: new Date().toISOString(),
+                participantId: participantId
+            };
+            
+            localStorage.setItem('background_survey_responses', JSON.stringify(saveData));
+            log('✅ Saved test responses: ' + JSON.stringify(testData));
+            log('');
+            log('🎯 Test data is ready!');
+        }
+
+        function openApp() {
+            log('🚀 Opening app - check console for debug messages!');
+            window.open('http://localhost:8083', '_blank');
+        }
+    </script>
+</body>
+</html>

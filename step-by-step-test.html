@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Step-by-Step Response Persistence Test</title>
+</head>
+<body>
+    <h1>Step-by-Step Response Persistence Test</h1>
+    
+    <div style="border: 1px solid #ccc; padding: 20px; margin: 20px 0;">
+        <h2>Step 1: Clear Everything</h2>
+        <button onclick="clearEverything()">Clear All Data</button>
+        <div id="clear-output"></div>
+    </div>
+    
+    <div style="border: 1px solid #ccc; padding: 20px; margin: 20px 0;">
+        <h2>Step 2: Setup Fresh Test Data</h2>
+        <button onclick="setupFreshData()">Setup Fresh Data</button>
+        <div id="setup-output"></div>
+    </div>
+    
+    <div style="border: 1px solid #ccc; padding: 20px; margin: 20px 0;">
+        <h2>Step 3: Test the App</h2>
+        <button onclick="openApp()">Open App</button>
+        <p><strong>Instructions:</strong></p>
+        <ol>
+            <li>Click the button above to open the app</li>
+            <li>Go to Welcome → Background Survey</li>
+            <li>Check if form is pre-filled (should show: 25-34, female, masters, etc.)</li>
+            <li>If not pre-filled, fill out a few fields manually</li>
+            <li>Go to Task Instructions</li>
+            <li>Click "Previous Page" to return to Background Survey</li>
+            <li>Check if your data is now restored</li>
+        </ol>
+    </div>
+    
+    <div style="border: 1px solid #ccc; padding: 20px; margin: 20px 0;">
+        <h2>Step 4: Check Current Data</h2>
+        <button onclick="checkCurrentData()">Check Current Data</button>
+        <div id="data-output"></div>
+    </div>
+
+    <script>
+        function log(containerId, message) {
+            const container = document.getElementById(containerId);
+            console.log(message);
+            container.innerHTML += '<div>' + message + '</div>';
+        }
+
+        function clearEverything() {
+            const container = document.getElementById('clear-output');
+            container.innerHTML = '';
+            localStorage.clear();
+            log('clear-output', '🗑️ All localStorage cleared');
+        }
+
+        function setupFreshData() {
+            const container = document.getElementById('setup-output');
+            container.innerHTML = '';
+            
+            // Create participant ID
+            const participantId = crypto.randomUUID();
+            localStorage.setItem('participant_id', participantId);
+            log('setup-output', '✅ Created participant ID: ' + participantId);
+            
+            // Create test responses
+            const testData = {
+                age: "25-34",
+                gender: "female",
+                education: "masters",
+                employment: "full-time",
+                nationality: "Canada",
+                country: "Canada",
+                experience_scale_q7: "4",
+                familiarity_scale_q8: "3",
+                search_frequency: "daily"
+            };
+            
+            const saveData = {
+                data: testData,
+                timestamp: new Date().toISOString(),
+                participantId: participantId
+            };
+            
+            localStorage.setItem('background_survey_responses', JSON.stringify(saveData));
+            log('setup-output', '✅ Saved background survey responses');
+            log('setup-output', '📋 Data: ' + JSON.stringify(testData, null, 2));
+        }
+
+        function openApp() {
+            window.open('http://localhost:8083', '_blank');
+        }
+
+        function checkCurrentData() {
+            const container = document.getElementById('data-output');
+            container.innerHTML = '';
+            
+            log('data-output', '=== Current localStorage ===');
+            
+            const participantId = localStorage.getItem('participant_id');
+            log('data-output', 'Participant ID: ' + (participantId || 'NOT SET'));
+            
+            const responses = localStorage.getItem('background_survey_responses');
+            if (responses) {
+                const parsed = JSON.parse(responses);
+                log('data-output', 'Background Survey Data:');
+                log('data-output', '  Participant ID: ' + parsed.participantId);
+                log('data-output', '  Data: ' + JSON.stringify(parsed.data, null, 2));
+            } else {
+                log('data-output', 'Background Survey Data: NOT SET');
+            }
+            
+            // Show all keys
+            log('data-output', '');
+            log('data-output', 'All localStorage keys:');
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                const value = localStorage.getItem(key);
+                log('data-output', '  ' + key + ': ' + (value.length > 100 ? value.substring(0, 100) + '...' : value));
+            }
+        }
+
+        // Auto-check on load
+        checkCurrentData();
+    </script>
+</body>
+</html>

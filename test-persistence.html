@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Persistence Test</title>
+</head>
+<body>
+    <h1>localStorage Persistence Test</h1>
+    <button onclick="testSave()">Test Save</button>
+    <button onclick="testLoad()">Test Load</button>
+    <button onclick="showAll()">Show All Storage</button>
+    <div id="output"></div>
+
+    <script>
+        function log(message) {
+            document.getElementById('output').innerHTML += '<div>' + message + '</div>';
+            console.log(message);
+        }
+
+        function testSave() {
+            document.getElementById('output').innerHTML = '';
+            log('=== Testing Save ===');
+            
+            const participantId = 'test-123';
+            const testData = { age: '25-34', gender: 'male' };
+            
+            localStorage.setItem('participant_id', participantId);
+            
+            const storageKey = 'background_survey_responses';
+            const saveData = {
+                data: testData,
+                timestamp: new Date().toISOString(),
+                participantId: participantId
+            };
+            
+            localStorage.setItem(storageKey, JSON.stringify(saveData));
+            log('✅ Saved: ' + JSON.stringify(saveData));
+        }
+
+        function testLoad() {
+            log('=== Testing Load ===');
+            
+            const participantId = localStorage.getItem('participant_id');
+            log('Participant ID: ' + participantId);
+            
+            const storageKey = 'background_survey_responses';
+            const savedData = localStorage.getItem(storageKey);
+            
+            if (savedData) {
+                const parsed = JSON.parse(savedData);
+                log('Found data: ' + JSON.stringify(parsed));
+                
+                if (parsed.participantId === participantId) {
+                    log('✅ Participant ID matches - data is valid');
+                    log('✅ Form data: ' + JSON.stringify(parsed.data));
+                } else {
+                    log('❌ Participant ID mismatch');
+                }
+            } else {
+                log('❌ No saved data found');
+            }
+        }
+
+        function showAll() {
+            log('=== All localStorage ===');
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                const value = localStorage.getItem(key);
+                log(key + ': ' + value);
+            }
+        }
+    </script>
+</body>
+</html>

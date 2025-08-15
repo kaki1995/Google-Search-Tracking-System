@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Response Persistence</title>
+</head>
+<body>
+    <h1>Response Persistence Test</h1>
+    <div id="output"></div>
+
+    <script>
+        const output = document.getElementById('output');
+        
+        // Function to log to both console and page
+        function log(message) {
+            console.log(message);
+            output.innerHTML += '<p>' + message + '</p>';
+        }
+
+        // Test localStorage directly
+        function testLocalStorage() {
+            log('=== Testing localStorage directly ===');
+            
+            // Simulate saving background survey data
+            const testData = {
+                age: "25-34",
+                gender: "prefer-not-to-say",
+                education: "bachelors",
+                employment: "full-time",
+                nationality: "US",
+                country: "US"
+            };
+            
+            const saveData = {
+                data: testData,
+                timestamp: new Date().toISOString(),
+                participantId: "test-participant-123"
+            };
+            
+            localStorage.setItem('background_survey_responses', JSON.stringify(saveData));
+            log('✅ Saved test data to localStorage');
+            
+            // Try to retrieve it
+            const retrieved = localStorage.getItem('background_survey_responses');
+            if (retrieved) {
+                const parsed = JSON.parse(retrieved);
+                log('✅ Retrieved data: ' + JSON.stringify(parsed.data, null, 2));
+            } else {
+                log('❌ Failed to retrieve data');
+            }
+        }
+
+        // Check what's currently in localStorage
+        function checkExistingData() {
+            log('=== Checking existing localStorage ===');
+            
+            const keys = [
+                'background_survey_responses',
+                'background_survey_data',
+                'participant_id',
+                'google_search_session'
+            ];
+            
+            keys.forEach(key => {
+                const value = localStorage.getItem(key);
+                if (value) {
+                    log(`${key}: ${value}`);
+                } else {
+                    log(`${key}: (empty)`);
+                }
+            });
+        }
+
+        // Run tests
+        checkExistingData();
+        testLocalStorage();
+        
+        log('=== Test completed ===');
+        log('Now go to Background Survey, fill out some fields, then come back to see if data persists');
+    </script>
+</body>
+</html>

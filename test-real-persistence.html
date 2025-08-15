@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Response Persistence in Real App</title>
+</head>
+<body>
+    <h1>Test Background Survey Persistence</h1>
+    
+    <h2>Step 1: Set up test data</h2>
+    <button onclick="setupTestData()">Setup Test Data</button>
+    
+    <h2>Step 2: Check current data</h2>
+    <button onclick="checkCurrentData()">Check Current Data</button>
+    
+    <h2>Step 3: Test app</h2>
+    <p><a href="http://localhost:8083" target="_blank">Open App in New Tab</a></p>
+    <p>Navigate to: Welcome → Background Survey</p>
+    <p>The form should be pre-filled with test data</p>
+    
+    <div id="output"></div>
+
+    <script>
+        const output = document.getElementById('output');
+        
+        function log(message) {
+            console.log(message);
+            output.innerHTML += '<p>' + message + '</p>';
+        }
+
+        function setupTestData() {
+            output.innerHTML = '';
+            log('=== Setting up test data ===');
+            
+            // Generate a proper participant ID
+            const participantId = 'test-' + Math.random().toString(36).substring(2, 15);
+            localStorage.setItem('participant_id', participantId);
+            log('✅ Set participant ID: ' + participantId);
+            
+            // Save main session data
+            const sessionData = {
+                participantId: participantId,
+                sessionId: null,
+                sessionTimingId: null,
+                updatedAt: new Date().toISOString()
+            };
+            localStorage.setItem('google_search_session', JSON.stringify(sessionData));
+            log('✅ Set session data');
+            
+            // Create test background survey responses
+            const testResponses = {
+                age: "25-34",
+                gender: "male", 
+                education: "bachelors",
+                employment: "full-time",
+                nationality: "US",
+                country: "US",
+                experience_scale_q7: "4",
+                familiarity_scale_q8: "3",
+                search_frequency: "daily"
+            };
+            
+            // Save using correct sessionManager format
+            const saveData = {
+                data: testResponses,
+                timestamp: new Date().toISOString(),
+                participantId: participantId
+            };
+            
+            localStorage.setItem('background_survey_responses', JSON.stringify(saveData));
+            log('✅ Saved background survey responses');
+            log('Data saved: ' + JSON.stringify(testResponses, null, 2));
+            log('');
+            log('Now go to the app and navigate to Background Survey!');
+        }
+
+        function checkCurrentData() {
+            output.innerHTML = '';
+            log('=== Current localStorage contents ===');
+            
+            const participantId = localStorage.getItem('participant_id');
+            log('Participant ID: ' + (participantId || 'NOT SET'));
+            
+            const session = localStorage.getItem('google_search_session');
+            if (session) {
+                log('Session data: ' + session);
+            } else {
+                log('Session data: NOT SET');
+            }
+            
+            const responses = localStorage.getItem('background_survey_responses');
+            if (responses) {
+                const parsed = JSON.parse(responses);
+                log('Background Survey Responses:');
+                log('  Participant ID: ' + parsed.participantId);
+                log('  Timestamp: ' + parsed.timestamp);
+                log('  Data: ' + JSON.stringify(parsed.data, null, 2));
+            } else {
+                log('Background Survey Responses: NOT SET');
+            }
+            
+            log('');
+            log('All localStorage keys:');
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                log('  ' + key + ': ' + localStorage.getItem(key));
+            }
+        }
+        
+        // Auto-check on load
+        checkCurrentData();
+    </script>
+</body>
+</html>

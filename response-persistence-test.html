@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Response Persistence Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .test-section h3 { margin-top: 0; }
+        button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; color: #155724; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; color: #721c24; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; color: #0c5460; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+        .clear-btn { background: #dc3545; }
+        .clear-btn:hover { background: #c82333; }
+        input, textarea, select { width: 100%; padding: 8px; margin: 5px 0; border: 1px solid #ddd; border-radius: 3px; }
+        .form-group { margin: 10px 0; }
+        label { font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Response Persistence Test</h1>
+        <p>This page tests the enhanced response persistence system for the study forms.</p>
+
+        <div class="test-section">
+            <h3>Participant Session Setup</h3>
+            <button onclick="setupTestSession()">🔧 Setup Test Session</button>
+            <button onclick="clearTestSession()" class="clear-btn">🗑️ Clear Test Session</button>
+            <div id="sessionStatus"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>Background Survey Simulation</h3>
+            <form id="backgroundForm">
+                <div class="form-group">
+                    <label>Age Group:</label>
+                    <select name="age" onchange="saveFormData('background_survey')">
+                        <option value="">Select age group</option>
+                        <option value="18-24">18-24</option>
+                        <option value="25-34">25-34</option>
+                        <option value="35-44">35-44</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Gender:</label>
+                    <select name="gender" onchange="saveFormData('background_survey')">
+                        <option value="">Select gender</option>
+                        <option value="female">Female</option>
+                        <option value="male">Male</option>
+                        <option value="non-binary">Non-binary</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Education:</label>
+                    <select name="education" onchange="saveFormData('background_survey')">
+                        <option value="">Select education level</option>
+                        <option value="high-school">High School</option>
+                        <option value="bachelor">Bachelor's Degree</option>
+                        <option value="master">Master's Degree</option>
+                    </select>
+                </div>
+            </form>
+            <button onclick="loadFormData('background_survey')">📋 Load Saved Data</button>
+            <button onclick="clearFormData('background_survey')" class="clear-btn">🗑️ Clear Data</button>
+        </div>
+
+        <div class="test-section">
+            <h3>Search Result Log Simulation</h3>
+            <form id="searchResultForm">
+                <div class="form-group">
+                    <label>Q11 - What specific search terms did you use?</label>
+                    <textarea name="q11_answer" rows="3" onchange="saveFormData('search_result_log')" placeholder="Enter your search terms..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Q12 - How many search results did you review?</label>
+                    <select name="q12_answer" onchange="saveFormData('search_result_log')">
+                        <option value="">Select number</option>
+                        <option value="1-3">1-3 results</option>
+                        <option value="4-6">4-6 results</option>
+                        <option value="7-10">7-10 results</option>
+                        <option value="more-than-10">More than 10 results</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Q13 - Did you find the information you were looking for?</label>
+                    <select name="q13_answer" onchange="saveFormData('search_result_log')">
+                        <option value="">Select answer</option>
+                        <option value="completely">Yes, completely</option>
+                        <option value="partially">Yes, partially</option>
+                        <option value="not-really">Not really</option>
+                        <option value="not-at-all">Not at all</option>
+                    </select>
+                </div>
+            </form>
+            <button onclick="loadFormData('search_result_log')">📋 Load Saved Data</button>
+            <button onclick="clearFormData('search_result_log')" class="clear-btn">🗑️ Clear Data</button>
+        </div>
+
+        <div class="test-section">
+            <h3>Navigation Test</h3>
+            <p>Simulate user navigation back and forth:</p>
+            <button onclick="simulateNavigation()">🔄 Test Navigation Flow</button>
+            <div id="navigationResults"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>Persistence Summary</h3>
+            <button onclick="showPersistenceSummary()">📊 Show All Saved Data</button>
+            <div id="persistenceSummary"></div>
+        </div>
+    </div>
+
+    <script>
+        // Mock sessionManager-like functionality for testing
+        const testSessionManager = {
+            participantId: null,
+            
+            generateUUID() {
+                return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                    const r = Math.random() * 16 | 0;
+                    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                    return v.toString(16);
+                });
+            },
+
+            setupTestSession() {
+                this.participantId = this.generateUUID();
+                localStorage.setItem('participant_id', this.participantId);
+                return this.participantId;
+            },
+
+            clearTestSession() {
+                this.participantId = null;
+                localStorage.removeItem('participant_id');
+                this.clearAllResponses();
+            },
+
+            saveResponses(pageId, responses) {
+                const storageKey = `${pageId}_responses`;
+                localStorage.setItem(storageKey, JSON.stringify({
+                    data: responses,
+                    timestamp: new Date().toISOString(),
+                    participantId: this.participantId
+                }));
+                console.log(`💾 Saved responses for ${pageId}:`, responses);
+            },
+
+            loadResponses(pageId) {
+                const storageKey = `${pageId}_responses`;
+                const savedData = localStorage.getItem(storageKey);
+                
+                if (savedData) {
+                    try {
+                        const parsed = JSON.parse(savedData);
+                        if (parsed.participantId === this.participantId) {
+                            console.log(`📋 Loaded responses for ${pageId}:`, parsed.data);
+                            return parsed.data;
+                        }
+                    } catch (e) {
+                        console.error('Error parsing saved data:', e);
+                    }
+                }
+                return null;
+            },
+
+            clearResponses(pageId) {
+                const storageKey = `${pageId}_responses`;
+                localStorage.removeItem(storageKey);
+                console.log(`🗑️ Cleared responses for ${pageId}`);
+            },
+
+            clearAllResponses() {
+                const pages = ['background_survey', 'task_instruction', 'search_result_log', 'post_task_survey'];
+                pages.forEach(pageId => {
+                    this.clearResponses(pageId);
+                });
+            },
+
+            hasResponses(pageId) {
+                const storageKey = `${pageId}_responses`;
+                const savedData = localStorage.getItem(storageKey);
+                
+                if (savedData) {
+                    try {
+                        const parsed = JSON.parse(savedData);
+                        return parsed.participantId === this.participantId && Object.keys(parsed.data || {}).length > 0;
+                    } catch {
+                        return false;
+                    }
+                }
+                return false;
+            },
+
+            getResponsesSummary() {
+                const pages = ['background_survey', 'task_instruction', 'search_result_log', 'post_task_survey'];
+                const summary = {};
+                
+                pages.forEach(pageId => {
+                    const storageKey = `${pageId}_responses`;
+                    const savedData = localStorage.getItem(storageKey);
+                    
+                    if (savedData) {
+                        try {
+                            const parsed = JSON.parse(savedData);
+                            summary[pageId] = {
+                                hasData: Object.keys(parsed.data || {}).length > 0,
+                                timestamp: parsed.timestamp,
+                                participantId: parsed.participantId,
+                                data: parsed.data
+                            };
+                        } catch {
+                            summary[pageId] = { hasData: false, error: 'Invalid JSON' };
+                        }
+                    } else {
+                        summary[pageId] = { hasData: false };
+                    }
+                });
+                
+                return summary;
+            }
+        };
+
+        function setupTestSession() {
+            const participantId = testSessionManager.setupTestSession();
+            document.getElementById('sessionStatus').innerHTML = 
+                `<div class="success">✅ Test session created with participant ID: ${participantId}</div>`;
+        }
+
+        function clearTestSession() {
+            testSessionManager.clearTestSession();
+            document.getElementById('sessionStatus').innerHTML = 
+                '<div class="info">🗑️ Test session cleared</div>';
+            
+            // Clear all forms
+            document.getElementById('backgroundForm').reset();
+            document.getElementById('searchResultForm').reset();
+        }
+
+        function saveFormData(pageId) {
+            if (!testSessionManager.participantId) {
+                alert('Please setup a test session first!');
+                return;
+            }
+
+            const formId = pageId === 'background_survey' ? 'backgroundForm' : 'searchResultForm';
+            const form = document.getElementById(formId);
+            const formData = new FormData(form);
+            const responses = {};
+            
+            for (let [key, value] of formData.entries()) {
+                responses[key] = value;
+            }
+            
+            testSessionManager.saveResponses(pageId, responses);
+        }
+
+        function loadFormData(pageId) {
+            if (!testSessionManager.participantId) {
+                alert('Please setup a test session first!');
+                return;
+            }
+
+            const responses = testSessionManager.loadResponses(pageId);
+            if (responses) {
+                const formId = pageId === 'background_survey' ? 'backgroundForm' : 'searchResultForm';
+                const form = document.getElementById(formId);
+                
+                Object.entries(responses).forEach(([key, value]) => {
+                    const element = form.querySelector(`[name="${key}"]`);
+                    if (element) {
+                        element.value = value;
+                    }
+                });
+                
+                alert(`✅ Loaded saved data for ${pageId}`);
+            } else {
+                alert(`❌ No saved data found for ${pageId}`);
+            }
+        }
+
+        function clearFormData(pageId) {
+            testSessionManager.clearResponses(pageId);
+            
+            const formId = pageId === 'background_survey' ? 'backgroundForm' : 'searchResultForm';
+            document.getElementById(formId).reset();
+            
+            alert(`🗑️ Cleared data for ${pageId}`);
+        }
+
+        function simulateNavigation() {
+            if (!testSessionManager.participantId) {
+                alert('Please setup a test session first!');
+                return;
+            }
+
+            const resultsDiv = document.getElementById('navigationResults');
+            
+            // Simulate filling forms on different pages
+            console.log('🔄 Simulating navigation test...');
+            
+            // Page 1: Background Survey
+            testSessionManager.saveResponses('background_survey', {
+                age: '25-34',
+                gender: 'female',
+                education: 'bachelor'
+            });
+            
+            // Page 2: Task Instructions 
+            testSessionManager.saveResponses('task_instruction', {
+                budget_range: '100-300'
+            });
+            
+            // Page 3: Search Result Log
+            testSessionManager.saveResponses('search_result_log', {
+                q11_answer: 'wireless headphones bluetooth',
+                q12_answer: '4-6',
+                q13_answer: 'partially'
+            });
+            
+            // Simulate going back to background survey
+            const backgroundData = testSessionManager.loadResponses('background_survey');
+            
+            // Simulate modifying and saving again
+            testSessionManager.saveResponses('background_survey', {
+                ...backgroundData,
+                age: '35-44' // User changed their answer
+            });
+            
+            resultsDiv.innerHTML = `
+                <div class="success">
+                    <h4>✅ Navigation Test Complete</h4>
+                    <p>Simulated user filling forms, navigating back, modifying answers, and saving again.</p>
+                    <p>Check the persistence summary below to see the results.</p>
+                </div>
+            `;
+        }
+
+        function showPersistenceSummary() {
+            const summary = testSessionManager.getResponsesSummary();
+            const summaryDiv = document.getElementById('persistenceSummary');
+            
+            let html = '<h4>📊 Persistence Summary</h4>';
+            
+            Object.entries(summary).forEach(([pageId, data]) => {
+                html += `<div class="info">
+                    <h5>${pageId.replace('_', ' ').toUpperCase()}</h5>
+                    <p>Has Data: ${data.hasData ? '✅ Yes' : '❌ No'}</p>`;
+                
+                if (data.hasData) {
+                    html += `<p>Timestamp: ${new Date(data.timestamp).toLocaleString()}</p>`;
+                    html += `<p>Participant: ${data.participantId}</p>`;
+                    html += `<pre>${JSON.stringify(data.data, null, 2)}</pre>`;
+                }
+                
+                html += '</div>';
+            });
+            
+            summaryDiv.innerHTML = html;
+        }
+
+        // Initialize
+        window.onload = () => {
+            document.getElementById('sessionStatus').innerHTML = 
+                '<div class="info">📋 Please setup a test session to begin testing</div>';
+        };
+    </script>
+</body>
+</html>

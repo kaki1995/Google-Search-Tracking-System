@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,7 @@ import { FormControl, FormField, FormItem, FormLabel, FormMessage, Form } from "
 import { sessionManager } from "@/lib/sessionManager";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import useResponsePersistence from "@/hooks/useResponsePersistence";
 
 interface TaskInstructionForm {
   budget_range: string;
@@ -21,46 +22,13 @@ export default function TaskInstructions() {
     }
   });
 
-  // Load saved form data on component mount
-  useEffect(() => {
-    const loadSavedData = async () => {
-      // Try to load from sessionManager first
-      const savedData = await sessionManager.loadPage('task_instruction');
-      if (savedData) {
-        form.reset(savedData);
-      } else {
-        // Fallback to localStorage
-        const localData = localStorage.getItem('task_instruction_data');
-        if (localData) {
-          try {
-            const parsedData = JSON.parse(localData);
-            form.reset(parsedData);
-          } catch (error) {
-            console.error('Error parsing saved task instruction data:', error);
-          }
-        }
-      }
-    };
-    loadSavedData();
-  }, [form]);
-
-  // Save form data whenever form values change
-  useEffect(() => {
-    const subscription = form.watch(async (value) => {
-      // Save to both localStorage and sessionManager
-      localStorage.setItem('task_instruction_data', JSON.stringify(value));
-      const participantId = localStorage.getItem('participant_id');
-      if (participantId) {
-        await sessionManager.savePage('task_instruction', value);
-      }
-    });
-    return () => subscription.unsubscribe();
-  }, [form]);
+  // Use the enhanced response persistence hook
+  const { saveResponses } = useResponsePersistence(form, 'task_instruction');
 
   const handlePrevious = async () => {
     // Save current form data
     const values = form.getValues();
-    await sessionManager.savePage('task_instruction', values);
+    await saveResponses(values);
     navigate('/background-survey');
   };
 
@@ -68,7 +36,7 @@ export default function TaskInstructions() {
     setIsSubmitting(true);
     try {
       // Save current form data
-      await sessionManager.savePage('task_instruction', data);
+      await saveResponses(data);
 
       const participant_id = sessionManager.getParticipantId();
       if (!participant_id) {
@@ -88,7 +56,7 @@ export default function TaskInstructions() {
       }
 
       // Clear saved form data after successful submission
-      localStorage.removeItem('task_instruction_data');
+      sessionManager.clearResponses('task_instruction');
       navigate('/search-interface');
     } catch (error: any) {
       console.error('Error submitting task instruction:', error);

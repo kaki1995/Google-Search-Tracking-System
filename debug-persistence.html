@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Response Persistence</title>
+</head>
+<body>
+    <h1>Debug Response Persistence</h1>
+    <div id="debug-info"></div>
+    
+    <script>
+        // Check localStorage for any saved data
+        function debugLocalStorage() {
+            const debugDiv = document.getElementById('debug-info');
+            let output = '<h2>localStorage Contents:</h2><ul>';
+            
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                const value = localStorage.getItem(key);
+                output += `<li><strong>${key}:</strong> ${value}</li>`;
+            }
+            
+            output += '</ul>';
+            
+            // Check for session data specifically
+            const sessionData = localStorage.getItem('google_search_session');
+            if (sessionData) {
+                output += '<h2>Session Data:</h2><pre>' + JSON.stringify(JSON.parse(sessionData), null, 2) + '</pre>';
+            }
+            
+            // Check for response data
+            const responseKeys = ['background_survey_responses', 'post_task_survey_responses', 'search_result_log_responses'];
+            output += '<h2>Response Data:</h2>';
+            responseKeys.forEach(key => {
+                const data = localStorage.getItem(key);
+                if (data) {
+                    output += `<h3>${key}:</h3><pre>${JSON.stringify(JSON.parse(data), null, 2)}</pre>`;
+                } else {
+                    output += `<p>${key}: Not found</p>`;
+                }
+            });
+            
+            debugDiv.innerHTML = output;
+        }
+        
+        debugLocalStorage();
+        
+        // Refresh every 2 seconds to see live changes
+        setInterval(debugLocalStorage, 2000);
+    </script>
+</body>
+</html>

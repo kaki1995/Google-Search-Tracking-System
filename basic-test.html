@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Basic localStorage Test</title>
+</head>
+<body>
+    <h1>Basic localStorage Test</h1>
+    
+    <button onclick="saveTestData()">Save Test Data</button>
+    <button onclick="checkData()">Check Data</button>
+    <button onclick="clearData()">Clear Data</button>
+    <button onclick="openApp()">Open App</button>
+    
+    <div id="output"></div>
+
+    <script>
+        function log(message) {
+            document.getElementById('output').innerHTML += '<div>' + message + '</div>';
+            console.log(message);
+        }
+
+        function saveTestData() {
+            document.getElementById('output').innerHTML = '';
+            
+            // Save participant ID
+            localStorage.setItem('participant_id', 'test-123');
+            log('✅ Saved participant_id: test-123');
+            
+            // Save responses using exact same format as app
+            const responses = {
+                age: "25-34",
+                gender: "female",
+                education: "masters"
+            };
+            
+            const saveData = {
+                data: responses,
+                timestamp: new Date().toISOString(),
+                participantId: 'test-123'
+            };
+            
+            localStorage.setItem('background_survey_responses', JSON.stringify(saveData));
+            log('✅ Saved responses: ' + JSON.stringify(responses));
+        }
+
+        function checkData() {
+            document.getElementById('output').innerHTML = '';
+            
+            const pid = localStorage.getItem('participant_id');
+            log('Participant ID: ' + pid);
+            
+            const responses = localStorage.getItem('background_survey_responses');
+            if (responses) {
+                const parsed = JSON.parse(responses);
+                log('Responses found: ' + JSON.stringify(parsed.data));
+            } else {
+                log('❌ No responses found');
+            }
+        }
+
+        function clearData() {
+            localStorage.clear();
+            log('🗑️ Cleared all data');
+        }
+
+        function openApp() {
+            window.open('http://localhost:8083', '_blank');
+            log('🚀 Opened app - now go to Background Survey and check console!');
+        }
+    </script>
+</body>
+</html>
