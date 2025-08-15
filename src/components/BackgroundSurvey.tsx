@@ -214,12 +214,7 @@ export default function BackgroundSurvey() {
             Your Personal Background
           </h1>
 
-          {/* Auto-save status indicator */}
-          {lastSaved && (
-            <div className="text-sm text-green-600 text-center mb-4">
-              ✅ Responses auto-saved at {lastSaved.toLocaleTimeString()}
-            </div>
-          )}
+          {/* Auto-save status indicator removed as requested */}
 
           {/* Information Box with Person Emoji */}
           <div className="border border-blue-200 rounded-lg p-4 mb-8 bg-sky-100">
