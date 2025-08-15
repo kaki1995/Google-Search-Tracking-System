@@ -132,12 +132,11 @@ class SessionManager {
   }
 
   async confirmConsent(): Promise<string | null> {
-    if (!this.participantId) {
-      console.error('No participant ID for consent confirmation');
-      return null;
-    }
-
     try {
+      // Generate a fresh participant ID for each new session
+      this.participantId = this.generateSessionBasedParticipantId();
+      localStorage.setItem('participant_id', this.participantId);
+      
       // Clear local storage
       this.clearLocalAnswers();
       

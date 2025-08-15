@@ -95,7 +95,8 @@ export default function PostTaskSurvey() {
         return;
       }
 
-      // No blocking for attention check - just store the value
+      const att = Number(values.attention_check || 0);
+      // Remove blocking for attention check - just store the value
 
       const responses = {
         q16_familiarity: Number(values.topic_familiarity || 0),
@@ -104,7 +105,7 @@ export default function PostTaskSurvey() {
         q19_relevance_google: Number(values.google_relevance || 0),
         q20_trust: Number(values.google_trust || 0),
         q21_effectiveness: Number(values.tool_effectiveness || 0),
-        q22_attention_check: Number(values.attention_check || 0),
+        q22_attention_check: att,
         q23_duration: String(values.task_duration || ''),
         q24_additional_details: String(values.google_open_feedback || ''),
       };
