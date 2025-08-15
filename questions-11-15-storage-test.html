@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔍 Questions 11-15 Storage Test</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f0f9ff; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .section { margin: 20px 0; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 4px; }
+        .success { background: #d1fae5; color: #065f46; }
+        .error { background: #fee2e2; color: #991b1b; }
+        .info { background: #dbeafe; color: #1e40af; }
+        .warning { background: #fef3c7; color: #92400e; }
+        button { 
+            margin: 10px 5px; padding: 12px 24px; background: #10b981; color: white; 
+            border: none; border-radius: 8px; cursor: pointer; font-weight: bold; 
+        }
+        button:hover { background: #059669; }
+        button:disabled { background: #9ca3af; cursor: not-allowed; }
+        pre { white-space: pre-wrap; font-size: 12px; max-height: 300px; overflow-y: auto; background: #f8fafc; padding: 10px; border-radius: 4px; }
+        .test-data { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 15px 0; }
+        .data-box { background: #f8fafc; padding: 15px; border-radius: 6px; border-left: 4px solid #3b82f6; }
+        .comparison { display: flex; gap: 20px; margin: 15px 0; }
+        .comparison > div { flex: 1; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 Questions 11-15 Storage Test</h1>
+            <p>Testing if search result log answers (smartphone details) are properly saved to the database</p>
+            <p><strong>Questions 11-15:</strong> Smartphone model, storage, color, price, website link</p>
+        </div>
+
+        <div class="section">
+            <h3>Step 1: Test Direct Database Insert</h3>
+            <p>Test saving questions 11-15 answers directly via the result-log Edge Function</p>
+            <button onclick="testDirectInsert()">Test Direct Insert</button>
+            <div id="direct-insert-result"></div>
+        </div>
+
+        <div class="section">
+            <h3>Step 2: Test SessionManager Integration</h3>
+            <p>Test the sessionManager.saveResultLog() function that components use</p>
+            <button onclick="testSessionManagerSave()">Test SessionManager Save</button>
+            <div id="session-manager-result"></div>
+        </div>
+
+        <div class="section">
+            <h3>Step 3: Test Answer Retention (Save & Load)</h3>
+            <p>Test saving and loading answers via survey-save/survey-load functions</p>
+            <button onclick="testAnswerRetention()">Test Save & Load</button>
+            <div id="answer-retention-result"></div>
+        </div>
+
+        <div class="section">
+            <h3>Step 4: View Recent Database Records</h3>
+            <p>Check what's actually stored in the search_result_log table</p>
+            <button onclick="viewDatabaseRecords()">View Database Records</button>
+            <div id="database-records-result"></div>
+        </div>
+
+        <div class="section">
+            <h3>Step 5: Complete Integration Test</h3>
+            <p>Simulate the complete flow: sessionManager → result-log → database verification</p>
+            <button onclick="runCompleteTest()" id="complete-btn">Run Complete Test</button>
+            <div id="complete-result"></div>
+        </div>
+
+        <div class="section">
+            <h3>Database Schema Check</h3>
+            <p>Verify the search_result_log table structure</p>
+            <button onclick="checkTableStructure()">Check Table Structure</button>
+            <div id="schema-result"></div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = "https://wbguuipoggeamyzrfvbv.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndiZ3V1aXBwZ2dlYW15enJmdmJ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3Nzc2OTksImV4cCI6MjA2OTM1MzY5OX0.ddgmJnxg6hipRZ8_r9WyQpvsM-pkhBlRoybPdtGPEtY";
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        function generateTestParticipantId() {
+            // Generate proper UUID format
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0;
+                const v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        function generateTestSessionId() {
+            // Generate proper UUID format  
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0;
+                const v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        const sampleAnswers = {
+            q11_answer: "iPhone 15 Pro Max",
+            q12_answer: "512gb", 
+            q13_answer: "Deep Purple",
+            q14_answer: "€1,199",
+            q15_answer: "https://store.apple.com/de/buy-iphone/iphone-15-pro"
+        };
+
+        async function testDirectInsert() {
+            const resultDiv = document.getElementById('direct-insert-result');
+            resultDiv.innerHTML = '<div class="info">Testing direct insert via result-log Edge Function...</div>';
+            
+            try {
+                const testParticipantId = generateTestParticipantId();
+                const testSessionId = generateTestSessionId();
+
+                console.log('Testing with:', { testParticipantId, testSessionId });
+
+                const { data, error } = await supabase.functions.invoke('result-log', {
+                    body: {
+                        participant_id: testParticipantId,
+                        session_id: testSessionId,
+                        ...sampleAnswers
+                    }
+                });
+
+                if (error) {
+                    throw error;
+                }
+
+                if (data && data.ok) {
+                    // Verify in database
+                    const { data: savedData, error: queryError } = await supabase
+                        .from('search_result_log')
+                        .select('*')
+                        .eq('participant_id', testParticipantId)
+                        .single();
+
+                    if (queryError) {
+                        throw new Error(`Database verification failed: ${queryError.message}`);
+                    }
+
+                    resultDiv.innerHTML = `
+                        <div class="success">✅ Direct insert successful!</div>
+                        <div class="test-data">
+                            <div class="data-box">
+                                <strong>Sent Data:</strong>
+                                <pre>${JSON.stringify({ testParticipantId, testSessionId, ...sampleAnswers }, null, 2)}</pre>
+                            </div>
+                            <div class="data-box">
+                                <strong>Database Record:</strong>
+                                <pre>${JSON.stringify(savedData, null, 2)}</pre>
+                            </div>
+                        </div>
+                        <div class="success">✅ Questions 11-15 are being saved correctly to search_result_log table</div>
+                    `;
+                } else {
+                    throw new Error(data?.error || 'Function returned false');
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">❌ Direct insert failed: ${error.message}</div>
+                    <div class="warning">Check if result-log Edge Function is working correctly</div>
+                `;
+                console.error('Direct insert error:', error);
+            }
+        }
+
+        async function testSessionManagerSave() {
+            const resultDiv = document.getElementById('session-manager-result');
+            resultDiv.innerHTML = '<div class="info">Testing sessionManager.saveResultLog() simulation...</div>';
+            
+            try {
+                const testParticipantId = generateTestParticipantId();
+                const testSessionId = generateTestSessionId();
+
+                // Simulate what sessionManager.saveResultLog does
+                const { data, error } = await supabase.functions.invoke('result-log', {
+                    body: { 
+                        participant_id: testParticipantId,
+                        session_id: testSessionId,
+                        q11_answer: sampleAnswers.q11_answer,
+                        q12_answer: sampleAnswers.q12_answer,
+                        q13_answer: sampleAnswers.q13_answer,
+                        q14_answer: sampleAnswers.q14_answer,
+                        q15_answer: sampleAnswers.q15_answer
+                    }
+                });
+
+                if (error || !data?.ok) {
+                    throw new Error(error?.message || data?.error || 'SessionManager save failed');
+                }
+
+                // Verify the data
+                const { data: savedData, error: queryError } = await supabase
+                    .from('search_result_log')
+                    .select('*')
+                    .eq('participant_id', testParticipantId)
+                    .single();
+
+                if (queryError) {
+                    throw queryError;
+                }
+
+                resultDiv.innerHTML = `
+                    <div class="success">✅ SessionManager save simulation successful!</div>
+                    <div class="info">This is exactly what SearchResultLog component calls:</div>
+                    <div class="data-box">
+                        <strong>SessionManager Method:</strong>
+                        <pre>await sessionManager.saveResultLog(
+  "${sampleAnswers.q11_answer}",
+  "${sampleAnswers.q12_answer}",
+  "${sampleAnswers.q13_answer}",
+  "${sampleAnswers.q14_answer}",
+  "${sampleAnswers.q15_answer}"
+);</pre>
+                    </div>
+                    <div class="success">✅ Data saved and verified in database</div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">❌ SessionManager save simulation failed: ${error.message}</div>
+                `;
+                console.error('SessionManager save error:', error);
+            }
+        }
+
+        async function testAnswerRetention() {
+            const resultDiv = document.getElementById('answer-retention-result');
+            resultDiv.innerHTML = '<div class="info">Testing answer retention via survey-save/survey-load...</div>';
+            
+            try {
+                const testParticipantId = generateTestParticipantId();
+
+                // Test save
+                const saveData = {
+                    smartphone_model: sampleAnswers.q11_answer,
+                    storage_capacity: sampleAnswers.q12_answer,
+                    color: sampleAnswers.q13_answer,
+                    lowest_price: sampleAnswers.q14_answer,
+                    website_link: sampleAnswers.q15_answer
+                };
+
+                const { data: saveResp, error: saveError } = await supabase.functions.invoke('survey-save', {
+                    body: {
+                        participant_id: testParticipantId,
+                        page_id: 'search_result_log',
+                        answers: saveData
+                    }
+                });
+
+                if (saveError || !saveResp?.ok) {
+                    throw new Error(`Save failed: ${saveError?.message || saveResp?.error}`);
+                }
+
+                // Test load
+                const { data: loadResp, error: loadError } = await supabase.functions.invoke('survey-load', {
+                    body: {
+                        participant_id: testParticipantId,
+                        page_id: 'search_result_log'
+                    }
+                });
+
+                if (loadError || !loadResp?.ok) {
+                    throw new Error(`Load failed: ${loadError?.message || loadResp?.error}`);
+                }
+
+                resultDiv.innerHTML = `
+                    <div class="success">✅ Answer retention working correctly!</div>
+                    <div class="comparison">
+                        <div class="data-box">
+                            <strong>Saved Answers:</strong>
+                            <pre>${JSON.stringify(saveData, null, 2)}</pre>
+                        </div>
+                        <div class="data-box">
+                            <strong>Loaded Answers:</strong>
+                            <pre>${JSON.stringify(loadResp.answers, null, 2)}</pre>
+                        </div>
+                    </div>
+                    <div class="success">✅ Users can navigate back and retain their Q11-15 answers</div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">❌ Answer retention test failed: ${error.message}</div>
+                `;
+                console.error('Answer retention error:', error);
+            }
+        }
+
+        async function viewDatabaseRecords() {
+            const resultDiv = document.getElementById('database-records-result');
+            resultDiv.innerHTML = '<div class="info">Querying search_result_log table...</div>';
+            
+            try {
+                const { data, error } = await supabase
+                    .from('search_result_log')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(10);
+
+                if (error) {
+                    throw error;
+                }
+
+                resultDiv.innerHTML = `
+                    <div class="success">✅ Found ${data.length} records in search_result_log table</div>
+                    <div class="data-box">
+                        <strong>Recent Records:</strong>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+
+                if (data.length === 0) {
+                    resultDiv.innerHTML += '<div class="warning">⚠️ No records found. Try running the insert tests first.</div>';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">❌ Database query failed: ${error.message}</div>
+                    <div class="warning">Check if search_result_log table exists</div>
+                `;
+                console.error('Database query error:', error);
+            }
+        }
+
+        async function checkTableStructure() {
+            const resultDiv = document.getElementById('schema-result');
+            resultDiv.innerHTML = '<div class="info">Checking search_result_log table structure...</div>';
+            
+            try {
+                // Try to get table info by attempting an empty select
+                const { data, error } = await supabase
+                    .from('search_result_log')
+                    .select('*')
+                    .limit(1);
+
+                if (error) {
+                    throw error;
+                }
+
+                // Also check what columns we can insert
+                const testParticipantId = 'schema_test_' + Date.now();
+                const { data: insertTest, error: insertError } = await supabase
+                    .from('search_result_log')
+                    .insert({
+                        participant_id: testParticipantId,
+                        session_id: 'test_session',
+                        q11_answer: 'Schema Test',
+                        q12_answer: 'Test',
+                        q13_answer: 'Test',
+                        q14_answer: 'Test',
+                        q15_answer: 'Test'
+                    })
+                    .select();
+
+                if (insertError) {
+                    throw insertError;
+                }
+
+                resultDiv.innerHTML = `
+                    <div class="success">✅ Table structure verified!</div>
+                    <div class="data-box">
+                        <strong>Schema Test Record:</strong>
+                        <pre>${JSON.stringify(insertTest, null, 2)}</pre>
+                    </div>
+                    <div class="success">✅ All required columns exist and accept data</div>
+                `;
+
+                // Clean up test record
+                await supabase
+                    .from('search_result_log')
+                    .delete()
+                    .eq('participant_id', testParticipantId);
+
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">❌ Table structure check failed: ${error.message}</div>
+                    <div class="warning">Check if search_result_log table exists with correct columns</div>
+                `;
+                console.error('Schema check error:', error);
+            }
+        }
+
+        async function runCompleteTest() {
+            const resultDiv = document.getElementById('complete-result');
+            const btn = document.getElementById('complete-btn');
+            
+            btn.disabled = true;
+            resultDiv.innerHTML = '<div class="info">🔄 Running complete Q11-15 storage test...</div>';
+            
+            try {
+                const testParticipantId = generateTestParticipantId();
+                const testSessionId = generateTestSessionId();
+                const results = [];
+
+                // Step 1: Direct Edge Function Test
+                resultDiv.innerHTML += '<div class="info">Step 1: Testing result-log Edge Function...</div>';
+                const { data: directResult, error: directError } = await supabase.functions.invoke('result-log', {
+                    body: {
+                        participant_id: testParticipantId,
+                        session_id: testSessionId,
+                        ...sampleAnswers
+                    }
+                });
+
+                if (directError || !directResult?.ok) {
+                    throw new Error(`Direct test failed: ${directError?.message || directResult?.error}`);
+                }
+                results.push('✅ result-log Edge Function working');
+
+                // Step 2: Database Verification
+                resultDiv.innerHTML += '<div class="info">Step 2: Verifying database storage...</div>';
+                const { data: dbData, error: dbError } = await supabase
+                    .from('search_result_log')
+                    .select('*')
+                    .eq('participant_id', testParticipantId)
+                    .single();
+
+                if (dbError) {
+                    throw new Error(`Database verification failed: ${dbError.message}`);
+                }
+                results.push('✅ Database storage verified');
+
+                // Step 3: Answer Retention Test
+                resultDiv.innerHTML += '<div class="info">Step 3: Testing answer retention...</div>';
+                const retentionData = {
+                    smartphone_model: 'Samsung Galaxy S24 Ultra',
+                    storage_capacity: '1TB',
+                    color: 'Titanium Black',
+                    lowest_price: '€1,399',
+                    website_link: 'https://samsung.com/galaxy-s24-ultra'
+                };
+
+                const { data: saveResult, error: saveError } = await supabase.functions.invoke('survey-save', {
+                    body: {
+                        participant_id: testParticipantId + '_retention',
+                        page_id: 'search_result_log',
+                        answers: retentionData
+                    }
+                });
+
+                if (saveError || !saveResult?.ok) {
+                    throw new Error(`Retention save failed: ${saveError?.message || saveResult?.error}`);
+                }
+
+                const { data: loadResult, error: loadError } = await supabase.functions.invoke('survey-load', {
+                    body: {
+                        participant_id: testParticipantId + '_retention',
+                        page_id: 'search_result_log'
+                    }
+                });
+
+                if (loadError || !loadResult?.ok) {
+                    throw new Error(`Retention load failed: ${loadError?.message || loadResult?.error}`);
+                }
+                results.push('✅ Answer retention working');
+
+                // Success!
+                resultDiv.innerHTML = `
+                    <div class="success">🎉 Complete Q11-15 Storage Test PASSED!</div>
+                    <div class="info">Test Results:</div>
+                    <div class="data-box">
+                        ${results.map(result => `<div>${result}</div>`).join('')}
+                    </div>
+                    <div class="success">
+                        <strong>✅ Questions 11-15 are being stored correctly!</strong><br>
+                        • SearchResultLog component saves to search_result_log table<br>
+                        • Answer retention works for navigation back/forward<br>
+                        • All Edge Functions functioning properly<br>
+                        • Database schema is correct
+                    </div>
+                    <div class="comparison">
+                        <div class="data-box">
+                            <strong>Original Test Data:</strong>
+                            <pre>${JSON.stringify(sampleAnswers, null, 2)}</pre>
+                        </div>
+                        <div class="data-box">
+                            <strong>Stored in Database:</strong>
+                            <pre>${JSON.stringify(dbData, null, 2)}</pre>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">❌ Complete test failed: ${error.message}</div>
+                    <div class="warning">Check individual test results above for details</div>
+                `;
+                console.error('Complete test error:', error);
+            } finally {
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

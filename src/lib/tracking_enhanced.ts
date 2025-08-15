@@ -127,7 +127,7 @@ class EnhancedTrackingService {
     try {
       // Create session in Supabase
       const { error } = await supabase
-        .from('sessions')
+        .from('search_sessions')
         .insert({
           id: sessionId,
           user_id: userId,

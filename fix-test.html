@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Background Survey Fix Test</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        button { margin: 10px; padding: 10px 20px; background: #007cba; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+        pre { background: #f5f5f5; padding: 10px; border-radius: 3px; overflow-x: auto; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Background Survey Fix Test</h1>
+    
+    <div class="section">
+        <h3>Step 1: Generate Proper UUID</h3>
+        <button onclick="testUUIDGeneration()">Test UUID Generation</button>
+        <div id="uuid-result"></div>
+    </div>
+
+    <div class="section">
+        <h3>Step 2: Test Background Survey Function with Proper UUID</h3>
+        <button onclick="testWithProperUUID()">Test Function with Proper UUID</button>
+        <div id="function-result"></div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = "https://wbguuipoggeamyzrfvbv.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndiZ3V1aXBvZ2dlYW15enJmdmJ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3Nzc2OTksImV4cCI6MjA2OTM1MzY5OX0.ddgmJnxg6hipRZ8_r9WyQpvsM-pkhBlRoybPdtGPEtY";
+
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        function generateUUID() {
+            if (crypto.randomUUID) {
+                return crypto.randomUUID();
+            } else {
+                // Fallback: create a UUID v4 format manually
+                return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                    const r = Math.random() * 16 | 0;
+                    const v = c == 'x' ? r : (r & 0x3 | 0x8);
+                    return v.toString(16);
+                });
+            }
+        }
+
+        function testUUIDGeneration() {
+            const resultDiv = document.getElementById('uuid-result');
+            
+            const uuid1 = generateUUID();
+            const uuid2 = generateUUID();
+            
+            const isValidUUID = (uuid) => /^[0-9a-fA-F-]{36}$/.test(uuid);
+            
+            resultDiv.innerHTML = `
+                <div class="info">Generated UUIDs:</div>
+                <div>UUID 1: ${uuid1} (Valid: ${isValidUUID(uuid1)})</div>
+                <div>UUID 2: ${uuid2} (Valid: ${isValidUUID(uuid2)})</div>
+                <div class="${isValidUUID(uuid1) && isValidUUID(uuid2) ? 'success' : 'error'}">
+                    ${isValidUUID(uuid1) && isValidUUID(uuid2) ? '✅ UUID generation working correctly' : '❌ UUID generation has issues'}
+                </div>
+            `;
+        }
+
+        async function testWithProperUUID() {
+            const resultDiv = document.getElementById('function-result');
+            resultDiv.innerHTML = '<div>Testing background survey function with proper UUID...</div>';
+            
+            try {
+                const participant_id = generateUUID();
+                const isValidUUID = /^[0-9a-fA-F-]{36}$/.test(participant_id);
+                
+                if (!isValidUUID) {
+                    resultDiv.innerHTML = `<div class="error">❌ Generated invalid UUID: ${participant_id}</div>`;
+                    return;
+                }
+                
+                const responses = {
+                    q1_age_group: '25-34',
+                    q2_gender: 'male',
+                    q3_education: 'bachelor',
+                    q4_employment_status: 'employed',
+                    q5_nationality: 'German',
+                    q6_country_residence: 'Germany',
+                    q7_ai_familiarity: 5,
+                    q8_attention_check: 1,
+                    q9_ai_usage_frequency: '3-5-times'
+                };
+
+                console.log('Testing with participant_id:', participant_id);
+                console.log('Testing with responses:', responses);
+
+                const { data: resp, error } = await supabase.functions.invoke('submit-background-survey', {
+                    body: { participant_id, responses }
+                });
+
+                console.log('Function response:', resp);
+                console.log('Function error:', error);
+
+                if (error) {
+                    resultDiv.innerHTML = `<div class="error">❌ Function error: ${error.message}</div>`;
+                } else if (!resp?.ok) {
+                    resultDiv.innerHTML = `<div class="error">❌ Function returned error: ${resp?.error || 'Unknown error'}</div>`;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="success">✅ Background survey function working with proper UUID!</div>
+                        <div class="info">Participant ID: ${participant_id}</div>
+                        <div class="info">Response: ${JSON.stringify(resp)}</div>
+                    `;
+                }
+            } catch (err) {
+                resultDiv.innerHTML = `<div class="error">❌ Exception: ${err.message}</div>`;
+                console.error('Exception:', err);
+            }
+        }
+    </script>
+</body>
+</html>

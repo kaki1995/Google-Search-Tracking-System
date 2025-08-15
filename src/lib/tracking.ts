@@ -714,7 +714,7 @@ class TrackingService {
       
       // First check if session already exists
       const { data: existingSession } = await supabase
-        .from('sessions')
+        .from('search_sessions')
         .select('budget_range')
         .eq('id', this.sessionData.sessionId)
         .single();
@@ -736,7 +736,7 @@ class TrackingService {
       }
 
       const { data, error } = await supabase
-        .from('sessions')
+        .from('search_sessions')
         .upsert(sessionData)
         .select('id')
         .single();

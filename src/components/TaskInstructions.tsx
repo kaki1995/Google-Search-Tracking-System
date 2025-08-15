@@ -6,6 +6,7 @@ import StudyButton from "@/components/StudyButton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { getOrCreateParticipantId } from "@/lib/utils/uuid";
 interface TaskForm {
   budget: string;
 }
@@ -40,11 +41,7 @@ const TaskInstructions = () => {
       console.log("Budget range selected:", budgetRange);
       
       if (budgetRange) {
-        let participant_id = localStorage.getItem('participant_id');
-        if (!participant_id) {
-          participant_id = (crypto as any).randomUUID ? (crypto as any).randomUUID() : Math.random().toString(36).slice(2) + Date.now();
-          localStorage.setItem('participant_id', participant_id);
-        }
+        const participant_id = getOrCreateParticipantId();
         const { data: resp, error } = await supabase.functions.invoke('submit-task-instruction', {
           body: { participant_id, q10_response: budgetRange }
         });

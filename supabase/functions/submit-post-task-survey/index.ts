@@ -69,12 +69,8 @@ serve(async (req) => {
       q24_additional_details: String(responses.q24_additional_details ?? ''),
     };
 
-    if (payload.q22_attention_check !== 3) {
-      return new Response(JSON.stringify({ ok: false, error: 'Attention check failed (Q22 must be 3)' }), {
-        status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
+    // REMOVED: Question 22 validation restriction - store value without blocking progress
+    // This allows users to continue regardless of their attention check answer
 
     // Ensure participant exists
     const { data: pExist, error: pErr } = await supabase

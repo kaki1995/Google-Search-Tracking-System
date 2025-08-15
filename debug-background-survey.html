@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Background Survey Submission</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        button { margin: 10px; padding: 10px 20px; background: #007cba; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+        pre { background: #f5f5f5; padding: 10px; border-radius: 3px; overflow-x: auto; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Debug Background Survey Submission</h1>
+    
+    <div class="section">
+        <h3>Step 1: Check Current localStorage Data</h3>
+        <button onclick="checkLocalStorage()">Check localStorage</button>
+        <div id="localStorage-result"></div>
+    </div>
+
+    <div class="section">
+        <h3>Step 2: Clear and Generate New UUID</h3>
+        <button onclick="generateNewUUID()">Generate New UUID</button>
+        <div id="uuid-result"></div>
+    </div>
+
+    <div class="section">
+        <h3>Step 3: Test Function with Generated UUID</h3>
+        <button onclick="testWithNewUUID()">Test Function</button>
+        <div id="function-result"></div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = "https://wbguuipoggeamyzrfvbv.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndiZ3V1aXBvZ2dlYW15enJmdmJ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3Nzc2OTksImV4cCI6MjA2OTM1MzY5OX0.ddgmJnxg6hipRZ8_r9WyQpvsM-pkhBlRoybPdtGPEtY";
+
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        function generateUUID() {
+            if (crypto.randomUUID) {
+                return crypto.randomUUID();
+            } else {
+                // Fallback: create a UUID v4 format manually
+                return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                    const r = Math.random() * 16 | 0;
+                    const v = c == 'x' ? r : (r & 0x3 | 0x8);
+                    return v.toString(16);
+                });
+            }
+        }
+
+        function checkLocalStorage() {
+            const resultDiv = document.getElementById('localStorage-result');
+            
+            const participantId = localStorage.getItem('participant_id');
+            const backgroundSurveyData = localStorage.getItem('background_survey_data');
+            
+            const isValidUUID = (uuid) => /^[0-9a-fA-F-]{36}$/.test(uuid);
+            
+            resultDiv.innerHTML = `
+                <div class="info">Current localStorage data:</div>
+                <div>participant_id: ${participantId} (Valid UUID: ${participantId ? isValidUUID(participantId) : 'null'})</div>
+                <div>background_survey_data: ${backgroundSurveyData ? 'exists' : 'null'}</div>
+                <pre>${JSON.stringify({
+                    participant_id: participantId,
+                    background_survey_data: backgroundSurveyData ? JSON.parse(backgroundSurveyData) : null
+                }, null, 2)}</pre>
+            `;
+        }
+
+        function generateNewUUID() {
+            const resultDiv = document.getElementById('uuid-result');
+            
+            // Clear old participant_id
+            localStorage.removeItem('participant_id');
+            
+            // Generate new UUID
+            const newUUID = generateUUID();
+            localStorage.setItem('participant_id', newUUID);
+            
+            const isValidUUID = (uuid) => /^[0-9a-fA-F-]{36}$/.test(uuid);
+            
+            resultDiv.innerHTML = `
+                <div class="success">✅ Generated new UUID: ${newUUID}</div>
+                <div>Valid UUID format: ${isValidUUID(newUUID)}</div>
+            `;
+        }
+
+        async function testWithNewUUID() {
+            const resultDiv = document.getElementById('function-result');
+            resultDiv.innerHTML = '<div>Testing with current participant_id...</div>';
+            
+            try {
+                const participant_id = localStorage.getItem('participant_id');
+                
+                if (!participant_id) {
+                    resultDiv.innerHTML = '<div class="error">❌ No participant_id found. Click "Generate New UUID" first.</div>';
+                    return;
+                }
+                
+                const responses = {
+                    q1_age_group: '25-34',
+                    q2_gender: 'male',
+                    q3_education: 'bachelor',
+                    q4_employment_status: 'employed',
+                    q5_nationality: 'German',
+                    q6_country_residence: 'Germany',
+                    q7_ai_familiarity: 5,
+                    q8_attention_check: 1,
+                    q9_ai_usage_frequency: '3-5-times'
+                };
+
+                console.log('Testing with participant_id:', participant_id);
+                console.log('Testing with responses:', responses);
+
+                const { data: resp, error } = await supabase.functions.invoke('submit-background-survey', {
+                    body: { participant_id, responses }
+                });
+
+                console.log('Function response:', resp);
+                console.log('Function error:', error);
+
+                if (error) {
+                    resultDiv.innerHTML = `
+                        <div class="error">❌ Function error: ${error.message}</div>
+                        <div class="info">Error details:</div>
+                        <pre>${JSON.stringify(error, null, 2)}</pre>
+                    `;
+                } else if (!resp?.ok) {
+                    resultDiv.innerHTML = `
+                        <div class="error">❌ Function returned error: ${resp?.error || 'Unknown error'}</div>
+                        <div class="info">Response details:</div>
+                        <pre>${JSON.stringify(resp, null, 2)}</pre>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="success">✅ Function working! UUID is valid and accepted.</div>
+                        <div class="info">Response: ${JSON.stringify(resp)}</div>
+                    `;
+                }
+            } catch (err) {
+                resultDiv.innerHTML = `
+                    <div class="error">❌ Exception: ${err.message}</div>
+                    <pre>${JSON.stringify(err, null, 2)}</pre>
+                `;
+                console.error('Exception:', err);
+            }
+        }
+    </script>
+</body>
+</html>

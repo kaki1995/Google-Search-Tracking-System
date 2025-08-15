@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Q11-15 Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .step { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; color: #155724; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; color: #721c24; }
+        .warning { background-color: #fff3cd; border-color: #ffeaa7; color: #856404; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Quick Q11-15 Storage Test</h1>
+        <p>This test will help us debug the Q11-15 storage issue step by step.</p>
+
+        <div class="step">
+            <h3>Step 1: Create Test Session</h3>
+            <p>We'll create a minimal session with participant_id and session_id</p>
+            <button onclick="createTestSession()">Create Test Session</button>
+            <div id="sessionResult"></div>
+        </div>
+
+        <div class="step">
+            <h3>Step 2: Test Direct Storage</h3>
+            <p>Test calling the Edge Function directly with our test session</p>
+            <button onclick="testDirectStorage()">Test Direct Storage</button>
+            <div id="storageResult"></div>
+        </div>
+
+        <div class="step">
+            <h3>Step 3: Check Results</h3>
+            <p>Check if the data was stored in the remote database</p>
+            <button onclick="checkResults()">Check Results</button>
+            <div id="resultsDiv"></div>
+        </div>
+
+        <div class="step">
+            <h3>Step 4: Debug Instructions</h3>
+            <ol>
+                <li>Open browser dev tools (F12)</li>
+                <li>Go to Console tab</li>
+                <li>Now go to the live app: <a href="http://localhost:8081" target="_blank">http://localhost:8081</a></li>
+                <li>Go through the flow and watch for console messages</li>
+                <li>Look for messages starting with 🔍, 📡, ✅, or ❌</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        // Supabase configuration
+        const SUPABASE_URL = 'https://qksrkvqrppvdqgocqbsj.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFrc3JrdnFycHB2ZHFnb2NxYnNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzE1MDQ1OTQsImV4cCI6MjA0NzA4MDU5NH0.o3jWF9pFSDERON32nDIDc-4g8QGkX6kQx5lCNOvPXwQ';
+
+        let supabase;
+        let testParticipantId;
+        let testSessionId;
+
+        // Initialize Supabase
+        function initSupabase() {
+            if (window.supabase) {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                console.log('✅ Supabase initialized');
+            } else {
+                setTimeout(initSupabase, 100);
+            }
+        }
+
+        function generateTestId() {
+            return 'test-' + Math.random().toString(36).substr(2, 9);
+        }
+
+        async function createTestSession() {
+            const resultDiv = document.getElementById('sessionResult');
+            resultDiv.innerHTML = '<div>Creating test session...</div>';
+
+            try {
+                // Generate test IDs
+                testParticipantId = generateTestId();
+                testSessionId = generateTestId();
+
+                // Set in localStorage (like the real app does)
+                localStorage.setItem('participant_id', testParticipantId);
+                localStorage.setItem('session_id', testSessionId);
+
+                resultDiv.innerHTML = `
+                    <div class="success">✅ Test session created!</div>
+                    <pre>participant_id: ${testParticipantId}
+session_id: ${testSessionId}</pre>
+                `;
+
+                console.log('Test session created:', { testParticipantId, testSessionId });
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        }
+
+        async function testDirectStorage() {
+            const resultDiv = document.getElementById('storageResult');
+            resultDiv.innerHTML = '<div>Testing direct storage...</div>';
+
+            if (!testParticipantId || !testSessionId) {
+                resultDiv.innerHTML = '<div class="error">❌ Please create test session first</div>';
+                return;
+            }
+
+            try {
+                const testData = {
+                    participant_id: testParticipantId,
+                    session_id: testSessionId,
+                    q11_answer: 'TEST iPhone 15 Pro',
+                    q12_answer: 'TEST 256GB',
+                    q13_answer: 'TEST Space Black',
+                    q14_answer: 'TEST $999',
+                    q15_answer: 'TEST https://apple.com/test'
+                };
+
+                console.log('Sending test data:', testData);
+
+                const { data, error } = await supabase.functions.invoke('result-log', {
+                    body: testData
+                });
+
+                if (error) {
+                    resultDiv.innerHTML = `<div class="error">❌ Error: ${JSON.stringify(error)}</div>`;
+                    console.error('Storage test error:', error);
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="success">✅ Storage test completed!</div>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                    console.log('Storage test result:', data);
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Exception: ${error.message}</div>`;
+                console.error('Storage test exception:', error);
+            }
+        }
+
+        async function checkResults() {
+            const resultDiv = document.getElementById('resultsDiv');
+            resultDiv.innerHTML = '<div>Checking results...</div>';
+
+            try {
+                // Try to query the table
+                const { data, error } = await supabase
+                    .from('search_result_log')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(5);
+
+                if (error) {
+                    resultDiv.innerHTML = `
+                        <div class="warning">⚠️ Cannot directly query table (RLS policy)</div>
+                        <div>Error: ${error.message}</div>
+                        <div>This is normal - the data might still be there but not accessible via direct query.</div>
+                    `;
+                } else {
+                    if (data && data.length > 0) {
+                        resultDiv.innerHTML = `
+                            <div class="success">✅ Found ${data.length} records!</div>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        `;
+                    } else {
+                        resultDiv.innerHTML = `
+                            <div class="warning">⚠️ No records found</div>
+                            <div>The table exists but may be empty or data is filtered by RLS.</div>
+                        `;
+                    }
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        }
+
+        // Auto-initialize
+        window.onload = () => {
+            const script = document.createElement('script');
+            script.src = 'https://unpkg.com/@supabase/supabase-js@2';
+            script.onload = initSupabase;
+            document.head.appendChild(script);
+        };
+    </script>
+</body>
+</html>

@@ -70,6 +70,52 @@ Deno.serve(async (req) => {
       }
 
       answers = data?.responses || null;
+    } else if (page_id === 'search_result_log') {
+      const { data, error } = await supabase
+        .from('search_result_log')
+        .select('smartphone_model, storage_capacity, color, lowest_price, website_link')
+        .eq('participant_id', participant_id)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        console.error('Search result log load error:', error);
+        return new Response(
+          JSON.stringify({ ok: false, error: 'Failed to load search result log' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      // Convert database fields back to form field names
+      if (data) {
+        answers = {
+          smartphone_model: data.smartphone_model,
+          storage_capacity: data.storage_capacity,
+          color: data.color,
+          lowest_price: data.lowest_price,
+          website_link: data.website_link
+        };
+      }
+    } else if (page_id === 'task_instruction') {
+      const { data, error } = await supabase
+        .from('task_instruction')
+        .select('q10_response')
+        .eq('participant_id', participant_id)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        console.error('Task instruction load error:', error);
+        return new Response(
+          JSON.stringify({ ok: false, error: 'Failed to load task instruction' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      // Convert database field back to form field name
+      if (data) {
+        answers = {
+          budget_range: data.q10_response
+        };
+      }
     }
 
     return new Response(

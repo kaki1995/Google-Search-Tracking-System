@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage, Form } from "@/components/ui/form";
 import { ArrowLeft } from "lucide-react";
+import { sessionManager } from "@/lib/sessionManager";
 interface SearchLogForm {
   smartphone_model: string;
   storage_capacity: string;
@@ -29,29 +30,66 @@ export default function SearchResultLog() {
 
   // Load saved form data on component mount
   useEffect(() => {
-    const savedData = localStorage.getItem('search_result_log_data');
-    if (savedData) {
-      try {
-        const parsedData = JSON.parse(savedData);
-        form.reset(parsedData);
-      } catch (error) {
-        console.error('Error parsing saved search result data:', error);
+    const loadSavedData = async () => {
+      // Try to load from sessionManager first (supports navigation back/forward)
+      const savedData = await sessionManager.loadPage('search_result_log');
+      if (savedData) {
+        form.reset(savedData);
+      } else {
+        // Fallback to localStorage for backwards compatibility
+        const localData = localStorage.getItem('search_result_log_data');
+        if (localData) {
+          try {
+            const parsedData = JSON.parse(localData);
+            form.reset(parsedData);
+          } catch (error) {
+            console.error('Error parsing saved search result data:', error);
+          }
+        }
       }
-    }
+    };
+    loadSavedData();
   }, [form]);
 
-  // Save form data whenever form values change
+  // Save form data whenever form values change (retain answers for navigation)
   useEffect(() => {
-    const subscription = form.watch((value) => {
+    const subscription = form.watch(async (value) => {
+      // Save to both localStorage and sessionManager for robust answer retention
       localStorage.setItem('search_result_log_data', JSON.stringify(value));
+      const participantId = localStorage.getItem('participant_id');
+      if (participantId) {
+        await sessionManager.savePage('search_result_log', value);
+      }
     });
     return () => subscription.unsubscribe();
   }, [form]);
   const onSubmit = async (data: SearchLogForm) => {
     setIsSubmitting(true);
     try {
-      // Save search results data
-      console.log('Search results:', data);
+      // Save to localStorage for persistence across navigation
+      localStorage.setItem('search_result_log_data', JSON.stringify(data));
+      
+      console.log('🚀 Submitting Q11-15 data:', data);
+
+      // Save questions 11-15 to search_result_log table using sessionManager
+      const success = await sessionManager.saveResultLog(
+        data.smartphone_model,
+        data.storage_capacity || '',
+        data.color || '',
+        data.lowest_price,
+        data.website_link
+      );
+      
+      if (success) {
+        console.log('✅ Search results saved to database successfully:', data);
+      } else {
+        console.error('❌ Failed to save search results to database, continuing anyway');
+        // Let's log the session state for debugging
+        const participantId = localStorage.getItem('participant_id');
+        const sessionId = localStorage.getItem('session_id');
+        console.error('Debug - participant_id:', participantId);
+        console.error('Debug - session_id:', sessionId);
+      }
       
       // Clear saved form data after successful submission
       localStorage.removeItem('search_result_log_data');
@@ -59,6 +97,8 @@ export default function SearchResultLog() {
       navigate('/post-task-survey');
     } catch (error) {
       console.error('Error submitting search log:', error);
+      // Continue to next page even if save fails
+      navigate('/post-task-survey');
     } finally {
       setIsSubmitting(false);
     }

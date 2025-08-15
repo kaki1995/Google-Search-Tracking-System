@@ -10,6 +10,7 @@ import LikertScale from "./LikertScale";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { sessionManager } from "@/lib/sessionManager";
+import { getOrCreateParticipantId } from "@/lib/utils/uuid";
 interface SurveyForm {
   age: string;
   gender: string;
@@ -40,33 +41,46 @@ export default function BackgroundSurvey() {
 
   // Load saved form data on component mount
   useEffect(() => {
-    const savedData = localStorage.getItem('background_survey_data');
-    if (savedData) {
-      try {
-        const parsedData = JSON.parse(savedData);
-        form.reset(parsedData);
-      } catch (error) {
-        console.error('Error parsing saved form data:', error);
+    const loadSavedData = async () => {
+      // Try to load from sessionManager first (supports navigation back/forward)
+      const savedData = await sessionManager.loadPage('background_survey');
+      if (savedData) {
+        form.reset(savedData);
+      } else {
+        // Fallback to localStorage for backwards compatibility
+        const localData = localStorage.getItem('background_survey_data');
+        if (localData) {
+          try {
+            const parsedData = JSON.parse(localData);
+            form.reset(parsedData);
+          } catch (error) {
+            console.error('Error parsing saved background survey data:', error);
+          }
+        }
       }
-    }
+    };
+    loadSavedData();
   }, [form]);
 
-  // Save form data whenever form values change
+  // Save form data whenever form values change (retain answers for navigation)
   useEffect(() => {
-    const subscription = form.watch((value) => {
+    const subscription = form.watch(async (value) => {
+      // Save to both localStorage and sessionManager for robust answer retention
       localStorage.setItem('background_survey_data', JSON.stringify(value));
+      const participantId = localStorage.getItem('participant_id');
+      if (participantId) {
+        await sessionManager.savePage('background_survey', value);
+      }
     });
     return () => subscription.unsubscribe();
   }, [form]);
   const onSubmit = async (data: SurveyForm) => {
+    console.log('BackgroundSurvey: onSubmit called with data:', data);
     setIsSubmitting(true);
     try {
-      // Participant id from localStorage or create one
-      let participant_id = localStorage.getItem('participant_id');
-      if (!participant_id) {
-        participant_id = (crypto as any).randomUUID ? (crypto as any).randomUUID() : Math.random().toString(36).slice(2) + Date.now();
-        localStorage.setItem('participant_id', participant_id);
-      }
+      // Get or create participant id using utility function (auto-validates UUID format)
+      const participant_id = getOrCreateParticipantId();
+      console.log('BackgroundSurvey: participant_id:', participant_id);
 
       const responses = {
         q1_age_group: data.age,
@@ -80,20 +94,27 @@ export default function BackgroundSurvey() {
         q9_ai_usage_frequency: data.search_frequency,
       };
 
+      console.log('BackgroundSurvey: submitting responses:', responses);
+
       const { data: resp, error } = await supabase.functions.invoke('submit-background-survey', {
         body: { participant_id, responses }
       });
 
+      console.log('BackgroundSurvey: function response:', resp);
+      console.log('BackgroundSurvey: function error:', error);
+
       if (error || !resp?.ok) {
         const msg = error?.message || resp?.error || 'Failed to submit background survey';
+        console.error('BackgroundSurvey: submission failed:', msg);
         throw new Error(msg);
       }
 
+      console.log('BackgroundSurvey: submission successful, navigating to /task-instructions');
       // Clear saved form data after successful submission
       localStorage.removeItem('background_survey_data');
       navigate('/task-instructions');
     } catch (error: any) {
-      console.error('Error submitting survey:', error);
+      console.error('BackgroundSurvey: Error submitting survey:', error);
       toast({ title: 'Submission failed', description: error?.message || 'Please try again.', variant: 'destructive' });
       // Keep data for retry
     } finally {

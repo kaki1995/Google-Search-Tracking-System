@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edge Function Diagnostic</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .test { margin: 15px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        button { padding: 8px 16px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; color: #155724; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; color: #721c24; }
+        .warning { background-color: #fff3cd; border-color: #ffeaa7; color: #856404; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; color: #0c5460; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 12px; }
+        .url { font-family: monospace; background: #f8f9fa; padding: 2px 4px; border-radius: 2px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Edge Function Diagnostic</h1>
+        <p>This will help us understand why the Edge Functions are not accessible.</p>
+
+        <div class="test">
+            <h3>Test 1: Basic Edge Function URL Check</h3>
+            <button onclick="testBasicUrl()">Test Edge Function URL</button>
+            <div id="urlTest"></div>
+        </div>
+
+        <div class="test">
+            <h3>Test 2: Edge Function Endpoints</h3>
+            <button onclick="testEndpoints()">Test All Endpoints</button>
+            <div id="endpointTest"></div>
+        </div>
+
+        <div class="test">
+            <h3>Test 3: Network Connectivity</h3>
+            <button onclick="testConnectivity()">Test Connectivity</button>
+            <div id="connectivityTest"></div>
+        </div>
+
+        <div class="test">
+            <h3>Test 4: Raw HTTP Request</h3>
+            <button onclick="testRawRequest()">Test Raw HTTP</button>
+            <div id="rawTest"></div>
+        </div>
+
+        <div class="test info">
+            <h3>📋 Configuration</h3>
+            <p><strong>Supabase URL:</strong> <span class="url">https://qksrkvqrppvdqgocqbsj.supabase.co</span></p>
+            <p><strong>Expected Edge Function URL:</strong> <span class="url">https://qksrkvqrppvdqgocqbsj.supabase.co/functions/v1/result-log</span></p>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://qksrkvqrppvdqgocqbsj.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFrc3JrdnFycHB2ZHFnb2NxYnNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzE1MDQ1OTQsImV4cCI6MjA0NzA4MDU5NH0.o3jWF9pFSDERON32nDIDc-4g8QGkX6kQx5lCNOvPXwQ';
+
+        async function testBasicUrl() {
+            const resultDiv = document.getElementById('urlTest');
+            resultDiv.innerHTML = '<div>Testing basic URL accessibility...</div>';
+
+            try {
+                const functionUrl = `${SUPABASE_URL}/functions/v1/result-log`;
+                
+                resultDiv.innerHTML = `
+                    <div class="info">Testing URL: ${functionUrl}</div>
+                    <div>Making basic GET request...</div>
+                `;
+
+                const response = await fetch(functionUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                    }
+                });
+
+                resultDiv.innerHTML += `
+                    <div class="info">Response Status: ${response.status}</div>
+                    <div class="info">Response Status Text: ${response.statusText}</div>
+                `;
+
+                if (response.status === 405) {
+                    resultDiv.innerHTML += `<div class="success">✅ Edge Function is accessible (405 = Method Not Allowed is expected for GET)</div>`;
+                } else if (response.status === 404) {
+                    resultDiv.innerHTML += `<div class="error">❌ Edge Function not found (404) - May not be deployed</div>`;
+                } else {
+                    resultDiv.innerHTML += `<div class="warning">⚠️ Unexpected status: ${response.status}</div>`;
+                }
+
+            } catch (error) {
+                resultDiv.innerHTML += `<div class="error">❌ Network Error: ${error.message}</div>`;
+                console.error('URL test error:', error);
+            }
+        }
+
+        async function testEndpoints() {
+            const resultDiv = document.getElementById('endpointTest');
+            resultDiv.innerHTML = '<div>Testing multiple endpoints...</div>';
+
+            const endpoints = [
+                'result-log',
+                'consent-confirm', 
+                'survey-save',
+                'survey-load',
+                'submit-post-task-survey'
+            ];
+
+            let html = '<h4>Endpoint Test Results:</h4>';
+
+            for (const endpoint of endpoints) {
+                try {
+                    const url = `${SUPABASE_URL}/functions/v1/${endpoint}`;
+                    const response = await fetch(url, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        }
+                    });
+
+                    if (response.status === 405) {
+                        html += `<div class="success">✅ ${endpoint}: Accessible</div>`;
+                    } else if (response.status === 404) {
+                        html += `<div class="error">❌ ${endpoint}: Not found (404)</div>`;
+                    } else {
+                        html += `<div class="warning">⚠️ ${endpoint}: Status ${response.status}</div>`;
+                    }
+                } catch (error) {
+                    html += `<div class="error">❌ ${endpoint}: ${error.message}</div>`;
+                }
+            }
+
+            resultDiv.innerHTML = html;
+        }
+
+        async function testConnectivity() {
+            const resultDiv = document.getElementById('connectivityTest');
+            resultDiv.innerHTML = '<div>Testing general connectivity...</div>';
+
+            try {
+                // Test basic Supabase URL
+                const baseResponse = await fetch(SUPABASE_URL);
+                
+                let html = `<div class="info">Base URL (${SUPABASE_URL}): ${baseResponse.status}</div>`;
+                
+                // Test if we can reach the functions path
+                const functionsUrl = `${SUPABASE_URL}/functions/v1/`;
+                try {
+                    const functionsResponse = await fetch(functionsUrl);
+                    html += `<div class="info">Functions path: ${functionsResponse.status}</div>`;
+                    
+                    if (functionsResponse.status === 404) {
+                        html += `<div class="error">❌ Functions not available - Edge Functions may not be deployed</div>`;
+                    }
+                } catch (error) {
+                    html += `<div class="error">❌ Functions path error: ${error.message}</div>`;
+                }
+
+                resultDiv.innerHTML = html;
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Basic connectivity failed: ${error.message}</div>`;
+            }
+        }
+
+        async function testRawRequest() {
+            const resultDiv = document.getElementById('rawTest');
+            resultDiv.innerHTML = '<div>Testing raw HTTP request...</div>';
+
+            try {
+                const url = `${SUPABASE_URL}/functions/v1/result-log`;
+                const testData = {
+                    participant_id: 'test-123',
+                    session_id: 'test-session-123',
+                    q11_answer: 'test',
+                    q12_answer: 'test',
+                    q13_answer: 'test',
+                    q14_answer: 'test',
+                    q15_answer: 'test'
+                };
+
+                console.log('Making raw request to:', url);
+                console.log('With data:', testData);
+
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Content-Type': 'application/json',
+                        'apikey': SUPABASE_ANON_KEY
+                    },
+                    body: JSON.stringify(testData)
+                });
+
+                const responseText = await response.text();
+                
+                let html = `
+                    <div class="info">URL: ${url}</div>
+                    <div class="info">Status: ${response.status}</div>
+                    <div class="info">Status Text: ${response.statusText}</div>
+                    <div class="info">Response:</div>
+                    <pre>${responseText}</pre>
+                `;
+
+                if (response.ok) {
+                    html += `<div class="success">✅ Raw request successful!</div>`;
+                } else {
+                    html += `<div class="error">❌ Raw request failed</div>`;
+                }
+
+                resultDiv.innerHTML = html;
+
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Raw request error: ${error.message}</div>`;
+                console.error('Raw request error:', error);
+            }
+        }
+
+        // Auto-run basic test on load
+        window.onload = () => {
+            testBasicUrl();
+        };
+    </script>
+</body>
+</html>

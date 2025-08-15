@@ -95,11 +95,11 @@ serve(async (req) => {
     const { ip_address, device_type } = getClientInfo(req);
 
     const { error } = await supabase
-      .from('background_survey')
+      .from('background_surveys')
       .insert([{ participant_id, responses: payload, ip_address, device_type }]);
 
     if (error) {
-      console.error('Insert background_survey error', error);
+      console.error('Insert background_surveys error', error);
       return new Response(JSON.stringify({ ok: false, error: error.message }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

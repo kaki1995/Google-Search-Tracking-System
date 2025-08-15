@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Live Q11-15 Storage</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .error { background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        .info { background-color: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; }
+        .warning { background-color: #fff3cd; border: 1px solid #ffeaa7; color: #856404; }
+        button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Debug Live Q11-15 Storage</h1>
+    <p>This page helps debug why Q11-15 answers aren't appearing in the remote Supabase table.</p>
+
+    <div class="section">
+        <h3>Step 1: Check Current Session State</h3>
+        <button onclick="checkSessionState()">Check Session State</button>
+        <div id="sessionResult"></div>
+    </div>
+
+    <div class="section">
+        <h3>Step 2: Test Database Connection</h3>
+        <button onclick="testDatabaseConnection()">Test Database Connection</button>
+        <div id="dbResult"></div>
+    </div>
+
+    <div class="section">
+        <h3>Step 3: Test Q11-15 Storage Function</h3>
+        <button onclick="testQ1115Storage()">Test Q11-15 Storage</button>
+        <div id="storageResult"></div>
+    </div>
+
+    <div class="section">
+        <h3>Step 4: Check Remote Table Directly</h3>
+        <button onclick="checkRemoteTable()">Check Remote Table</button>
+        <div id="tableResult"></div>
+    </div>
+
+    <script>
+        // Supabase configuration (using your actual project)
+        const SUPABASE_URL = 'https://qksrkvqrppvdqgocqbsj.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFrc3JrdnFycHB2ZHFnb2NxYnNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzE1MDQ1OTQsImV4cCI6MjA0NzA4MDU5NH0.o3jWF9pFSDERON32nDIDc-4g8QGkX6kQx5lCNOvPXwQ';
+
+        // Initialize Supabase client
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        async function checkSessionState() {
+            const resultDiv = document.getElementById('sessionResult');
+            resultDiv.innerHTML = '<div class="info">Checking session state...</div>';
+
+            try {
+                // Check localStorage for session data
+                const localSession = localStorage.getItem('google_search_session');
+                
+                let html = '<h4>Session State:</h4>';
+                
+                if (localSession) {
+                    const sessionData = JSON.parse(localSession);
+                    html += `<div class="success">✅ Session found in localStorage</div>`;
+                    html += `<pre>${JSON.stringify(sessionData, null, 2)}</pre>`;
+                    
+                    // Check if we have participant_id and session_id
+                    if (sessionData.participantId && sessionData.sessionId) {
+                        html += `<div class="success">✅ Has participant_id: ${sessionData.participantId}</div>`;
+                        html += `<div class="success">✅ Has session_id: ${sessionData.sessionId}</div>`;
+                    } else {
+                        html += `<div class="error">❌ Missing participant_id or session_id</div>`;
+                    }
+                } else {
+                    html += `<div class="error">❌ No session found in localStorage</div>`;
+                    html += `<div class="warning">⚠️ You need to start from the beginning of the application flow</div>`;
+                }
+
+                // Check for saved Q11-15 data
+                const q1115Data = localStorage.getItem('search_result_log_data');
+                if (q1115Data) {
+                    html += `<div class="info">📝 Found saved Q11-15 data:</div>`;
+                    html += `<pre>${JSON.stringify(JSON.parse(q1115Data), null, 2)}</pre>`;
+                } else {
+                    html += `<div class="warning">⚠️ No saved Q11-15 data found</div>`;
+                }
+
+                resultDiv.innerHTML = html;
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Error checking session: ${error.message}</div>`;
+            }
+        }
+
+        async function testDatabaseConnection() {
+            const resultDiv = document.getElementById('dbResult');
+            resultDiv.innerHTML = '<div class="info">Testing database connection...</div>';
+
+            try {
+                // Test Edge Function availability
+                const response = await fetch(`${SUPABASE_URL}/functions/v1/result-log`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        participant_id: 'test-connection',
+                        session_id: 'test-session',
+                        q11_answer: 'test',
+                        q12_answer: 'test',
+                        q13_answer: 'test',
+                        q14_answer: 'test',
+                        q15_answer: 'test'
+                    })
+                });
+
+                let html = '<h4>Database Connection:</h4>';
+                html += `<div class="info">📡 Response status: ${response.status}</div>`;
+                
+                const result = await response.json();
+                html += `<div class="info">📝 Response data:</div>`;
+                html += `<pre>${JSON.stringify(result, null, 2)}</pre>`;
+
+                if (response.ok && result.ok) {
+                    html += `<div class="success">✅ Edge Function is accessible</div>`;
+                } else {
+                    html += `<div class="error">❌ Edge Function test failed</div>`;
+                }
+
+                resultDiv.innerHTML = html;
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Database connection failed: ${error.message}</div>`;
+            }
+        }
+
+        async function testQ1115Storage() {
+            const resultDiv = document.getElementById('storageResult');
+            resultDiv.innerHTML = '<div class="info">Testing Q11-15 storage...</div>';
+
+            try {
+                // Get session data
+                const localSession = localStorage.getItem('google_search_session');
+                if (!localSession) {
+                    resultDiv.innerHTML = '<div class="error">❌ No session found. Please start the application flow first.</div>';
+                    return;
+                }
+
+                const sessionData = JSON.parse(localSession);
+                if (!sessionData.participantId || !sessionData.sessionId) {
+                    resultDiv.innerHTML = '<div class="error">❌ Session missing participant_id or session_id. Please restart the application flow.</div>';
+                    return;
+                }
+
+                // Test with real session data
+                const testData = {
+                    participant_id: sessionData.participantId,
+                    session_id: sessionData.sessionId,
+                    q11_answer: 'Debug Test iPhone 15',
+                    q12_answer: 'Debug Test 128GB',
+                    q13_answer: 'Debug Test Blue',
+                    q14_answer: 'Debug Test $799',
+                    q15_answer: 'Debug Test https://apple.com'
+                };
+
+                const response = await supabase.functions.invoke('result-log', {
+                    body: testData
+                });
+
+                let html = '<h4>Q11-15 Storage Test:</h4>';
+                html += `<div class="info">📡 Using participant_id: ${sessionData.participantId}</div>`;
+                html += `<div class="info">📡 Using session_id: ${sessionData.sessionId}</div>`;
+                html += `<div class="info">📝 Test data sent:</div>`;
+                html += `<pre>${JSON.stringify(testData, null, 2)}</pre>`;
+                
+                if (response.error) {
+                    html += `<div class="error">❌ Error: ${JSON.stringify(response.error, null, 2)}</div>`;
+                } else {
+                    html += `<div class="success">✅ Response: ${JSON.stringify(response.data, null, 2)}</div>`;
+                    
+                    if (response.data?.ok) {
+                        html += `<div class="success">🎯 Q11-15 storage test successful!</div>`;
+                    } else {
+                        html += `<div class="error">❌ Storage failed: ${response.data?.error || 'Unknown error'}</div>`;
+                    }
+                }
+
+                resultDiv.innerHTML = html;
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Storage test failed: ${error.message}</div>`;
+            }
+        }
+
+        async function checkRemoteTable() {
+            const resultDiv = document.getElementById('tableResult');
+            resultDiv.innerHTML = '<div class="info">Checking remote table...</div>';
+
+            try {
+                // Try to read from search_result_log table directly
+                const { data, error } = await supabase
+                    .from('search_result_log')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(10);
+
+                let html = '<h4>Remote Table Check:</h4>';
+                
+                if (error) {
+                    html += `<div class="error">❌ Error accessing table: ${error.message}</div>`;
+                    html += `<div class="warning">⚠️ This might be due to RLS policies. Data might still be there but not directly accessible.</div>`;
+                } else {
+                    html += `<div class="success">✅ Table accessible</div>`;
+                    html += `<div class="info">📝 Recent records (last 10):</div>`;
+                    
+                    if (data && data.length > 0) {
+                        html += `<div class="success">🎯 Found ${data.length} records!</div>`;
+                        html += `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+                    } else {
+                        html += `<div class="warning">⚠️ No records found in table</div>`;
+                    }
+                }
+
+                resultDiv.innerHTML = html;
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Table check failed: ${error.message}</div>`;
+            }
+        }
+
+        // Auto-check session state on page load
+        window.onload = () => {
+            checkSessionState();
+        };
+    </script>
+
+    <!-- Include Supabase JS -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+</body>
+</html>

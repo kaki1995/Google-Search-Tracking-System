@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Background Survey Function Test</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        button { margin: 10px; padding: 10px 20px; background: #007cba; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        .success { color: green; }
+        .error { color: red; }
+        pre { background: #f5f5f5; padding: 10px; border-radius: 3px; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Background Survey Function Test</h1>
+    
+    <div class="section">
+        <h3>Test Background Survey Submission</h3>
+        <button onclick="testBackgroundSurveyFunction()">Test Function</button>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = "https://wbguuipoggeamyzrfvbv.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndiZ3V1aXBvZ2dlYW15enJmdmJ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3Nzc2OTksImV4cCI6MjA2OTM1MzY5OX0.ddgmJnxg6hipRZ8_r9WyQpvsM-pkhBlRoybPdtGPEtY";
+
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        async function testBackgroundSurveyFunction() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<div>Testing background survey function...</div>';
+            
+            try {
+                // Generate a test participant ID
+                const participant_id = 'test-' + Math.random().toString(36).slice(2) + Date.now();
+                
+                const responses = {
+                    q1_age_group: '25-34',
+                    q2_gender: 'male',
+                    q3_education: 'bachelor',
+                    q4_employment_status: 'employed',
+                    q5_nationality: 'German',
+                    q6_country_residence: 'Germany',
+                    q7_ai_familiarity: 5,
+                    q8_attention_check: 1,
+                    q9_ai_usage_frequency: '3-5-times'
+                };
+
+                console.log('Submitting with participant_id:', participant_id);
+                console.log('Submitting responses:', responses);
+
+                const { data: resp, error } = await supabase.functions.invoke('submit-background-survey', {
+                    body: { participant_id, responses }
+                });
+
+                console.log('Function response:', resp);
+                console.log('Function error:', error);
+
+                if (error) {
+                    resultDiv.innerHTML = `<div class="error">❌ Function error: ${error.message}</div>`;
+                    console.error('Function invoke error:', error);
+                } else if (!resp?.ok) {
+                    resultDiv.innerHTML = `<div class="error">❌ Function returned error: ${resp?.error || 'Unknown error'}</div>`;
+                    console.error('Function response error:', resp);
+                } else {
+                    resultDiv.innerHTML = `<div class="success">✅ Background survey function working! Participant: ${participant_id}</div>`;
+                    console.log('Function success:', resp);
+                }
+            } catch (err) {
+                resultDiv.innerHTML = `<div class="error">❌ Exception: ${err.message}</div>`;
+                console.error('Exception:', err);
+            }
+        }
+    </script>
+</body>
+</html>

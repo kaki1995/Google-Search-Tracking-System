@@ -41,7 +41,7 @@ Deno.serve(async (req) => {
     // Insert into search_result_log
     const { error: insertError } = await supabase
       .from('search_result_log')
-      .upsert({
+      .insert([{
         participant_id,
         session_id,
         q11_answer: q11_answer || null,
@@ -51,14 +51,16 @@ Deno.serve(async (req) => {
         q15_answer: q15_answer || null,
         ip_address,
         device_type
-      }, {
-        onConflict: 'session_id'
-      });
+      }]);
 
     if (insertError) {
       console.error('Search result log insert error:', insertError);
       return new Response(
-        JSON.stringify({ ok: false, error: 'Failed to save search result log' }),
+        JSON.stringify({ 
+          ok: false, 
+            error: 'Failed to save search result log',
+            details: insertError.message || insertError.error || insertError
+        }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }

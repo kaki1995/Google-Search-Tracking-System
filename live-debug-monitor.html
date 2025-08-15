@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Application Debug Monitor</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .panel { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .logs { background: #f8f9fa; padding: 10px; border-radius: 3px; max-height: 300px; overflow-y: auto; }
+        .success { color: #28a745; }
+        .error { color: #dc3545; }
+        .warning { color: #ffc107; }
+        .info { color: #17a2b8; }
+        button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Live Application Debug Monitor</h1>
+        <p>This page monitors the live application for Q11-15 storage issues.</p>
+
+        <div class="panel">
+            <h3>Instructions:</h3>
+            <ol>
+                <li>Open your main application at <a href="http://localhost:8081" target="_blank">http://localhost:8081</a></li>
+                <li>Go through the complete flow: Background Survey → Task Instructions → Search Results (Q11-15)</li>
+                <li>Watch the logs below for any issues</li>
+                <li>Check if data appears in the remote Supabase table</li>
+            </ol>
+        </div>
+
+        <div class="panel">
+            <h3>Session Monitor</h3>
+            <button onclick="checkCurrentSession()">Check Current Session</button>
+            <button onclick="monitorLocalStorage()">Monitor LocalStorage</button>
+            <button onclick="clearLogs()">Clear Logs</button>
+            <div id="sessionInfo"></div>
+        </div>
+
+        <div class="panel">
+            <h3>Application Flow Logs</h3>
+            <div id="logs" class="logs"></div>
+        </div>
+
+        <div class="panel">
+            <h3>Quick Database Check</h3>
+            <button onclick="checkDatabase()">Check Remote Database</button>
+            <div id="dbInfo"></div>
+        </div>
+    </div>
+
+    <script>
+        // Supabase configuration
+        const SUPABASE_URL = 'https://qksrkvqrppvdqgocqbsj.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFrc3JrdnFycHB2ZHFnb2NxYnNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzE1MDQ1OTQsImV4cCI6MjA0NzA4MDU5NH0.o3jWF9pFSDERON32nDIDc-4g8QGkX6kQx5lCNOvPXwQ';
+
+        let supabase;
+        
+        // Initialize when supabase is available
+        function initSupabase() {
+            if (window.supabase) {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                log('✅ Supabase client initialized', 'success');
+            } else {
+                setTimeout(initSupabase, 100);
+            }
+        }
+
+        function log(message, type = 'info') {
+            const logsDiv = document.getElementById('logs');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = type;
+            logEntry.innerHTML = `[${timestamp}] ${message}`;
+            logsDiv.appendChild(logEntry);
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+
+        function clearLogs() {
+            document.getElementById('logs').innerHTML = '';
+        }
+
+        function checkCurrentSession() {
+            const sessionInfo = document.getElementById('sessionInfo');
+            
+            try {
+                const localSession = localStorage.getItem('google_search_session');
+                const q1115Data = localStorage.getItem('search_result_log_data');
+                
+                let html = '<h4>Current Session:</h4>';
+                
+                if (localSession) {
+                    const sessionData = JSON.parse(localSession);
+                    html += `<div class="success">✅ Session found</div>`;
+                    html += `<pre style="background: #f8f9fa; padding: 10px; border-radius: 3px;">${JSON.stringify(sessionData, null, 2)}</pre>`;
+                    
+                    log(`Session found: participant_id=${sessionData.participantId}, session_id=${sessionData.sessionId}`, 'success');
+                } else {
+                    html += `<div class="error">❌ No session found</div>`;
+                    log('No session found in localStorage', 'error');
+                }
+                
+                if (q1115Data) {
+                    const data = JSON.parse(q1115Data);
+                    html += `<div class="info">📝 Q11-15 draft data found</div>`;
+                    html += `<pre style="background: #f8f9fa; padding: 10px; border-radius: 3px;">${JSON.stringify(data, null, 2)}</pre>`;
+                    log('Q11-15 draft data found in localStorage', 'info');
+                } else {
+                    html += `<div class="warning">⚠️ No Q11-15 draft data</div>`;
+                    log('No Q11-15 draft data in localStorage', 'warning');
+                }
+                
+                sessionInfo.innerHTML = html;
+            } catch (error) {
+                sessionInfo.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+                log(`Error checking session: ${error.message}`, 'error');
+            }
+        }
+
+        function monitorLocalStorage() {
+            log('Starting localStorage monitoring...', 'info');
+            
+            // Monitor changes to localStorage
+            const originalSetItem = localStorage.setItem;
+            localStorage.setItem = function(key, value) {
+                if (key.includes('survey') || key.includes('session') || key.includes('search_result')) {
+                    log(`📝 LocalStorage updated: ${key}`, 'info');
+                    if (key === 'search_result_log_data') {
+                        try {
+                            const data = JSON.parse(value);
+                            log(`🎯 Q11-15 data saved: ${JSON.stringify(data)}`, 'success');
+                        } catch (e) {
+                            log(`⚠️ Q11-15 data not valid JSON: ${value}`, 'warning');
+                        }
+                    }
+                }
+                originalSetItem.apply(this, arguments);
+            };
+
+            // Monitor session changes specifically
+            setInterval(() => {
+                const session = localStorage.getItem('google_search_session');
+                if (session) {
+                    try {
+                        const data = JSON.parse(session);
+                        if (data.participantId && data.sessionId) {
+                            // Session looks good
+                        }
+                    } catch (e) {
+                        log('⚠️ Session data corrupted', 'warning');
+                    }
+                }
+            }, 2000);
+        }
+
+        async function checkDatabase() {
+            const dbInfo = document.getElementById('dbInfo');
+            dbInfo.innerHTML = '<div>Checking database...</div>';
+            
+            try {
+                log('🔍 Checking remote database...', 'info');
+                
+                // Try to get recent records
+                const { data, error } = await supabase
+                    .from('search_result_log')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(5);
+
+                if (error) {
+                    dbInfo.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+                    log(`Database error: ${error.message}`, 'error');
+                } else {
+                    dbInfo.innerHTML = `<div class="success">✅ Found ${data.length} records</div>`;
+                    log(`Found ${data.length} records in search_result_log table`, 'success');
+                    
+                    if (data.length > 0) {
+                        dbInfo.innerHTML += `<pre style="background: #f8f9fa; padding: 10px; border-radius: 3px;">${JSON.stringify(data, null, 2)}</pre>`;
+                    }
+                }
+            } catch (error) {
+                dbInfo.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+                log(`Database check failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Auto-start monitoring
+        window.onload = () => {
+            log('🚀 Debug monitor started', 'info');
+            checkCurrentSession();
+            monitorLocalStorage();
+        };
+
+        // Load Supabase and initialize
+        const script = document.createElement('script');
+        script.src = 'https://unpkg.com/@supabase/supabase-js@2';
+        script.onload = initSupabase;
+        document.head.appendChild(script);
+    </script>
+</body>
+</html>

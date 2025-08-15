@@ -78,6 +78,44 @@ Deno.serve(async (req) => {
           { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
+    } else if (page_id === 'search_result_log') {
+      // Save to search_result_log or update existing
+      const { error: saveError } = await supabase
+        .from('search_result_log')
+        .upsert({
+          participant_id,
+          ...answers, // Spread the q11-q15 answers
+          ...getClientInfo(req)
+        }, {
+          onConflict: 'participant_id'
+        });
+
+      if (saveError) {
+        console.error('Search result log save error:', saveError);
+        return new Response(
+          JSON.stringify({ ok: false, error: 'Failed to save search result log' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+    } else if (page_id === 'task_instruction') {
+      // Save to task_instruction or update existing
+      const { error: saveError } = await supabase
+        .from('task_instruction')
+        .upsert({
+          participant_id,
+          q10_response: answers.budget_range || answers.q10_response,
+          ...getClientInfo(req)
+        }, {
+          onConflict: 'participant_id'
+        });
+
+      if (saveError) {
+        console.error('Task instruction save error:', saveError);
+        return new Response(
+          JSON.stringify({ ok: false, error: 'Failed to save task instruction' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
     }
 
     return new Response(
