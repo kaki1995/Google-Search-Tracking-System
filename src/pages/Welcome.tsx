@@ -71,16 +71,14 @@ export default function Welcome() {
   const handleContinue = async () => {
     if (agreed === true) {
       try {
-        // confirmConsent now generates a fresh participant ID internally
-        const sessionId = await sessionManager.confirmConsent();
-        const participant_id = sessionManager.getParticipantId();
-        
-        if (participant_id) {
-          await supabase.functions.invoke('log-consent-event', {
-            body: { participant_id, event_type: 'continue_study' }
-          });
-        }
-        
+        // Ensure participant ID and start session
+        const participant_id = sessionManager.ensureParticipantId();
+        sessionManager.setParticipantId(participant_id);
+        await supabase.functions.invoke('log-consent-event', {
+          body: { participant_id, event_type: 'continue_study' }
+        });
+        // Confirm consent and start new session
+        await sessionManager.confirmConsent();
         // Track consent given (final consent action)
         await trackingService.trackConsent(true);
       } catch (error) {
