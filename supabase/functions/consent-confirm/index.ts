@@ -39,6 +39,35 @@ Deno.serve(async (req) => {
 
     console.log(`Consent confirmed for participant: ${participant_id}`);
 
+    // Ensure participant exists first
+    const { data: pExist, error: pErr } = await supabase
+      .from('participants')
+      .select('participant_id')
+      .eq('participant_id', participant_id)
+      .maybeSingle();
+
+    if (pErr) {
+      console.error('participants select error', pErr);
+      return new Response(
+        JSON.stringify({ ok: false, error: 'Failed to check participant' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (!pExist) {
+      const { error: insP } = await supabase
+        .from('participants')
+        .insert([{ participant_id }]);
+      if (insP) {
+        console.error('participants insert error', insP);
+        return new Response(
+          JSON.stringify({ ok: false, error: 'Failed to create participant' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      console.log(`Created new participant: ${participant_id}`);
+    }
+
     // End any active session for this participant
     const { error: endSessionError } = await supabase
       .from('search_sessions')

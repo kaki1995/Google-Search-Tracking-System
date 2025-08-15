@@ -10,7 +10,6 @@ import LikertScale from "./LikertScale";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { sessionManager } from "@/lib/sessionManager";
-import { getOrCreateParticipantId } from "@/lib/utils/uuid";
 interface SurveyForm {
   age: string;
   gender: string;
@@ -78,8 +77,11 @@ export default function BackgroundSurvey() {
     console.log('BackgroundSurvey: onSubmit called with data:', data);
     setIsSubmitting(true);
     try {
-      // Get or create participant id using utility function (auto-validates UUID format)
-      const participant_id = getOrCreateParticipantId();
+      // Use existing participant ID from session (should be set from Welcome page)
+      const participant_id = sessionManager.getParticipantId();
+      if (!participant_id) {
+        throw new Error('No participant ID found. Please restart from the welcome page.');
+      }
       console.log('BackgroundSurvey: participant_id:', participant_id);
 
       const responses = {

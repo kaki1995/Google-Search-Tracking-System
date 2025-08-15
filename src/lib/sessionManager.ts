@@ -1,5 +1,4 @@
 import { supabase } from "@/integrations/supabase/client";
-import { getOrCreateParticipantId } from "@/lib/utils/uuid";
 
 class SessionManager {
   private participantId: string | null = null;
@@ -48,6 +47,17 @@ class SessionManager {
     if (this.participantId) localStorage.setItem('participant_id', this.participantId);
     if (this.sessionId) localStorage.setItem('session_id', this.sessionId);
     if (this.sessionTimingId) localStorage.setItem('session_timing_id', this.sessionTimingId);
+    
+    // Update the main session data
+    if (this.participantId) {
+      const sessionData = {
+        participantId: this.participantId,
+        sessionId: this.sessionId,
+        sessionTimingId: this.sessionTimingId,
+        updatedAt: new Date().toISOString()
+      };
+      localStorage.setItem('google_search_session', JSON.stringify(sessionData));
+    }
   }
 
   private clearStorage() {
@@ -69,12 +79,51 @@ class SessionManager {
     localStorage.setItem('participant_id', id);
   }
 
-  ensureParticipantId(): string {
-    // Use session-based participant ID for better multi-user support on same device
-    if (!this.participantId) {
-      this.participantId = this.generateSessionBasedParticipantId();
-      localStorage.setItem('participant_id', this.participantId);
+  // Generate a unique participant ID for each new session (supports multiple users per device)
+  private generateUniqueParticipantId(): string {
+    // Generate a proper UUID for database compatibility
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+      return crypto.randomUUID();
     }
+    // Fallback UUID generation
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      const r = Math.random() * 16 | 0;
+      const v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  }
+
+  // Clear all session data to start fresh
+  clearSession(): void {
+    this.participantId = null;
+    this.sessionId = null;
+    this.sessionTimingId = null;
+    localStorage.removeItem('participant_id');
+    localStorage.removeItem('session_id');
+    localStorage.removeItem('session_timing_id');
+    localStorage.removeItem('google_search_session');
+    this.clearLocalAnswers();
+  }
+
+  // Create new session - only called after consent confirmation
+  createNewSession(): string {
+    // Always generate a new unique participant ID for each session
+    this.participantId = this.generateUniqueParticipantId();
+    this.sessionId = null; // Will be set when confirmConsent is called
+    this.sessionTimingId = null;
+    
+    // Save the new participant ID
+    localStorage.setItem('participant_id', this.participantId);
+    
+    // Store session info for cross-tab consistency
+    const sessionData = {
+      participantId: this.participantId,
+      sessionId: this.sessionId,
+      createdAt: new Date().toISOString()
+    };
+    localStorage.setItem('google_search_session', JSON.stringify(sessionData));
+    
+    console.log('🆕 New session created with participant_id:', this.participantId);
     return this.participantId;
   }
 

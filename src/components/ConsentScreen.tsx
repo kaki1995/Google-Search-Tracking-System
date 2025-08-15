@@ -6,7 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { trackingService } from "@/lib/tracking";
 import { supabase } from "@/integrations/supabase/client";
-import { getOrCreateParticipantId } from "@/lib/utils/uuid";
+import { sessionManager } from "@/lib/sessionManager";
 
 const ConsentScreen = () => {
   const [consent, setConsent] = useState(false);
@@ -18,7 +18,12 @@ const ConsentScreen = () => {
     setIsSubmitting(true);
     try {
       // Get or create participant id using utility function
-      const participant_id = getOrCreateParticipantId();
+      // Use existing participant ID from session
+      const participant_id = sessionManager.getParticipantId();
+      if (!participant_id) {
+        console.warn('No participant ID found during consent');
+        return;
+      }
       // Log consent event via Edge Function
       await supabase.functions.invoke('log-consent-event', {
         body: { participant_id, event_type: 'consent_given' }

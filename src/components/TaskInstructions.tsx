@@ -6,7 +6,7 @@ import StudyButton from "@/components/StudyButton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { getOrCreateParticipantId } from "@/lib/utils/uuid";
+import { sessionManager } from "@/lib/sessionManager";
 interface TaskForm {
   budget: string;
 }
@@ -41,7 +41,12 @@ const TaskInstructions = () => {
       console.log("Budget range selected:", budgetRange);
       
       if (budgetRange) {
-        const participant_id = getOrCreateParticipantId();
+        // Use existing participant ID from session
+        const participant_id = sessionManager.getParticipantId();
+        if (!participant_id) {
+          console.warn('No participant ID found during task instruction');
+          return;
+        }
         const { data: resp, error } = await supabase.functions.invoke('submit-task-instruction', {
           body: { participant_id, q10_response: budgetRange }
         });

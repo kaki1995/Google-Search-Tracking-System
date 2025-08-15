@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-User Session Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .session { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .session h3 { margin-top: 0; }
+        button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; color: #155724; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; color: #721c24; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; color: #0c5460; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+        .clear-btn { background: #dc3545; }
+        .clear-btn:hover { background: #c82333; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Multi-User Session Test</h1>
+        <p>This page tests that multiple users can use the same browser/device and get unique participant IDs.</p>
+
+        <div class="session">
+            <h3>Browser Storage Status</h3>
+            <button onclick="checkCurrentStorage()">Check Current Storage</button>
+            <button onclick="clearAllStorage()" class="clear-btn">Clear All Storage</button>
+            <div id="storageStatus"></div>
+        </div>
+
+        <div class="session">
+            <h3>Simulate Multiple Users</h3>
+            <p>Each "user" will get a fresh session as if they just opened the app.</p>
+            <button onclick="simulateUser(1)">👤 User 1 - Start Session</button>
+            <button onclick="simulateUser(2)">👤 User 2 - Start Session</button>
+            <button onclick="simulateUser(3)">👤 User 3 - Start Session</button>
+            <div id="userResults"></div>
+        </div>
+
+        <div class="session">
+            <h3>Test Results Summary</h3>
+            <div id="testSummary"></div>
+        </div>
+    </div>
+
+    <script>
+        let userSessions = [];
+
+        function generateUUID() {
+            if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+                return crypto.randomUUID();
+            }
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0;
+                const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        function checkCurrentStorage() {
+            const statusDiv = document.getElementById('storageStatus');
+            
+            const participantId = localStorage.getItem('participant_id');
+            const sessionId = localStorage.getItem('session_id');
+            const sessionData = localStorage.getItem('google_search_session');
+            
+            let html = '<h4>Current Storage:</h4>';
+            html += `<div>participant_id: ${participantId || 'Not set'}</div>`;
+            html += `<div>session_id: ${sessionId || 'Not set'}</div>`;
+            
+            if (sessionData) {
+                try {
+                    const data = JSON.parse(sessionData);
+                    html += `<div>google_search_session:</div>`;
+                    html += `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+                } catch (e) {
+                    html += `<div>google_search_session: Invalid JSON</div>`;
+                }
+            } else {
+                html += `<div>google_search_session: Not set</div>`;
+            }
+            
+            statusDiv.innerHTML = html;
+        }
+
+        function clearAllStorage() {
+            localStorage.clear();
+            userSessions = [];
+            document.getElementById('storageStatus').innerHTML = '<div class="success">✅ All storage cleared</div>';
+            document.getElementById('userResults').innerHTML = '';
+            document.getElementById('testSummary').innerHTML = '';
+        }
+
+        async function simulateUser(userNumber) {
+            const resultsDiv = document.getElementById('userResults');
+            
+            // Clear previous session (simulating new user opening app)
+            localStorage.removeItem('participant_id');
+            localStorage.removeItem('session_id');
+            localStorage.removeItem('session_timing_id');
+            localStorage.removeItem('google_search_session');
+            
+            // Generate unique participant ID (like sessionManager.createNewSession() would do)
+            const participantId = generateUUID();
+            
+            // Store it (like the app would do)
+            localStorage.setItem('participant_id', participantId);
+            
+            const sessionData = {
+                participantId: participantId,
+                sessionId: null,
+                createdAt: new Date().toISOString(),
+                userNumber: userNumber
+            };
+            localStorage.setItem('google_search_session', JSON.stringify(sessionData));
+            
+            // Record this session
+            userSessions.push({
+                userNumber,
+                participantId,
+                timestamp: new Date().toISOString()
+            });
+            
+            // Update display
+            let html = '<h4>User Sessions:</h4>';
+            userSessions.forEach(session => {
+                html += `<div class="info">👤 User ${session.userNumber}: ${session.participantId} (${new Date(session.timestamp).toLocaleTimeString()})</div>`;
+            });
+            
+            resultsDiv.innerHTML = html;
+            
+            // Update summary
+            updateTestSummary();
+            
+            console.log(`User ${userNumber} session created:`, participantId);
+        }
+
+        function updateTestSummary() {
+            const summaryDiv = document.getElementById('testSummary');
+            
+            if (userSessions.length === 0) {
+                summaryDiv.innerHTML = '<div>No sessions created yet</div>';
+                return;
+            }
+            
+            // Check for uniqueness
+            const participantIds = userSessions.map(s => s.participantId);
+            const uniqueIds = [...new Set(participantIds)];
+            
+            let html = '<h4>Test Results:</h4>';
+            html += `<div>Total sessions: ${userSessions.length}</div>`;
+            html += `<div>Unique participant IDs: ${uniqueIds.length}</div>`;
+            
+            if (uniqueIds.length === userSessions.length) {
+                html += `<div class="success">✅ All participant IDs are unique! Multi-user support working correctly.</div>`;
+            } else {
+                html += `<div class="error">❌ Duplicate participant IDs found! Multi-user support needs fixing.</div>`;
+            }
+            
+            html += '<h5>All Participant IDs:</h5>';
+            uniqueIds.forEach(id => {
+                const count = participantIds.filter(pid => pid === id).length;
+                const duplicateText = count > 1 ? ` (${count} times - DUPLICATE!)` : '';
+                html += `<div><code>${id}</code>${duplicateText}</div>`;
+            });
+            
+            summaryDiv.innerHTML = html;
+        }
+
+        // Initialize
+        window.onload = () => {
+            checkCurrentStorage();
+        };
+    </script>
+</body>
+</html>

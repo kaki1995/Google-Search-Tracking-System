@@ -71,28 +71,45 @@ export default function Welcome() {
   const handleContinue = async () => {
     if (agreed === true) {
       try {
-        // Ensure participant ID and start session
-        const participant_id = sessionManager.ensureParticipantId();
-        sessionManager.setParticipantId(participant_id);
+        // Clear any existing session data to ensure fresh start
+        sessionManager.clearSession();
+        
+        // Create a new unique session for this participant
+        const participant_id = sessionManager.createNewSession();
+        
+        console.log('🎯 Starting new study session for participant:', participant_id);
+        
+        // Log consent event
         await supabase.functions.invoke('log-consent-event', {
           body: { participant_id, event_type: 'continue_study' }
         });
-        // Confirm consent and start new session
-        await sessionManager.confirmConsent();
+        
+        // Confirm consent and start new session (this will set session_id)
+        const session_id = await sessionManager.confirmConsent();
+        if (!session_id) {
+          throw new Error('Failed to create session');
+        }
+        
+        console.log('✅ Session created successfully:', { participant_id, session_id });
+        
         // Track consent given (final consent action)
         await trackingService.trackConsent(true);
       } catch (error) {
-        console.error('Failed to log/track consent:', error);
+        console.error('Failed to create new session:', error);
+        // Still navigate to continue the flow
       }
       navigate("/background-survey");
     }
   };
   const handleExit = async () => {
     try {
-      const participant_id = sessionManager.ensureParticipantId();
-      await supabase.functions.invoke('log-consent-event', {
-        body: { participant_id, event_type: 'exit_study' }
-      });
+      // Only log if we have an existing participant ID (don't create new one for exit)
+      const participant_id = sessionManager.getParticipantId();
+      if (participant_id) {
+        await supabase.functions.invoke('log-consent-event', {
+          body: { participant_id, event_type: 'exit_study' }
+        });
+      }
     } catch (e) {
       console.error('Failed to log exit_study', e);
     }
