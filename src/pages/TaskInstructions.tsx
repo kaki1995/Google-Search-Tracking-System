@@ -125,9 +125,9 @@ export default function TaskInstructions() {
                     </FormLabel>
                     <FormControl>
                       <Select onValueChange={field.onChange} value={field.value}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select your budget range" />
-                        </SelectTrigger>
+                     <SelectTrigger>
+                       <SelectValue placeholder="Please select your budget range" />
+                     </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="under-500">Under $500</SelectItem>
                           <SelectItem value="500-1000">$500 - $1,000</SelectItem>
