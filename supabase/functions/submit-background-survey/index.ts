@@ -82,6 +82,14 @@ serve(async (req) => {
 
     if (pErr) {
       console.error('participants select error', pErr);
+      return new Response(JSON.stringify({ 
+        ok: false, 
+        error: 'Failed to check participant existence',
+        details: pErr.message || pErr
+      }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
     if (!pExist) {
       const { error: insP } = await supabase
@@ -89,18 +97,30 @@ serve(async (req) => {
         .insert([{ participant_id }]);
       if (insP) {
         console.error('participants insert error', insP);
+        return new Response(JSON.stringify({ 
+          ok: false, 
+          error: 'Failed to create participant',
+          details: insP.message || insP
+        }), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
       }
     }
 
     const { ip_address, device_type } = getClientInfo(req);
 
     const { error } = await supabase
-      .from('background_surveys')
+      .from('background_survey')
       .insert([{ participant_id, responses: payload, ip_address, device_type }]);
 
     if (error) {
-      console.error('Insert background_surveys error', error);
-      return new Response(JSON.stringify({ ok: false, error: error.message }), {
+      console.error('Insert background_survey error', error);
+      return new Response(JSON.stringify({ 
+        ok: false, 
+        error: error.message,
+        details: error.details || error.hint || error
+      }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
