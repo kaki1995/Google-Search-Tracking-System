@@ -5,6 +5,7 @@ import StudyButton from "@/components/StudyButton";
 import { trackingService } from "@/lib/tracking";
 import { enhancedTrackingService } from "@/lib/tracking_enhanced";
 import { supabase } from "@/integrations/supabase/client";
+import { sessionManager } from "@/lib/sessionManager";
 export default function Welcome() {
   const [agreed, setAgreed] = useState<boolean | null>(null);
   const [sessionInitialized, setSessionInitialized] = useState(false);
@@ -66,25 +67,18 @@ export default function Welcome() {
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [searchParams, agreed]);
-  // Retrieve or create a participant_id
-  const getParticipantId = () => {
-    let pid = localStorage.getItem('participant_id');
-    if (!pid) {
-      // Generate a UUID (browser crypto)
-      pid = (crypto as any).randomUUID ? (crypto as any).randomUUID() : Math.random().toString(36).slice(2) + Date.now();
-      localStorage.setItem('participant_id', pid);
-    }
-    return pid;
-  };
 
   const handleContinue = async () => {
     if (agreed === true) {
       try {
-        // Log consent continue event via Edge Function
-        const participant_id = getParticipantId();
+        // Ensure participant ID and start session
+        const participant_id = sessionManager.ensureParticipantId();
+        sessionManager.setParticipantId(participant_id);
         await supabase.functions.invoke('log-consent-event', {
           body: { participant_id, event_type: 'continue_study' }
         });
+        // Confirm consent and start new session
+        await sessionManager.confirmConsent();
         // Track consent given (final consent action)
         await trackingService.trackConsent(true);
       } catch (error) {
@@ -95,7 +89,7 @@ export default function Welcome() {
   };
   const handleExit = async () => {
     try {
-      const participant_id = getParticipantId();
+      const participant_id = sessionManager.ensureParticipantId();
       await supabase.functions.invoke('log-consent-event', {
         body: { participant_id, event_type: 'exit_study' }
       });

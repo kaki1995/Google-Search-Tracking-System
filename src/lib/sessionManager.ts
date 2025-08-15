@@ -9,6 +9,14 @@ class SessionManager {
     this.loadFromStorage();
   }
 
+  // Generate session-based participant ID to handle multiple users on same device
+  generateSessionBasedParticipantId(): string {
+    const timestamp = Date.now();
+    const random = Math.random().toString(36).substring(2, 15);
+    const sessionId = `${timestamp}-${random}`;
+    return sessionId;
+  }
+
   private loadFromStorage() {
     this.participantId = localStorage.getItem('participant_id');
     this.sessionId = localStorage.getItem('session_id');
@@ -38,6 +46,14 @@ class SessionManager {
   setParticipantId(id: string) {
     this.participantId = id;
     localStorage.setItem('participant_id', id);
+  }
+
+  ensureParticipantId(): string {
+    if (!this.participantId) {
+      this.participantId = this.generateSessionBasedParticipantId();
+      localStorage.setItem('participant_id', this.participantId);
+    }
+    return this.participantId;
   }
 
   async ensureSession(): Promise<string | null> {
