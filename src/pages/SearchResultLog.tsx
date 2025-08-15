@@ -30,10 +30,7 @@ export default function SearchResultLog() {
     }
   });
 
-  // Use the enhanced response persistence hook
-  const { saveResponses } = useResponsePersistence(form, 'search_result_log');
-
-  // Use the enhanced response persistence hook
+  // Response persistence (single hook instance – removed accidental duplicate)
   const { saveResponses } = useResponsePersistence(form, 'search_result_log');
 
   const handlePrevious = async () => {

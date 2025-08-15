@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { sessionManager } from '@/lib/sessionManager';
 
@@ -16,6 +16,8 @@ export function useResponsePersistence<T extends Record<string, any>>(
 ) {
   const { autosave = true, debounceMs = 500 } = options;
 
+  const lastSavedRef = useRef<string>("{}");
+
   // Load saved responses on component mount
   useEffect(() => {
     const loadSavedResponses = async () => {
@@ -29,20 +31,14 @@ export function useResponsePersistence<T extends Record<string, any>>(
           return;
         }
         
-        console.log(`🔍 [${pageId}] Loading saved responses...`);
         const savedData = await sessionManager.loadResponses(pageId);
-        console.log(`📋 [${pageId}] Retrieved data:`, savedData);
         
         if (savedData && Object.keys(savedData).length > 0) {
-          console.log(`🔄 [${pageId}] Restoring saved responses:`, savedData);
-          
           // Reset form with saved data - this is the key part
           form.reset(savedData as T);
-          
-          console.log(`✅ [${pageId}] Form reset completed`);
-          console.log(`📊 [${pageId}] Current form values:`, form.getValues());
+          try { lastSavedRef.current = JSON.stringify(savedData); } catch {}
         } else {
-          console.log(`📭 [${pageId}] No saved data found`);
+          // no saved data
         }
       } catch (error) {
         console.error(`❌ [${pageId}] Failed to load saved responses:`, error);
@@ -59,12 +55,15 @@ export function useResponsePersistence<T extends Record<string, any>>(
       return;
     }
 
-    console.log(`🔧 Setting up auto-save for ${pageId}`);
     let timeoutId: NodeJS.Timeout;
 
     const subscription = form.watch((values) => {
-      console.log(`👀 [${pageId}] Form values changed:`, values);
-      
+      // Skip if identical snapshot
+      try {
+        const json = JSON.stringify(values);
+        if (json === lastSavedRef.current) return;
+      } catch {}
+
       // Clear previous timeout
       if (timeoutId) {
         clearTimeout(timeoutId);
@@ -79,11 +78,13 @@ export function useResponsePersistence<T extends Record<string, any>>(
           );
 
           if (hasValues) {
-            console.log(`💾 [${pageId}] Auto-saving responses:`, values);
-            await sessionManager.saveResponses(pageId, values);
-            console.log(`✅ [${pageId}] Auto-save completed`);
+            const json = JSON.stringify(values);
+            if (json !== lastSavedRef.current) {
+              await sessionManager.saveResponses(pageId, values);
+              lastSavedRef.current = json;
+            }
           } else {
-            console.log(`⚠️ [${pageId}] No values to save - all fields empty`);
+            // all empty – skip
           }
         } catch (error) {
           console.error(`❌ [${pageId}] Failed to auto-save responses:`, error);
@@ -92,7 +93,6 @@ export function useResponsePersistence<T extends Record<string, any>>(
     });
 
     return () => {
-      console.log(`🧹 [${pageId}] Cleaning up auto-save`);
       if (timeoutId) {
         clearTimeout(timeoutId);
       }
@@ -104,8 +104,11 @@ export function useResponsePersistence<T extends Record<string, any>>(
   const saveResponses = async (data?: T) => {
     try {
       const values = data || form.getValues();
-      await sessionManager.saveResponses(pageId, values);
-      console.log(`💾 [${pageId}] Manually saved responses`);
+      const json = JSON.stringify(values);
+      if (json !== lastSavedRef.current) {
+        await sessionManager.saveResponses(pageId, values);
+        lastSavedRef.current = json;
+      }
     } catch (error) {
       console.error(`❌ [${pageId}] Failed to manually save responses:`, error);
       throw error;
@@ -114,9 +117,9 @@ export function useResponsePersistence<T extends Record<string, any>>(
 
   // Clear saved responses
   const clearResponses = () => {
-    sessionManager.clearResponses(pageId);
-    form.reset();
-    console.log(`🗑️ [${pageId}] Cleared responses`);
+  sessionManager.clearResponses(pageId);
+  form.reset();
+  lastSavedRef.current = "{}";
   };
 
   // Check if responses exist
