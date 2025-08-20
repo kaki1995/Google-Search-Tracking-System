@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { trackingAPI } from "@/lib/trackingApi";
 import { useScrollTracking } from "@/hooks/useScrollTracking";
@@ -256,8 +256,9 @@ const GoogleSERP = () => {
                 className="flex-1 outline-none border-0 bg-transparent text-base px-2" 
                 value={searchQuery} 
                 onChange={(e) => setSearchQuery(e.target.value)} 
-                onKeyPress={(e) => e.key === 'Enter' && handleSearch(1)}
+                onKeyPress={(e) => e.key === 'Enter' && !isLoading && handleSearch(1)}
                 placeholder=""
+                disabled={isLoading}
               />
               <div className="flex items-center gap-3 ml-3">
                 <svg className="w-5 h-5 text-gray-400 cursor-pointer hover:text-gray-600" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -275,17 +276,33 @@ const GoogleSERP = () => {
           <div className="flex justify-center gap-8 mb-12">
             <Button 
               onClick={() => handleSearch(1)}
-              className="px-6 py-2 text-sm font-medium bg-gray-50 border border-gray-300 rounded hover:shadow-sm hover:bg-gray-100 text-gray-700"
+              disabled={isLoading}
+              className="px-6 py-2 text-sm font-medium bg-gray-50 border border-gray-300 rounded hover:shadow-sm hover:bg-gray-100 text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
               variant="outline"
             >
-              Google Search
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Searching...
+                </>
+              ) : (
+                "Google Search"
+              )}
             </Button>
             <Button 
               onClick={() => handleSearch(1)}
-              className="px-6 py-2 text-sm font-medium bg-gray-50 border border-gray-300 rounded hover:shadow-sm hover:bg-gray-100 text-gray-700"
+              disabled={isLoading}
+              className="px-6 py-2 text-sm font-medium bg-gray-50 border border-gray-300 rounded hover:shadow-sm hover:bg-gray-100 text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
               variant="outline"
             >
-              I'm Feeling Lucky
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Searching...
+                </>
+              ) : (
+                "I'm Feeling Lucky"
+              )}
             </Button>
           </div>
           
@@ -342,7 +359,8 @@ const GoogleSERP = () => {
                       className="flex-1 outline-none border-0 bg-transparent text-base px-2" 
                       value={searchQuery} 
                       onChange={(e) => setSearchQuery(e.target.value)} 
-                      onKeyPress={(e) => e.key === 'Enter' && handleSearch(1)}
+                      onKeyPress={(e) => e.key === 'Enter' && !isLoading && handleSearch(1)}
+                      disabled={isLoading}
                     />
                     <div className="flex items-center gap-3 ml-3">
                       <svg className="w-5 h-5 text-gray-400 cursor-pointer hover:text-gray-600" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -352,7 +370,11 @@ const GoogleSERP = () => {
                       <svg className="w-5 h-5 text-gray-400 cursor-pointer hover:text-gray-600" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M14.12 4l1.83 2H20v12H4V6h4.05l1.83-2h4.24M15 2H9L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2zm-3 7c1.65 0 3 1.35 3 3s-1.35 3-3 3-3-1.35-3-3 1.35-3 3-3m0-2c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5z" fill="currentColor"/>
                       </svg>
-                      <Search className="w-4 h-4 text-blue-500 cursor-pointer" onClick={() => handleSearch(1)} />
+                      {isLoading ? (
+                        <Loader2 className="w-4 h-4 text-blue-500 animate-spin" />
+                      ) : (
+                        <Search className="w-4 h-4 text-blue-500 cursor-pointer" onClick={() => handleSearch(1)} />
+                      )}
                     </div>
                   </div>
                 </div>
@@ -390,12 +412,23 @@ const GoogleSERP = () => {
           {/* Search Results */}
           <div className="max-w-[700px] mx-auto px-4 py-4">
             {/* Results Meta Info */}
-            <div className="text-sm text-gray-600 mb-6">
-              About {formatNumber(pagination.totalResults)} results ({formatSearchTime(pagination.searchTime)} seconds)
-            </div>
+            {!isLoading && (
+              <div className="text-sm text-gray-600 mb-6">
+                About {formatNumber(pagination.totalResults)} results ({formatSearchTime(pagination.searchTime)} seconds)
+              </div>
+            )}
+
+            {/* Loading Spinner */}
+            {isLoading && (
+              <div className="flex flex-col items-center justify-center py-12">
+                <Loader2 className="w-8 h-8 text-blue-500 animate-spin mb-4" />
+                <p className="text-sm text-gray-600">Searching...</p>
+              </div>
+            )}
 
             {/* Results List */}
-            <div className="space-y-6">
+            {!isLoading && (
+              <div className="space-y-6">
               {currentResults.map((result) => (
                 <div key={result.rank} className="group">
                   <div className="flex gap-4">
@@ -477,10 +510,12 @@ const GoogleSERP = () => {
                   </div>
                 </div>
               ))}
-            </div>
+              </div>
+            )}
 
             {/* Pagination */}
-            <div className="flex items-center justify-center gap-8 mt-8 pt-6">
+            {!isLoading && (
+              <div className="flex items-center justify-center gap-8 mt-8 pt-6">
               <Button
                 variant="ghost"
                 onClick={handlePreviousPage}
@@ -504,12 +539,6 @@ const GoogleSERP = () => {
                 Next
                 <ChevronRight className="w-4 h-4" />
               </Button>
-            </div>
-
-            {/* Loading State */}
-            {isLoading && (
-              <div className="flex justify-center py-8">
-                <div className="text-gray-600">Loading...</div>
               </div>
             )}
           </div>
