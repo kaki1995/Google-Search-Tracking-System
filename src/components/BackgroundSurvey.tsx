@@ -367,7 +367,7 @@ export default function BackgroundSurvey() {
                         className="border-b border-t-0 border-l-0 border-r-0 rounded-none"
                         onBlur={(e) => {
                           field.onBlur(e);
-                          handleSaveResponses(form.getValues());
+                          saveResponses();
                         }}
                       />
                     </FormControl>
@@ -389,7 +389,7 @@ export default function BackgroundSurvey() {
                         className="border-b border-t-0 border-l-0 border-r-0 rounded-none"
                         onBlur={(e) => {
                           field.onBlur(e);
-                          handleSaveResponses(form.getValues());
+                          saveResponses();
                         }}
                       />
                     </FormControl>
