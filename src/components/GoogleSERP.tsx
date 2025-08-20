@@ -190,6 +190,11 @@ const GoogleSERP = () => {
   };
 
   const handleResultClick = (result: SearchResult, event?: React.MouseEvent) => {
+    // Always prevent default and open in new tab
+    if (event) {
+      event.preventDefault();
+    }
+    
     // Log the click for tracking
     trackingAPI.logClick(result.link, result.rank);
     dispatchSERPEvent('result_click', { 
@@ -198,12 +203,8 @@ const GoogleSERP = () => {
       title: result.title 
     });
     
-    // Only handle regular left clicks, let browser handle special clicks
-    if (event && !event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0) {
-      event.preventDefault();
-      window.open(result.link, '_blank', 'noopener,noreferrer');
-    }
-    // For Ctrl+click, middle-click, right-click, etc., let the browser handle it naturally
+    // Always open in new tab
+    window.open(result.link, '_blank', 'noopener,noreferrer');
   };
 
   const handleNextPage = () => {
@@ -228,179 +229,230 @@ const GoogleSERP = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Header with search box */}
-      <div className="border-b border-gray-200 bg-white sticky top-0 z-10">
-        <div className="max-w-[700px] mx-auto px-4 py-3">
-          <div className="flex items-center gap-4">
-            {/* Google Logo (smaller) */}
+      {currentResults.length === 0 ? (
+        // Google Homepage Layout
+        <div className="flex flex-col items-center justify-center min-h-screen px-4">
+          {/* Google Logo */}
+          <div className="mb-8">
             <img 
-              src="/lovable-uploads/35f40ea1-5551-4fc9-a6b3-d7ef526bef72.png" 
+              src="/lovable-uploads/9fa17bbd-23cd-47dc-afd2-a32fb3dc9574.png" 
               alt="Google" 
-              className="h-8 w-auto cursor-pointer"
-              onClick={() => navigate('/')}
+              className="h-24 w-auto"
             />
-            
-            {/* Search Box */}
-            <div className="flex-1 max-w-[584px]">
-              <div className="flex items-center h-11 border border-gray-300 rounded-full px-4 hover:shadow-md transition-shadow bg-white">
-                <Input 
-                  type="text" 
-                  className="flex-1 outline-none border-0 bg-transparent text-base px-2" 
-                  value={searchQuery} 
-                  onChange={(e) => setSearchQuery(e.target.value)} 
-                  onKeyPress={(e) => e.key === 'Enter' && handleSearch(1)}
-                />
-                <div className="border-l border-gray-300 h-6 mx-3"></div>
+          </div>
+          
+          {/* Search Box */}
+          <div className="w-full max-w-[584px] mb-8">
+            <div className="flex items-center h-12 border border-gray-300 rounded-full px-4 hover:shadow-md transition-shadow bg-white">
+              <Search className="w-4 h-4 text-gray-400 mr-3" />
+              <Input 
+                type="text" 
+                className="flex-1 outline-none border-0 bg-transparent text-base px-2" 
+                value={searchQuery} 
+                onChange={(e) => setSearchQuery(e.target.value)} 
+                onKeyPress={(e) => e.key === 'Enter' && handleSearch(1)}
+              />
+              <div className="flex items-center gap-3 ml-3">
                 <Search className="w-4 h-4 text-blue-500 cursor-pointer" onClick={() => handleSearch(1)} />
               </div>
             </div>
-            
-            <Button onClick={handleFinishTask} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-sm">
+          </div>
+          
+          {/* Action Buttons */}
+          <div className="flex gap-4 mb-8">
+            <Button 
+              variant="outline" 
+              onClick={() => navigate('/task-instructions')} 
+              className="px-6 py-2 text-sm font-medium border border-gray-300 rounded hover:shadow-sm bg-gray-50 hover:bg-gray-100"
+            >
+              Previous Page
+            </Button>
+            <Button 
+              onClick={handleFinishTask} 
+              className="px-6 py-2 text-sm font-medium border border-gray-300 rounded hover:shadow-sm bg-gray-50 hover:bg-gray-100 text-gray-700"
+            >
               Finish Task
             </Button>
           </div>
-          
-          {/* Navigation Tabs */}
-          <div className="flex items-center gap-8 mt-4 text-sm">
-            <span className="text-blue-600 border-b-2 border-blue-600 pb-3 cursor-pointer">All</span>
-            <span className="text-gray-600 hover:text-gray-900 cursor-pointer pb-3">Images</span>
-            <span className="text-gray-600 hover:text-gray-900 cursor-pointer pb-3">Videos</span>
-            <span className="text-gray-600 hover:text-gray-900 cursor-pointer pb-3">News</span>
-            <span className="text-gray-600 hover:text-gray-900 cursor-pointer pb-3">More</span>
-          </div>
         </div>
-      </div>
-
-      {/* Search Results */}
-      <div className="max-w-[700px] mx-auto px-4 py-4">
-        {/* Results Meta Info */}
-        {currentResults.length > 0 && (
-          <div className="text-sm text-gray-600 mb-6">
-            About {formatNumber(pagination.totalResults)} results ({formatSearchTime(pagination.searchTime)} seconds)
-          </div>
-        )}
-
-        {/* Results List */}
-        <div className="space-y-6">
-          {currentResults.map((result) => (
-            <div key={result.rank} className="group">
-              <div className="flex gap-4">
-                <div className="flex-1">
-                  {/* URL/Breadcrumb with favicon */}
-                  <div className="flex items-center gap-2 mb-1">
-                    <img 
-                      src={getFaviconUrl(result.link)} 
-                      alt="" 
-                      className="w-4 h-4"
-                      onError={(e) => {
-                        e.currentTarget.style.display = 'none';
-                      }}
+      ) : (
+        // Search Results Layout
+        <>
+          {/* Header with search box */}
+          <div className="border-b border-gray-200 bg-white sticky top-0 z-10">
+            <div className="max-w-[700px] mx-auto px-4 py-3">
+              <div className="flex items-center gap-4">
+                {/* Google Logo (smaller) */}
+                <img 
+                  src="/lovable-uploads/9fa17bbd-23cd-47dc-afd2-a32fb3dc9574.png" 
+                  alt="Google" 
+                  className="h-8 w-auto cursor-pointer"
+                  onClick={() => {
+                    setCurrentResults([]);
+                    setSearchQuery("");
+                    setCurrentQuery("");
+                  }}
+                />
+                
+                {/* Search Box */}
+                <div className="flex-1 max-w-[584px]">
+                  <div className="flex items-center h-11 border border-gray-300 rounded-full px-4 hover:shadow-md transition-shadow bg-white">
+                    <Input 
+                      type="text" 
+                      className="flex-1 outline-none border-0 bg-transparent text-base px-2" 
+                      value={searchQuery} 
+                      onChange={(e) => setSearchQuery(e.target.value)} 
+                      onKeyPress={(e) => e.key === 'Enter' && handleSearch(1)}
                     />
-                    <span className="text-sm text-green-700">{result.displayLink}</span>
+                    <div className="border-l border-gray-300 h-6 mx-3"></div>
+                    <Search className="w-4 h-4 text-blue-500 cursor-pointer" onClick={() => handleSearch(1)} />
                   </div>
-                  
-                  {/* Title */}
-                  <h3 className="mb-1">
-                    <a 
-                      href={result.link}
-                      onClick={(e) => handleResultClick(result, e)}
-                      className="text-xl text-blue-600 hover:underline cursor-pointer visited:text-purple-600"
-                    >
-                      {result.title}
-                    </a>
-                    {result.hasVideo && (
-                      <span className="ml-2 px-2 py-0.5 bg-gray-100 text-xs text-gray-600 rounded">
-                        Video
-                      </span>
-                    )}
-                  </h3>
-                  
-                  {/* Rating */}
-                  {result.rating && (
-                    <div className="flex items-center gap-1 mb-1">
-                      <span className="text-orange-400">★</span>
-                      <span className="text-sm text-gray-600">
-                        {result.rating.value} ({result.rating.count})
-                      </span>
-                    </div>
-                  )}
-                  
-                  {/* Snippet */}
-                  <p className="text-sm text-gray-600 line-clamp-2 mb-2">
-                    {result.snippet}
-                  </p>
-                  
-                  {/* Sitelinks */}
-                  {result.sitelinks && result.sitelinks.length > 0 && (
-                    <div className="flex flex-wrap gap-4 text-sm">
-                      {result.sitelinks.slice(0, 4).map((sitelink, index) => (
-                        <a 
-                          key={index}
-                          href={sitelink.link}
-                          onClick={(e) => handleResultClick({...result, link: sitelink.link, title: sitelink.title}, e)}
-                          className="text-blue-600 hover:underline"
-                        >
-                          {sitelink.title}
-                        </a>
-                      ))}
-                    </div>
-                  )}
                 </div>
                 
-                {/* Thumbnail */}
-                {result.thumbnail && (
-                  <div className="hidden sm:block flex-shrink-0">
-                    <img 
-                      src={result.thumbnail} 
-                      alt=""
-                      className="w-20 h-20 object-cover rounded border"
-                      onError={(e) => {
-                        e.currentTarget.style.display = 'none';
-                      }}
-                    />
-                  </div>
-                )}
+                <Button onClick={handleFinishTask} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-sm">
+                  Finish Task
+                </Button>
+              </div>
+              
+              {/* Navigation Tabs */}
+              <div className="flex items-center gap-8 mt-4 text-sm">
+                <span className="text-blue-600 border-b-2 border-blue-600 pb-3 cursor-pointer">All</span>
+                <span className="text-gray-600 hover:text-gray-900 cursor-pointer pb-3">Images</span>
+                <span className="text-gray-600 hover:text-gray-900 cursor-pointer pb-3">Videos</span>
+                <span className="text-gray-600 hover:text-gray-900 cursor-pointer pb-3">News</span>
+                <span className="text-gray-600 hover:text-gray-900 cursor-pointer pb-3">More</span>
               </div>
             </div>
-          ))}
-        </div>
-
-        {/* Pagination */}
-        {currentResults.length > 0 && (
-          <div className="flex items-center justify-center gap-8 mt-8 pt-6">
-            <Button
-              variant="ghost"
-              onClick={handlePreviousPage}
-              disabled={pagination.currentPage <= 1 || isLoading}
-              className="flex items-center gap-2 text-blue-600 hover:text-blue-800"
-            >
-              <ChevronLeft className="w-4 h-4" />
-              Previous
-            </Button>
-            
-            <span className="text-sm text-gray-600">
-              Page {pagination.currentPage}
-            </span>
-            
-            <Button
-              variant="ghost"
-              onClick={handleNextPage}
-              disabled={!pagination.hasNextPage || isLoading}
-              className="flex items-center gap-2 text-blue-600 hover:text-blue-800"
-            >
-              Next
-              <ChevronRight className="w-4 h-4" />
-            </Button>
           </div>
-        )}
 
-        {/* Loading State */}
-        {isLoading && (
-          <div className="flex justify-center py-8">
-            <div className="text-gray-600">Loading...</div>
+          {/* Search Results */}
+          <div className="max-w-[700px] mx-auto px-4 py-4">
+            {/* Results Meta Info */}
+            <div className="text-sm text-gray-600 mb-6">
+              About {formatNumber(pagination.totalResults)} results ({formatSearchTime(pagination.searchTime)} seconds)
+            </div>
+
+            {/* Results List */}
+            <div className="space-y-6">
+              {currentResults.map((result) => (
+                <div key={result.rank} className="group">
+                  <div className="flex gap-4">
+                    <div className="flex-1">
+                      {/* URL/Breadcrumb with favicon */}
+                      <div className="flex items-center gap-2 mb-1">
+                        <img 
+                          src={getFaviconUrl(result.link)} 
+                          alt="" 
+                          className="w-4 h-4"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                          }}
+                        />
+                        <span className="text-sm text-green-700">{result.displayLink}</span>
+                      </div>
+                      
+                      {/* Title */}
+                      <h3 className="mb-1">
+                        <a 
+                          href={result.link}
+                          onClick={(e) => handleResultClick(result, e)}
+                          className="text-xl text-blue-600 hover:underline cursor-pointer visited:text-purple-600"
+                        >
+                          {result.title}
+                        </a>
+                        {result.hasVideo && (
+                          <span className="ml-2 px-2 py-0.5 bg-gray-100 text-xs text-gray-600 rounded">
+                            Video
+                          </span>
+                        )}
+                      </h3>
+                      
+                      {/* Rating */}
+                      {result.rating && (
+                        <div className="flex items-center gap-1 mb-1">
+                          <span className="text-orange-400">★</span>
+                          <span className="text-sm text-gray-600">
+                            {result.rating.value} ({result.rating.count})
+                          </span>
+                        </div>
+                      )}
+                      
+                      {/* Snippet */}
+                      <p className="text-sm text-gray-600 line-clamp-2 mb-2">
+                        {result.snippet}
+                      </p>
+                      
+                      {/* Sitelinks */}
+                      {result.sitelinks && result.sitelinks.length > 0 && (
+                        <div className="flex flex-wrap gap-4 text-sm">
+                          {result.sitelinks.slice(0, 4).map((sitelink, index) => (
+                            <a 
+                              key={index}
+                              href={sitelink.link}
+                              onClick={(e) => handleResultClick({...result, link: sitelink.link, title: sitelink.title}, e)}
+                              className="text-blue-600 hover:underline"
+                            >
+                              {sitelink.title}
+                            </a>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Thumbnail */}
+                    {result.thumbnail && (
+                      <div className="hidden sm:block flex-shrink-0">
+                        <img 
+                          src={result.thumbnail} 
+                          alt=""
+                          className="w-20 h-20 object-cover rounded border"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                          }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Pagination */}
+            <div className="flex items-center justify-center gap-8 mt-8 pt-6">
+              <Button
+                variant="ghost"
+                onClick={handlePreviousPage}
+                disabled={pagination.currentPage <= 1 || isLoading}
+                className="flex items-center gap-2 text-blue-600 hover:text-blue-800"
+              >
+                <ChevronLeft className="w-4 h-4" />
+                Previous
+              </Button>
+              
+              <span className="text-sm text-gray-600">
+                Page {pagination.currentPage}
+              </span>
+              
+              <Button
+                variant="ghost"
+                onClick={handleNextPage}
+                disabled={!pagination.hasNextPage || isLoading}
+                className="flex items-center gap-2 text-blue-600 hover:text-blue-800"
+              >
+                Next
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+            </div>
+
+            {/* Loading State */}
+            {isLoading && (
+              <div className="flex justify-center py-8">
+                <div className="text-gray-600">Loading...</div>
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </>
+      )}
     </div>
   );
 };
