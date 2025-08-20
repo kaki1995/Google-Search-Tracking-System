@@ -190,10 +190,7 @@ const GoogleSERP = () => {
   };
 
   const handleResultClick = (result: SearchResult, event?: React.MouseEvent) => {
-    if (event) {
-      event.preventDefault();
-    }
-    
+    // Log the click for tracking
     trackingAPI.logClick(result.link, result.rank);
     dispatchSERPEvent('result_click', { 
       link: result.link, 
@@ -201,7 +198,12 @@ const GoogleSERP = () => {
       title: result.title 
     });
     
-    window.open(result.link, '_blank', 'noopener,noreferrer');
+    // Only handle regular left clicks, let browser handle special clicks
+    if (event && !event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0) {
+      event.preventDefault();
+      window.open(result.link, '_blank', 'noopener,noreferrer');
+    }
+    // For Ctrl+click, middle-click, right-click, etc., let the browser handle it naturally
   };
 
   const handleNextPage = () => {
