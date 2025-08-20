@@ -366,7 +366,7 @@ export default function BackgroundSurvey() {
                         placeholder="" 
                         className="border-b border-t-0 border-l-0 border-r-0 rounded-none"
                         onBlur={(e) => {
-                          field.onBlur(e);
+                          field.onBlur();
                           saveResponses();
                         }}
                       />
@@ -388,7 +388,7 @@ export default function BackgroundSurvey() {
                         placeholder="" 
                         className="border-b border-t-0 border-l-0 border-r-0 rounded-none"
                         onBlur={(e) => {
-                          field.onBlur(e);
+                          field.onBlur();
                           saveResponses();
                         }}
                       />
