@@ -151,20 +151,11 @@ export default function SearchResultLog() {
           }) => <FormItem>
                   <FormLabel className="text-base font-medium text-gray-900">
                     12. What is its storage capacity? <span className="text-sm font-normal text-gray-600 italic">(Optional)</span>
+                    <br />
+                    <span className="text-sm font-normal text-gray-600 italic">(e.g., 64 GB, 128 GB, 256 GB)</span>
                   </FormLabel>
                   <FormControl>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select storage capacity" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="64gb">64 GB</SelectItem>
-                        <SelectItem value="128gb">128 GB</SelectItem>
-                        <SelectItem value="256gb">256 GB</SelectItem>
-                        <SelectItem value="512gb">512 GB</SelectItem>
-                        <SelectItem value="1tb">1 TB and above</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <Input {...field} placeholder="e.g., 128 GB, 512 GB, 1 TB" className="border-b border-t-0 border-l-0 border-r-0 rounded-none bg-transparent" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>} />
@@ -175,24 +166,11 @@ export default function SearchResultLog() {
           }) => <FormItem>
                   <FormLabel className="text-base font-medium text-gray-900">
                     13. What is its color? <span className="text-sm font-normal text-gray-600 italic">(Optional)</span>
+                    <br />
+                    <span className="text-sm font-normal text-gray-600 italic">(e.g., Black, Gold, Titanium, White, Gold)</span>
                   </FormLabel>
                   <FormControl>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select color" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="black">Black</SelectItem>
-                        <SelectItem value="white">White</SelectItem>
-                        <SelectItem value="blue">Blue</SelectItem>
-                        <SelectItem value="gray">Gray / Graphite</SelectItem>
-                        <SelectItem value="green">Green</SelectItem>
-                        <SelectItem value="silver">Silver</SelectItem>
-                        <SelectItem value="gold">Gold</SelectItem>
-                        <SelectItem value="red">Red</SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <Input {...field} placeholder="e.g., Black, White, Blue, Silver" className="border-b border-t-0 border-l-0 border-r-0 rounded-none bg-transparent" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>} />

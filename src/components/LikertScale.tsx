@@ -1,5 +1,4 @@
 import { FormControl, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 interface LikertScaleProps {
   field: {
@@ -22,29 +21,29 @@ export default function LikertScale({
   required = true 
 }: LikertScaleProps) {
   return (
-    <FormItem className="space-y-3">
+    <FormItem>
       <FormLabel className="text-base font-medium text-gray-900">
         {questionNumber}. {question} {required && <span className="text-red-500">*</span>}
       </FormLabel>
       <FormControl>
-        <div className="flex items-center gap-4">
-          {/* Left label */}
-          <div className="text-sm text-gray-600 min-w-[120px] text-left">
-            1-{leftLabel}
+        <div className="bg-gray-50 p-4 rounded-lg">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-sm text-gray-600">1-{leftLabel}</span>
+            <span className="text-sm text-gray-600">7-{rightLabel}</span>
           </div>
-          
-          {/* Radio buttons */}
-          <RadioGroup
-            onValueChange={field.onChange}
-            value={field.value}
-            className="flex items-center gap-6"
-          >
+          <div className="flex justify-between items-center">
             {[1, 2, 3, 4, 5, 6, 7].map((value) => (
-              <div key={value} className="flex flex-col items-center gap-1">
-                <RadioGroupItem 
+              <div key={value} className="flex flex-col items-center">
+                <input 
+                  type="radio" 
+                  name={`question-${questionNumber}`}
                   value={value.toString()} 
+                  checked={field.value === value.toString()} 
+                  onChange={(e) => {
+                    field.onChange(e.target.value);
+                  }}
+                  className="mb-1 w-4 h-4" 
                   id={`${questionNumber}-${value}`}
-                  className="w-4 h-4"
                 />
                 <label 
                   htmlFor={`${questionNumber}-${value}`} 
@@ -54,11 +53,6 @@ export default function LikertScale({
                 </label>
               </div>
             ))}
-          </RadioGroup>
-          
-          {/* Right label */}
-          <div className="text-sm text-gray-600 min-w-[120px] text-right">
-            7-{rightLabel}
           </div>
         </div>
       </FormControl>
