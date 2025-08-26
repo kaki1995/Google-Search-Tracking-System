@@ -155,7 +155,7 @@ export default function SearchResultLog() {
                     <span className="text-sm font-normal text-gray-600 italic">(e.g., 64 GB, 128 GB, 256 GB)</span>
                   </FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="e.g., 128 GB, 512 GB, 1 TB" className="border-b border-t-0 border-l-0 border-r-0 rounded-none bg-transparent" />
+                    <Input {...field} placeholder="" className="border-b border-t-0 border-l-0 border-r-0 rounded-none bg-transparent" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>} />
@@ -170,7 +170,7 @@ export default function SearchResultLog() {
                     <span className="text-sm font-normal text-gray-600 italic">(e.g., Black, Gold, Titanium, White, Gold)</span>
                   </FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="e.g., Black, White, Blue, Silver" className="border-b border-t-0 border-l-0 border-r-0 rounded-none bg-transparent" />
+                    <Input {...field} placeholder="" className="border-b border-t-0 border-l-0 border-r-0 rounded-none bg-transparent" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>} />

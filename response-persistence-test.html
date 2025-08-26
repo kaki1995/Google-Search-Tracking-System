@@ -78,23 +78,11 @@
                 </div>
                 <div class="form-group">
                     <label>Q12 - How many search results did you review?</label>
-                    <select name="q12_answer" onchange="saveFormData('search_result_log')">
-                        <option value="">Select number</option>
-                        <option value="1-3">1-3 results</option>
-                        <option value="4-6">4-6 results</option>
-                        <option value="7-10">7-10 results</option>
-                        <option value="more-than-10">More than 10 results</option>
-                    </select>
+                        <textarea name="q12_answer" rows="2" onchange="saveFormData('search_result_log')"></textarea>
                 </div>
                 <div class="form-group">
                     <label>Q13 - Did you find the information you were looking for?</label>
-                    <select name="q13_answer" onchange="saveFormData('search_result_log')">
-                        <option value="">Select answer</option>
-                        <option value="completely">Yes, completely</option>
-                        <option value="partially">Yes, partially</option>
-                        <option value="not-really">Not really</option>
-                        <option value="not-at-all">Not at all</option>
-                    </select>
+                        <textarea name="q13_answer" rows="2" onchange="saveFormData('search_result_log')"></textarea>
                 </div>
             </form>
             <button onclick="loadFormData('search_result_log')">📋 Load Saved Data</button>
