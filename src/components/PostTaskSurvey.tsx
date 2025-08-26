@@ -135,47 +135,47 @@ export default function PostTaskSurvey() {
                 required: "This field is required"
               }} render={({
                 field
-              }) => <LikertScale field={field} question="I was familiar with the topic of this task before starting." leftLabel="Strongly disagree" rightLabel="Strongly agree" questionNumber="16" />} />
+              }) => <LikertScale field={field} question="How familiar were you with the topic of this task before starting?" leftLabel="Not familiar at all" rightLabel="Very familiar" questionNumber="16" />} />
 
                 {/* Question 17: Google Search Satisfaction */}
                 <FormField control={form.control} name="google_satisfaction" rules={{
                 required: "This field is required"
               }} render={({
                 field
-              }) => <LikertScale field={field} question="I was satisfied with my overall search experience." leftLabel="Not satisfied at all" rightLabel="Very satisfied" questionNumber="17" />} />
+              }) => <LikertScale field={field} question="How satisfied were you with your overall search experience?" leftLabel="Not satisfied at all" rightLabel="Very satisfied" questionNumber="17" />} />
 
                 {/* Question 18: Google Search Ease */}
                 <FormField control={form.control} name="google_ease" rules={{
                 required: "This field is required"
               }} render={({
                 field
-              }) => <LikertScale field={field} question="I found the search interface easy to use." leftLabel="Not easy at all" rightLabel="Very easy" questionNumber="18" />} />
+              }) => <LikertScale field={field} question="How easy was it to use the search interface?" leftLabel="Not easy at all" rightLabel="Very easy" questionNumber="18" />} />
 
                 {/* Question 19: Google Search Relevance */}
                 <FormField control={form.control} name="google_relevance" rules={{
                 required: "This field is required"
               }} render={({
                 field
-              }) => <LikertScale field={field} question="The search results were relevant to my query." leftLabel="Not relevant at all" rightLabel="Very relevant" questionNumber="19" />} />
+              }) => <LikertScale field={field} question="How relevant were the search results to your query?" leftLabel="Not relevant at all" rightLabel="Very relevant" questionNumber="19" />} />
 
                 {/* Question 20: Google Search Trust */}
                 <FormField control={form.control} name="google_trust" rules={{
                 required: "This field is required"
               }} render={({
                 field
-              }) => <LikertScale field={field} question="I trusted the information provided by the tool in the search results." leftLabel="Do not trust at all" rightLabel="Trust completely" questionNumber="20" />} />
+              }) => <LikertScale field={field} question="To what degree do you trust the information provided by the search tool?" leftLabel="Do not trust at all" rightLabel="Trust completely" questionNumber="20" />} />
 
                 {/* Question 21: Tool Effectiveness */}
                 <FormField control={form.control} name="tool_effectiveness" rules={{
                 required: "This field is required"
               }} render={({
                 field
-              }) => <LikertScale field={field} question="The search tool helped me complete the task effectively." leftLabel="Strongly disagree" rightLabel="Strongly agree" questionNumber="21" />} />
+              }) => <LikertScale field={field} question="How effectively did the search tool help you complete the task?" leftLabel="Not effective at all" rightLabel="Very effective" questionNumber="21" />} />
 
                 {/* Question 22: Attention Check */}
                 <FormField control={form.control} name="attention_check" render={({
                 field
-              }) => <LikertScale field={field} question="Please select '3' for this question." leftLabel="Strongly disagree" rightLabel="Strongly agree" questionNumber="22" />} />
+              }) => <LikertScale field={field} question='Please select "3" for this question.' leftLabel="Strongly disagree" rightLabel="Strongly agree" questionNumber="22" />} />
 
                 {/* Question 23: Task Duration */}
                 <FormField control={form.control} name="task_duration" rules={{
