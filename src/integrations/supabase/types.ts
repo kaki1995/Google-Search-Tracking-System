@@ -337,6 +337,7 @@ export type Database = {
       }
       search_sessions: {
         Row: {
+          browser: string | null
           created_at: string
           device_type: string | null
           id: string
@@ -351,6 +352,7 @@ export type Database = {
           total_clicked_results_count: number | null
         }
         Insert: {
+          browser?: string | null
           created_at?: string
           device_type?: string | null
           id?: string
@@ -365,6 +367,7 @@ export type Database = {
           total_clicked_results_count?: number | null
         }
         Update: {
+          browser?: string | null
           created_at?: string
           device_type?: string | null
           id?: string
