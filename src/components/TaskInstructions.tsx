@@ -103,13 +103,20 @@ const TaskInstructions = () => {
             </p>
 
             {/* Important Warning */}
-            <div className="bg-amber-50 border-l-4 border-amber-400 p-4">
-              <div className="flex items-start gap-2">
-                <span className="text-xl">⚠️</span>
-                <div>
+            <div className="bg-amber-50 border-l-4 border-amber-400 p-4 rounded-r-md">
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0">
+                  <svg className="w-5 h-5 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="flex-1">
                   <p className="text-sm text-amber-800">
                     <strong>Important:</strong><br />
-                    Please conduct <strong>all searches exclusively</strong> through this interface. To ensure we capture your complete search journey, <strong>do not use any external tools</strong> (e.g., Google, Amazon, price comparison websites, etc.).
+                    Please conduct <strong>all searches exclusively</strong> through this interface. To ensure we capture your complete search journey, do not use any external search tools.
+                  </p>
+                  <p className="text-sm text-amber-800 mt-2">
+                    After submitting a query, you <strong>may click on any links</strong> displayed in the responses to view additional information about the product. This is encouraged and will be considered <strong>part of your search process</strong>.
                   </p>
                 </div>
               </div>
