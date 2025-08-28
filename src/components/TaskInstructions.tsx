@@ -155,7 +155,7 @@ const TaskInstructions = () => {
                 <div className="mt-2">
                   <Select onValueChange={(v) => setBudgetRange(v)} value={budgetRange}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select your budget" />
+                      <SelectValue placeholder="Select your budget range" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="under-150">Under €150</SelectItem>
