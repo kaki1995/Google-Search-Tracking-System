@@ -152,7 +152,7 @@ export default function SearchResultLog() {
                   <FormLabel className="text-base font-medium text-gray-900">
                     12. What is its storage capacity? <span className="text-sm font-normal text-gray-600 italic">(Optional)</span>
                     <br />
-                    <span className="text-sm font-normal text-gray-600 italic">(e.g., 64 GB, 128 GB, 256 GB)</span>
+                    <span className="text-sm font-normal text-gray-600 italic">(e.g., 64 GB, 128 GB, 256 GB, 512 GB, 1TB)</span>
                   </FormLabel>
                   <FormControl>
                     <Input {...field} placeholder="" className="border-b border-t-0 border-l-0 border-r-0 rounded-none bg-transparent" />
@@ -167,7 +167,7 @@ export default function SearchResultLog() {
                   <FormLabel className="text-base font-medium text-gray-900">
                     13. What is its color? <span className="text-sm font-normal text-gray-600 italic">(Optional)</span>
                     <br />
-                    <span className="text-sm font-normal text-gray-600 italic">(e.g., Black, Gold, Titanium, White, Gold)</span>
+                    <span className="text-sm font-normal text-gray-600 italic">(e.g., Black, White, Silver, Titanium, Blue, Pink Gold, Ultramarine, Teal)</span>
                   </FormLabel>
                   <FormControl>
                     <Input {...field} placeholder="" className="border-b border-t-0 border-l-0 border-r-0 rounded-none bg-transparent" />

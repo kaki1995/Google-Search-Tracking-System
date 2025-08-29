@@ -272,8 +272,8 @@ const GoogleSERP = () => {
             </div>
           </div>
           
-          {/* Google Search and I'm Feeling Lucky Buttons */}
-          <div className="flex justify-center gap-8 mb-12">
+          {/* Google Search Button */}
+          <div className="flex justify-center mb-12">
             <Button 
               onClick={() => handleSearch(1)}
               disabled={isLoading}
@@ -286,22 +286,7 @@ const GoogleSERP = () => {
                   Searching...
                 </>
               ) : (
-                "Google Search"
-              )}
-            </Button>
-            <Button 
-              onClick={() => handleSearch(1)}
-              disabled={isLoading}
-              className="px-6 py-2 text-sm font-medium bg-gray-50 border border-gray-300 rounded hover:shadow-sm hover:bg-gray-100 text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-              variant="outline"
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Searching...
-                </>
-              ) : (
-                "I'm Feeling Lucky"
+                "Start Search"
               )}
             </Button>
           </div>

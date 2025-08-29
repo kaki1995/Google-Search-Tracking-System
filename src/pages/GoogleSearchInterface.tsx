@@ -51,13 +51,10 @@ export default function GoogleSearchInterface() {
                 </div>
               </div>
 
-              {/* Search Buttons */}
-              <div className="flex gap-4 mb-8">
+              {/* Search Button */}
+              <div className="flex justify-center mb-8">
                 <button className="px-3 md:px-4 py-2 bg-[#f8f9fa] border border-[#f8f9fa] rounded text-sm text-[#3c4043] hover:shadow-sm hover:border-gray-300">
-                  Google Search
-                </button>
-                <button className="px-3 md:px-4 py-2 bg-[#f8f9fa] border border-[#f8f9fa] rounded text-sm text-[#3c4043] hover:shadow-sm hover:border-gray-300">
-                  I'm Feeling Lucky
+                  Start Search
                 </button>
               </div>
 

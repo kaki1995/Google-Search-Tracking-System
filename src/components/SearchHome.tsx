@@ -58,21 +58,13 @@ const SearchHome = () => {
             </button>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
+          <div className="flex justify-center">
             <Button
               type="submit"
               variant="secondary"
               className="px-4 md:px-6 py-2 bg-google-gray hover:bg-border text-google-text border-border"
             >
-              Google Search
-            </Button>
-            <Button
-              type="button"
-              onClick={handleLuckySearch}
-              variant="secondary"
-              className="px-4 md:px-6 py-2 bg-google-gray hover:bg-border text-google-text border-border"
-            >
-              I'm Feeling Lucky
+              Start Search
             </Button>
           </div>
         </form>
