@@ -22,7 +22,6 @@ interface PostTaskSurveyForm {
   tool_effectiveness: string;
   attention_check: string;
   task_duration: string;
-  google_open_feedback: string;
   contradictory_info_handling: string[];
   future_usage_feedback: string;
 }
@@ -40,7 +39,6 @@ export default function PostTaskSurvey() {
       tool_effectiveness: "",
       attention_check: "",
       task_duration: "",
-      google_open_feedback: "",
       contradictory_info_handling: [],
       future_usage_feedback: ""
     }
@@ -80,8 +78,7 @@ export default function PostTaskSurvey() {
         q23_attention_check: att,
         q24_contradictory_handling: values.contradictory_info_handling?.join(', ') || '',
         q25_duration: String(values.task_duration || ''),
-        q26_additional_details: String(values.google_open_feedback || ''),
-        q27_future_usage: String(values.future_usage_feedback || ''),
+        q26_future_usage: String(values.future_usage_feedback || ''),
       };
 
       const { data: resp, error } = await supabase.functions.invoke('submit-post-task-survey', {
@@ -250,31 +247,14 @@ export default function PostTaskSurvey() {
                       <FormMessage />
                     </FormItem>} />
 
-                {/* Question 26: Additional Feedback (Optional) */}
-                <FormField control={form.control} name="google_open_feedback" render={({
-                field
-              }) => <FormItem>
-                      <FormLabel className="text-base font-medium text-gray-900">
-                        26. Please share any additional details about your experience with Google search — for example, did you also use other tools or websites to help with your purchase decision, compare prices, read reviews, or gather product information? <span className="text-sm font-normal text-gray-600">(Optional)</span>
-                      </FormLabel>
-                      <FormControl>
-                        <Textarea 
-                          placeholder="Add any additional details about your search experience (optional)"
-                          className="min-h-[100px] resize-y"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>} />
-
-                {/* Question 27: Future Usage Feedback */}
+                {/* Question 26: Future Usage Feedback */}
                 <FormField control={form.control} name="future_usage_feedback" rules={{
                 required: "This field is required"
               }} render={({
                 field
               }) => <FormItem>
                       <FormLabel className="text-base font-medium text-gray-900">
-                        27. Thinking about your experience with this version of Google Search, would you consider using it again in the future instead of your usual search method? Please explain why or why not. <span className="text-red-500">*</span>
+                        26. Thinking about your experience with this version of Google Search, would you consider using it again in the future instead of your usual search method? Please explain why or why not. <span className="text-red-500">*</span>
                       </FormLabel>
                       <FormControl>
                         <Textarea 
