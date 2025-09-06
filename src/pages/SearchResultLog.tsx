@@ -10,11 +10,13 @@ import { toast } from "@/hooks/use-toast";
 import useResponsePersistence from "@/hooks/useResponsePersistence";
 
 interface SearchResultLogForm {
-  q11_answer: string;
-  q12_answer: string; 
-  q13_answer: string;
+  q12_answer: string;
+  q13_answer: string; 
   q14_answer: string;
   q15_answer: string;
+  q16_answer: string;
+  q17_price_importance: string;
+  q18_smartphone_features: string[];
 }
 
 export default function SearchResultLog() {
@@ -22,11 +24,13 @@ export default function SearchResultLog() {
   const navigate = useNavigate();
   const form = useForm<SearchResultLogForm>({
     defaultValues: {
-      q11_answer: "",
       q12_answer: "",
       q13_answer: "",
       q14_answer: "",
-      q15_answer: ""
+      q15_answer: "",
+      q16_answer: "",
+      q17_price_importance: "",
+      q18_smartphone_features: []
     }
   });
 
@@ -48,11 +52,11 @@ export default function SearchResultLog() {
       
       // Save to search_result_log table
       const success = await sessionManager.saveResultLog(
-        data.q11_answer || '',
         data.q12_answer || '',
         data.q13_answer || '',
         data.q14_answer || '',
-        data.q15_answer || ''
+        data.q15_answer || '',
+        data.q16_answer || ''
       );
 
       if (!success) {
@@ -102,28 +106,6 @@ export default function SearchResultLog() {
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit(handleNext)} className="space-y-6">
-              {/* Question 11 */}
-              <FormField
-                control={form.control}
-                name="q11_answer"
-                rules={{ required: "This field is required" }}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-base font-medium text-gray-900">
-                      11. Which search result(s) did you find most helpful for your task? <span className="text-red-500">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <Textarea 
-                        placeholder="Please describe the most helpful search results"
-                        className="min-h-[100px] resize-y"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
               {/* Question 12 */}
               <FormField
                 control={form.control}
@@ -132,11 +114,11 @@ export default function SearchResultLog() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-base font-medium text-gray-900">
-                      12. How did you decide which search results to click on? <span className="text-red-500">*</span>
+                      12. Which search result(s) did you find most helpful for your task? <span className="text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
                       <Textarea 
-                        placeholder="Please describe your decision-making process"
+                        placeholder="Please describe the most helpful search results"
                         className="min-h-[100px] resize-y"
                         {...field}
                       />
@@ -154,11 +136,11 @@ export default function SearchResultLog() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-base font-medium text-gray-900">
-                      13. Did you modify your search terms during the task? If so, why? <span className="text-red-500">*</span>
+                      13. How did you decide which search results to click on? <span className="text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
                       <Textarea 
-                        placeholder="Please describe any search term modifications"
+                        placeholder="Please describe your decision-making process"
                         className="min-h-[100px] resize-y"
                         {...field}
                       />
@@ -176,11 +158,11 @@ export default function SearchResultLog() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-base font-medium text-gray-900">
-                      14. What information were you looking for that was difficult to find? <span className="text-red-500">*</span>
+                      14. Did you modify your search terms during the task? If so, why? <span className="text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
                       <Textarea 
-                        placeholder="Please describe any information that was hard to find"
+                        placeholder="Please describe any search term modifications"
                         className="min-h-[100px] resize-y"
                         {...field}
                       />
@@ -198,7 +180,29 @@ export default function SearchResultLog() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-base font-medium text-gray-900">
-                      15. Overall, how satisfied were you with the search results quality? <span className="text-red-500">*</span>
+                      15. What information were you looking for that was difficult to find? <span className="text-red-500">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        placeholder="Please describe any information that was hard to find"
+                        className="min-h-[100px] resize-y"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Question 16 */}
+              <FormField
+                control={form.control}
+                name="q16_answer"
+                rules={{ required: "This field is required" }}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-base font-medium text-gray-900">
+                      16. Overall, how satisfied were you with the search results quality? <span className="text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
                       <Select onValueChange={field.onChange} value={field.value}>
@@ -213,6 +217,91 @@ export default function SearchResultLog() {
                           <SelectItem value="very-satisfied">Very Satisfied</SelectItem>
                         </SelectContent>
                       </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Question 17: Price vs Technical Specifications */}
+              <FormField
+                control={form.control}
+                name="q17_price_importance"
+                rules={{ required: "This field is required" }}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-base font-medium text-gray-900">
+                      17. The price is more important to me than the technical specifications of a smartphone. <span className="text-red-500">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <div className="bg-gray-50 p-4 rounded-lg">
+                        <div className="flex items-center justify-between mb-4">
+                          <span className="text-sm text-gray-600">1-Strongly disagree</span>
+                          <span className="text-sm text-gray-600">2-Strongly agree</span>
+                        </div>
+                        <div className="flex justify-center gap-4">
+                          {[1, 2].map((value) => (
+                            <label key={value} className="flex items-center cursor-pointer">
+                              <input
+                                type="radio"
+                                value={value.toString()}
+                                checked={field.value === value.toString()}
+                                onChange={(e) => field.onChange(e.target.value)}
+                                className="mr-2"
+                              />
+                              <span className="text-sm">{value}</span>
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Question 18: Smartphone Features */}
+              <FormField
+                control={form.control}
+                name="q18_smartphone_features"
+                rules={{ required: "Please select at least one feature" }}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-base font-medium text-gray-900">
+                      18. Please choose up to 3 features that are most important when selecting a smartphone. <span className="text-red-500">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <div className="space-y-2">
+                        {[
+                          { value: "camera", label: "Camera" },
+                          { value: "battery", label: "Battery Life" },
+                          { value: "display", label: "Display Quality" },
+                          { value: "storage", label: "Storage" },
+                          { value: "processing", label: "Processing Speed" },
+                          { value: "other", label: "Other" }
+                        ].map((feature) => (
+                          <label key={feature.value} className="flex items-center cursor-pointer">
+                            <input
+                              type="checkbox"
+                              value={feature.value}
+                              checked={field.value?.includes(feature.value) || false}
+                              onChange={(e) => {
+                                const current = field.value || [];
+                                if (e.target.checked) {
+                                  if (current.length < 3) {
+                                    field.onChange([...current, feature.value]);
+                                  }
+                                } else {
+                                  field.onChange(current.filter(item => item !== feature.value));
+                                }
+                              }}
+                              className="mr-2"
+                              disabled={field.value?.length >= 3 && !field.value?.includes(feature.value)}
+                            />
+                            <span className="text-sm">{feature.label}</span>
+                          </label>
+                        ))}
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>

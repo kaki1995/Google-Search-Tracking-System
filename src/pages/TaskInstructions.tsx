@@ -121,7 +121,7 @@ export default function TaskInstructions() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-base font-medium text-gray-900">
-                      10. What is your budget range for this laptop purchase? <span className="text-red-500">*</span>
+                      11. What is your budget range for this laptop purchase? <span className="text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
                       <Select onValueChange={field.onChange} value={field.value}>

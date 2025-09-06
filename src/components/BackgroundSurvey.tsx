@@ -22,6 +22,7 @@ interface SurveyForm {
   experience_scale_q7: string;
   familiarity_scale_q8: string;
   search_frequency: string;
+  shopping_search_tool: string;
 }
 
 export default function BackgroundSurvey() {
@@ -39,7 +40,8 @@ export default function BackgroundSurvey() {
       country: "",
       experience_scale_q7: "",
       familiarity_scale_q8: "",
-      search_frequency: ""
+      search_frequency: "",
+      shopping_search_tool: ""
     }
   });
 
@@ -71,7 +73,8 @@ export default function BackgroundSurvey() {
             country: saved.country || "",
             experience_scale_q7: saved.experience_scale_q7 || "",
             familiarity_scale_q8: saved.familiarity_scale_q8 || "",
-            search_frequency: saved.search_frequency || ""
+            search_frequency: saved.search_frequency || "",
+            shopping_search_tool: saved.shopping_search_tool || ""
           };
           
           // Reset form with restored values
@@ -166,6 +169,7 @@ export default function BackgroundSurvey() {
         q7_ai_familiarity: Number(data.experience_scale_q7 || 0),
         q8_attention_check: Number(data.familiarity_scale_q8 || 0),
         q9_ai_usage_frequency: data.search_frequency,
+        q10_shopping_search_tool: data.shopping_search_tool,
       };
 
       console.log('BackgroundSurvey: submitting responses:', responses);
@@ -511,6 +515,29 @@ export default function BackgroundSurvey() {
                           <SelectItem value="more-than-10">More than 10 times</SelectItem>
                         </SelectContent>
                       </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                } />
+
+              {/* Question 10: Shopping Search Tool */}
+              <FormField control={form.control} name="shopping_search_tool" rules={{
+              required: "This field is required"
+            }} render={({
+              field
+            }) => <FormItem>
+                    <FormLabel className="text-base font-medium text-gray-900">
+                      10. Which search tool do you usually use for shopping-related tasks? <span className="text-red-500">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <Input {...field} 
+                        placeholder="e.g., Google, Amazon, price comparison sites, etc." 
+                        className="border-b border-t-0 border-l-0 border-r-0 rounded-none"
+                        onBlur={(e) => {
+                          field.onBlur();
+                          saveResponses();
+                        }}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

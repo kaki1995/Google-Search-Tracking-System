@@ -23,6 +23,8 @@ interface PostTaskSurveyForm {
   attention_check: string;
   task_duration: string;
   google_open_feedback: string;
+  contradictory_info_handling: string[];
+  future_usage_feedback: string;
 }
 export default function PostTaskSurvey() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -38,7 +40,9 @@ export default function PostTaskSurvey() {
       tool_effectiveness: "",
       attention_check: "",
       task_duration: "",
-      google_open_feedback: ""
+      google_open_feedback: "",
+      contradictory_info_handling: [],
+      future_usage_feedback: ""
     }
   });
 
@@ -67,15 +71,17 @@ export default function PostTaskSurvey() {
       // Remove blocking for attention check - just store the value
 
       const responses = {
-        q16_familiarity: Number(values.topic_familiarity || 0),
-        q17_satisfaction: Number(values.google_satisfaction || 0),
-        q18_ease_of_use: Number(values.google_ease || 0),
-        q19_relevance_google: Number(values.google_relevance || 0),
-        q20_trust: Number(values.google_trust || 0),
-        q21_effectiveness: Number(values.tool_effectiveness || 0),
-        q22_attention_check: att,
-        q23_duration: String(values.task_duration || ''),
-        q24_additional_details: String(values.google_open_feedback || ''),
+        q17_familiarity: Number(values.topic_familiarity || 0),
+        q18_satisfaction: Number(values.google_satisfaction || 0),
+        q19_ease_of_use: Number(values.google_ease || 0),
+        q20_relevance_google: Number(values.google_relevance || 0),
+        q21_trust: Number(values.google_trust || 0),
+        q22_effectiveness: Number(values.tool_effectiveness || 0),
+        q23_attention_check: att,
+        q24_contradictory_handling: values.contradictory_info_handling?.join(', ') || '',
+        q25_duration: String(values.task_duration || ''),
+        q26_additional_details: String(values.google_open_feedback || ''),
+        q27_future_usage: String(values.future_usage_feedback || ''),
       };
 
       const { data: resp, error } = await supabase.functions.invoke('submit-post-task-survey', {
@@ -130,61 +136,103 @@ export default function PostTaskSurvey() {
 
             <Form {...form}>
               <form className="space-y-8">
-                {/* Question 16: Topic Familiarity - FIRST */}
+                {/* Question 17: Topic Familiarity - FIRST */}
                 <FormField control={form.control} name="topic_familiarity" rules={{
                 required: "This field is required"
               }} render={({
                 field
-              }) => <LikertScale field={field} question="How familiar were you with the topic of this task before starting?" leftLabel="Not familiar at all" rightLabel="Very familiar" questionNumber="16" />} />
+              }) => <LikertScale field={field} question="How familiar were you with the topic of this task before starting?" leftLabel="Not familiar at all" rightLabel="Very familiar" questionNumber="17" />} />
 
-                {/* Question 17: Google Search Satisfaction */}
+                {/* Question 18: Google Search Satisfaction */}
                 <FormField control={form.control} name="google_satisfaction" rules={{
                 required: "This field is required"
               }} render={({
                 field
-              }) => <LikertScale field={field} question="How satisfied were you with your overall search experience?" leftLabel="Not satisfied at all" rightLabel="Very satisfied" questionNumber="17" />} />
+              }) => <LikertScale field={field} question="How satisfied were you with your overall search experience?" leftLabel="Not satisfied at all" rightLabel="Very satisfied" questionNumber="18" />} />
 
-                {/* Question 18: Google Search Ease */}
+                {/* Question 19: Google Search Ease */}
                 <FormField control={form.control} name="google_ease" rules={{
                 required: "This field is required"
               }} render={({
                 field
-              }) => <LikertScale field={field} question="How easy was it to use the search interface?" leftLabel="Not easy at all" rightLabel="Very easy" questionNumber="18" />} />
+              }) => <LikertScale field={field} question="How easy was it to use the search interface?" leftLabel="Not easy at all" rightLabel="Very easy" questionNumber="19" />} />
 
-                {/* Question 19: Google Search Relevance */}
+                {/* Question 20: Google Search Relevance */}
                 <FormField control={form.control} name="google_relevance" rules={{
                 required: "This field is required"
               }} render={({
                 field
-              }) => <LikertScale field={field} question="How relevant were the search results to your query?" leftLabel="Not relevant at all" rightLabel="Very relevant" questionNumber="19" />} />
+              }) => <LikertScale field={field} question="How relevant were the search results to your query?" leftLabel="Not relevant at all" rightLabel="Very relevant" questionNumber="20" />} />
 
-                {/* Question 20: Google Search Trust */}
+                {/* Question 21: Google Search Trust */}
                 <FormField control={form.control} name="google_trust" rules={{
                 required: "This field is required"
               }} render={({
                 field
-              }) => <LikertScale field={field} question="To what degree do you trust the information provided by the search tool?" leftLabel="Do not trust at all" rightLabel="Trust completely" questionNumber="20" />} />
+              }) => <LikertScale field={field} question="To what degree do you trust the information provided by the search tool?" leftLabel="Do not trust at all" rightLabel="Trust completely" questionNumber="21" />} />
 
-                {/* Question 21: Tool Effectiveness */}
+                {/* Question 22: Tool Effectiveness */}
                 <FormField control={form.control} name="tool_effectiveness" rules={{
                 required: "This field is required"
               }} render={({
                 field
-              }) => <LikertScale field={field} question="How effectively did the search tool help you complete the task?" leftLabel="Not effective at all" rightLabel="Very effective" questionNumber="21" />} />
+              }) => <LikertScale field={field} question="How effectively did the search tool help you complete the task?" leftLabel="Not effective at all" rightLabel="Very effective" questionNumber="22" />} />
 
-                {/* Question 22: Attention Check */}
+                {/* Question 23: Attention Check */}
                 <FormField control={form.control} name="attention_check" render={({
                 field
-              }) => <LikertScale field={field} question='Please select "3" for this question.' leftLabel="Strongly disagree" rightLabel="Strongly agree" questionNumber="22" />} />
+              }) => <LikertScale field={field} question='Please select "3" for this question.' leftLabel="Strongly disagree" rightLabel="Strongly agree" questionNumber="23" />} />
 
-                {/* Question 23: Task Duration */}
+                {/* Question 24: Contradictory Information Handling */}
+                <FormField control={form.control} name="contradictory_info_handling" rules={{
+                required: "Please select at least one option"
+              }} render={({
+                field
+              }) => <FormItem>
+                      <FormLabel className="text-base font-medium text-gray-900">
+                        24. If you found contradictory information across different search results, how did you handle it? (Select all that apply) <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <div className="space-y-2">
+                          {[
+                            { value: "first_result", label: "I trusted the first result I clicked on" },
+                            { value: "additional_sources", label: "I searched for and compared additional sources" },
+                            { value: "most_detailed", label: "I chose the result that seemed most detailed or complete" },
+                            { value: "own_judgment", label: "I relied on my own knowledge or judgment" },
+                            { value: "no_contradictions", label: "I did not find any contradictions" },
+                            { value: "other", label: "Other" }
+                          ].map((option) => (
+                            <label key={option.value} className="flex items-center cursor-pointer">
+                              <input
+                                type="checkbox"
+                                value={option.value}
+                                checked={field.value?.includes(option.value) || false}
+                                onChange={(e) => {
+                                  const current = field.value || [];
+                                  if (e.target.checked) {
+                                    field.onChange([...current, option.value]);
+                                  } else {
+                                    field.onChange(current.filter(item => item !== option.value));
+                                  }
+                                }}
+                                className="mr-2"
+                              />
+                              <span className="text-sm">{option.label}</span>
+                            </label>
+                          ))}
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>} />
+
+                {/* Question 25: Task Duration */}
                 <FormField control={form.control} name="task_duration" rules={{
                 required: "This field is required"
               }} render={({
                 field
               }) => <FormItem>
                       <FormLabel className="text-base font-medium text-gray-900">
-                        23. Approximately how long did it take you to complete the task? <span className="text-red-500">*</span>
+                        25. Approximately how long did it take you to complete the task? <span className="text-red-500">*</span>
                       </FormLabel>
                       <FormControl>
                         <Select onValueChange={field.onChange} value={field.value}>
@@ -202,16 +250,35 @@ export default function PostTaskSurvey() {
                       <FormMessage />
                     </FormItem>} />
 
-                {/* Question 24: Additional Feedback (Optional) */}
+                {/* Question 26: Additional Feedback (Optional) */}
                 <FormField control={form.control} name="google_open_feedback" render={({
                 field
               }) => <FormItem>
                       <FormLabel className="text-base font-medium text-gray-900">
-                        24. Please share any additional details about your experience with Google search — for example, did you also use other tools or websites to help with your purchase decision, compare prices, read reviews, or gather product information? <span className="text-sm font-normal text-gray-600">(Optional)</span>
+                        26. Please share any additional details about your experience with Google search — for example, did you also use other tools or websites to help with your purchase decision, compare prices, read reviews, or gather product information? <span className="text-sm font-normal text-gray-600">(Optional)</span>
                       </FormLabel>
                       <FormControl>
                         <Textarea 
                           placeholder="Add any additional details about your search experience (optional)"
+                          className="min-h-[100px] resize-y"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>} />
+
+                {/* Question 27: Future Usage Feedback */}
+                <FormField control={form.control} name="future_usage_feedback" rules={{
+                required: "This field is required"
+              }} render={({
+                field
+              }) => <FormItem>
+                      <FormLabel className="text-base font-medium text-gray-900">
+                        27. Thinking about your experience with this version of Google Search, would you consider using it again in the future instead of your usual search method? Please explain why or why not. <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="Please explain your thoughts about using this search tool in the future"
                           className="min-h-[100px] resize-y"
                           {...field}
                         />
