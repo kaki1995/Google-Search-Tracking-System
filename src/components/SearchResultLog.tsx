@@ -8,12 +8,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { FormControl, FormField, FormItem, FormLabel, FormMessage, Form } from "@/components/ui/form";
 import { ArrowLeft } from "lucide-react";
 import { sessionManager } from "@/lib/sessionManager";
+import LikertScale from "@/components/LikertScale";
+import { Checkbox } from "@/components/ui/checkbox";
 interface SearchLogForm {
   smartphone_model: string;
   storage_capacity: string;
   color: string;
   lowest_price: string;
   website_link: string;
+  q17_price_importance: string;
+  q18_smartphone_features: string[];
 }
 export default function SearchResultLog() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -24,7 +28,9 @@ export default function SearchResultLog() {
       storage_capacity: "",
       color: "",
       lowest_price: "",
-      website_link: ""
+      website_link: "",
+      q17_price_importance: "",
+      q18_smartphone_features: []
     }
   });
 
@@ -205,6 +211,77 @@ export default function SearchResultLog() {
                   </FormControl>
                   <FormMessage />
                 </FormItem>} />
+
+            {/* Question 17: Price vs Technical Specifications */}
+            <FormField
+              control={form.control}
+              name="q17_price_importance"
+              rules={{ required: "This field is required" }}
+              render={({ field }) => (
+                <LikertScale
+                  field={field}
+                  question="The price is more important to me than the technical specifications of a smartphone."
+                  leftLabel="Strongly disagree"
+                  rightLabel="Strongly agree"
+                  questionNumber="17"
+                  required={true}
+                />
+              )}
+            />
+
+            {/* Question 18: Smartphone Features */}
+            <FormField
+              control={form.control}
+              name="q18_smartphone_features"
+              rules={{ required: "Please select at least one feature" }}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-base font-medium text-gray-900">
+                    18. Please choose up to 3 features that are most important when selecting a smartphone. <span className="text-red-500">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <div className="space-y-3">
+                      {[
+                        { value: "camera", label: "Camera" },
+                        { value: "battery", label: "Battery Life" },
+                        { value: "display", label: "Display Quality" },
+                        { value: "storage", label: "Storage" },
+                        { value: "processing", label: "Processing Speed" },
+                        { value: "other", label: "Other" }
+                      ].map((feature) => (
+                        <div key={feature.value} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={feature.value}
+                            checked={field.value?.includes(feature.value) || false}
+                            onCheckedChange={(checked) => {
+                              const current = field.value || [];
+                              if (checked) {
+                                if (current.length < 3) {
+                                  field.onChange([...current, feature.value]);
+                                }
+                              } else {
+                                field.onChange(current.filter(item => item !== feature.value));
+                              }
+                            }}
+                            disabled={field.value?.length >= 3 && !field.value?.includes(feature.value)}
+                          />
+                          <label
+                            htmlFor={feature.value}
+                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                          >
+                            {feature.label}
+                          </label>
+                        </div>
+                      ))}
+                      {field.value?.length >= 3 && (
+                        <p className="text-sm text-gray-600">Maximum 3 features selected</p>
+                      )}
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             {/* Buttons */}
             <div className="flex justify-between pt-8">
