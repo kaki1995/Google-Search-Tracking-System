@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { sessionManager } from "@/lib/sessionManager";
 import { toast } from "@/hooks/use-toast";
 import useResponsePersistence from "@/hooks/useResponsePersistence";
+import LikertScale from "@/components/LikertScale";
 
 interface SearchResultLogForm {
   q12_answer: string;
@@ -229,34 +230,14 @@ export default function SearchResultLog() {
                 name="q17_price_importance"
                 rules={{ required: "This field is required" }}
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-base font-medium text-gray-900">
-                      17. The price is more important to me than the technical specifications of a smartphone. <span className="text-red-500">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <div className="bg-gray-50 p-4 rounded-lg">
-                        <div className="flex items-center justify-between mb-4">
-                          <span className="text-sm text-gray-600">1-Strongly disagree</span>
-                          <span className="text-sm text-gray-600">2-Strongly agree</span>
-                        </div>
-                        <div className="flex justify-center gap-4">
-                          {[1, 2].map((value) => (
-                            <label key={value} className="flex items-center cursor-pointer">
-                              <input
-                                type="radio"
-                                value={value.toString()}
-                                checked={field.value === value.toString()}
-                                onChange={(e) => field.onChange(e.target.value)}
-                                className="mr-2"
-                              />
-                              <span className="text-sm">{value}</span>
-                            </label>
-                          ))}
-                        </div>
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+                  <LikertScale
+                    field={field}
+                    question="The price is more important to me than the technical specifications of a smartphone."
+                    leftLabel="Strongly disagree"
+                    rightLabel="Strongly agree"
+                    questionNumber="17"
+                    required={true}
+                  />
                 )}
               />
 
