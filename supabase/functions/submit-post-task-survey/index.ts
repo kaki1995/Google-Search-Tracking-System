@@ -58,15 +58,15 @@ serve(async (req) => {
     }
 
     const payload = {
-      q19_satisfaction: Number(responses.q19_satisfaction ?? 0),
-      q20_ease_of_use: Number(responses.q20_ease_of_use ?? 0),
-      q21_relevance_google: Number(responses.q21_relevance_google ?? 0),
-      q22_trust: Number(responses.q22_trust ?? 0),
-      q23_familiarity: Number(responses.q23_familiarity ?? 0),
-      q24_effectiveness: Number(responses.q24_effectiveness ?? 0),
-      q25_attention_check: Number(responses.q25_attention_check ?? 0),
+      q19_satisfaction: Number(responses.q19_satisfaction ?? responses.q18_satisfaction ?? 0),
+      q20_ease_of_use: Number(responses.q20_ease_of_use ?? responses.q19_ease_of_use ?? 0),
+      q21_relevance_google: Number(responses.q21_relevance_google ?? responses.q20_relevance_google ?? 0),
+      q22_trust: Number(responses.q22_trust ?? responses.q21_trust ?? 0),
+      q23_familiarity: Number(responses.q23_familiarity ?? responses.q17_familiarity ?? 0),
+      q24_effectiveness: Number(responses.q24_effectiveness ?? responses.q23_effectiveness ?? 0),
+      q25_attention_check: Number(responses.q25_attention_check ?? responses.q24_attention_check ?? 0),
       q26_duration: String(responses.q26_duration ?? ''),
-      q27_additional_details: String(responses.q27_additional_details ?? ''),
+      q27_additional_details: String(responses.q27_additional_details ?? responses.q27_future_usage ?? ''),
       q28_overall_experience: String(responses.q28_overall_experience ?? ''),
       q29_recommendations: String(responses.q29_recommendations ?? ''),
     };

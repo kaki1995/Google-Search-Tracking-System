@@ -68,7 +68,7 @@ serve(async (req) => {
       q7_ai_familiarity: Number(responses.q7_ai_familiarity ?? 0),
       q8_attention_check: Number(responses.q8_attention_check ?? 0),
       q9_ai_usage_frequency: String(responses.q9_ai_usage_frequency ?? ''),
-      q10_additional_info: String(responses.q10_additional_info ?? ''),
+      q10_additional_info: String(responses.q10_additional_info ?? responses.q10_shopping_search_tool ?? ''),
     };
 
     // Attention check (Q8 should be 1 per instructions, but allow any response and just log it)

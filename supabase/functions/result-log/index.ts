@@ -25,7 +25,7 @@ Deno.serve(async (req) => {
     }
 
     const body = await req.json();
-    const { participant_id, session_id, q11_answer, q12_answer, q13_answer, q14_answer, q15_answer } = body;
+    const { participant_id, session_id, q11_answer, q12_answer, q13_answer, q14_answer, q15_answer, q16_answer, q17_answer, q18_answer } = body;
 
     if (!participant_id || !session_id) {
       return new Response(
@@ -49,6 +49,9 @@ Deno.serve(async (req) => {
         q13_answer: q13_answer || null,
         q14_answer: q14_answer || null,
         q15_answer: q15_answer || null,
+        q16_answer: q16_answer || null,
+        q17_answer: q17_answer || null,
+        q18_answer: q18_answer || null,
         ip_address,
         device_type
       }]);
