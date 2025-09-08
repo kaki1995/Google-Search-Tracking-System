@@ -48,7 +48,7 @@ const TaskInstructions = () => {
           return;
         }
         const { data: resp, error } = await supabase.functions.invoke('submit-task-instruction', {
-          body: { participant_id, q10_response: budgetRange }
+          body: { participant_id, q11_response: budgetRange }
         });
         if (error || !resp?.ok) {
           const msg = error?.message || resp?.error || 'Failed to save your answer';
@@ -149,7 +149,7 @@ const TaskInstructions = () => {
               {/* Question 10: Budget */}
               <div className="space-y-3">
                 <label className="text-base font-medium text-gray-900 block">
-                  10. What is your smartphone budget? <span className="text-red-500">*</span><br />
+                  11. What is your smartphone budget? <span className="text-red-500">*</span><br />
                   <span className="text-sm font-normal text-gray-600">(Please select one option based on your real-life financial habits.)</span>
                 </label>
                 <div className="mt-2">
