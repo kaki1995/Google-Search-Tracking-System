@@ -47,7 +47,7 @@ export default function TaskInstructions() {
       const { error } = await supabase.functions.invoke('submit-task-instruction', {
         body: { 
           participant_id, 
-          q10_response: data.budget_range 
+          q11_response: data.budget_range 
         }
       });
 
@@ -113,7 +113,7 @@ export default function TaskInstructions() {
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              {/* Question 10: Budget Range */}
+              {/* Question 11: Budget Range */}
               <FormField
                 control={form.control}
                 name="budget_range"

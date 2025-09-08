@@ -42,7 +42,7 @@ serve(async (req) => {
 
   try {
     const body = await req.json();
-    const { participant_id, q10_response } = body ?? {};
+    const { participant_id, q11_response } = body ?? {};
 
     if (!isUuid(participant_id)) {
       return new Response(JSON.stringify({ ok: false, error: 'Invalid participant_id' }), {
@@ -50,8 +50,8 @@ serve(async (req) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
-    if (typeof q10_response !== 'string' || q10_response.length === 0) {
-      return new Response(JSON.stringify({ ok: false, error: 'Invalid q10_response' }), {
+    if (typeof q11_response !== 'string' || q11_response.length === 0) {
+      return new Response(JSON.stringify({ ok: false, error: 'Invalid q11_response' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
@@ -76,7 +76,7 @@ serve(async (req) => {
 
     const { error } = await supabase
       .from('task_instruction')
-      .insert([{ participant_id, q10_response, ip_address, device_type }]);
+      .insert([{ participant_id, q11_response, ip_address, device_type }]);
 
     if (error) {
       console.error('Insert task_instruction error', error);

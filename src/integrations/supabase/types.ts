@@ -439,7 +439,7 @@ export type Database = {
           id: string
           ip_address: string | null
           participant_id: string
-          q10_response: string | null
+          q11_response: string | null
           timestamp: string
         }
         Insert: {
@@ -447,7 +447,7 @@ export type Database = {
           id?: string
           ip_address?: string | null
           participant_id: string
-          q10_response?: string | null
+          q11_response?: string | null
           timestamp?: string
         }
         Update: {
@@ -455,7 +455,7 @@ export type Database = {
           id?: string
           ip_address?: string | null
           participant_id?: string
-          q10_response?: string | null
+          q11_response?: string | null
           timestamp?: string
         }
         Relationships: [
