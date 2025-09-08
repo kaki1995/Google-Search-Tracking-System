@@ -290,6 +290,9 @@ export type Database = {
           q13_answer: string | null
           q14_answer: string | null
           q15_answer: string | null
+          q16_answer: string | null
+          q17_answer: string | null
+          q18_answer: string | null
           session_id: string
         }
         Insert: {
@@ -303,6 +306,9 @@ export type Database = {
           q13_answer?: string | null
           q14_answer?: string | null
           q15_answer?: string | null
+          q16_answer?: string | null
+          q17_answer?: string | null
+          q18_answer?: string | null
           session_id: string
         }
         Update: {
@@ -316,6 +322,9 @@ export type Database = {
           q13_answer?: string | null
           q14_answer?: string | null
           q15_answer?: string | null
+          q16_answer?: string | null
+          q17_answer?: string | null
+          q18_answer?: string | null
           session_id?: string
         }
         Relationships: [

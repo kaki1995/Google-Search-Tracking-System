@@ -42,10 +42,16 @@ serve(async (req) => {
 
   try {
     const body = await req.json();
-    const { participant_id, responses } = body ?? {};
+    const { participant_id, session_id, responses } = body ?? {};
 
     if (!isUuid(participant_id)) {
       return new Response(JSON.stringify({ ok: false, error: 'Invalid participant_id' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    if (!isUuid(session_id)) {
+      return new Response(JSON.stringify({ ok: false, error: 'Invalid session_id' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
@@ -57,71 +63,43 @@ serve(async (req) => {
       });
     }
 
-    // Basic field normalization and validation
-    const payload = {
-      q1_age_group: String(responses.q1_age_group ?? ''),
-      q2_gender: String(responses.q2_gender ?? ''),
-      q3_education: String(responses.q3_education ?? ''),
-      q4_employment_status: String(responses.q4_employment_status ?? ''),
-      q5_nationality: String(responses.q5_nationality ?? ''),
-      q6_country_residence: String(responses.q6_country_residence ?? ''),
-      q7_ai_familiarity: Number(responses.q7_ai_familiarity ?? 0),
-      q8_attention_check: Number(responses.q8_attention_check ?? 0),
-      q9_ai_usage_frequency: String(responses.q9_ai_usage_frequency ?? ''),
-      q10_additional_info: String(responses.q10_additional_info ?? ''),
-    };
-
-    // Attention check (Q8 should be 1 per instructions, but allow any response and just log it)
-    // We'll validate this on the analysis side rather than blocking submission
-
-    // Ensure participant exists (idempotent)
+    // Ensure participant exists
     const { data: pExist, error: pErr } = await supabase
       .from('participants')
       .select('participant_id')
       .eq('participant_id', participant_id)
       .maybeSingle();
 
-    if (pErr) {
-      console.error('participants select error', pErr);
-      return new Response(JSON.stringify({ 
-        ok: false, 
-        error: 'Failed to check participant existence',
-        details: pErr.message || pErr
-      }), {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
+    if (pErr) console.error('participants select error', pErr);
     if (!pExist) {
       const { error: insP } = await supabase
         .from('participants')
         .insert([{ participant_id }]);
-      if (insP) {
-        console.error('participants insert error', insP);
-        return new Response(JSON.stringify({ 
-          ok: false, 
-          error: 'Failed to create participant',
-          details: insP.message || insP
-        }), {
-          status: 500,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-      }
+      if (insP) console.error('participants insert error', insP);
     }
 
     const { ip_address, device_type } = getClientInfo(req);
 
+    // Insert search result log with questions 12-18
     const { error } = await supabase
-      .from('background_survey')
-      .insert([{ participant_id, responses: payload, ip_address, device_type }]);
+      .from('search_result_log')
+      .insert([{
+        participant_id,
+        session_id,
+        q12_answer: String(responses.q12_answer ?? ''),
+        q13_answer: String(responses.q13_answer ?? ''),
+        q14_answer: String(responses.q14_answer ?? ''),
+        q15_answer: String(responses.q15_answer ?? ''),
+        q16_answer: String(responses.q16_answer ?? ''),
+        q17_answer: String(responses.q17_answer ?? ''),
+        q18_answer: String(responses.q18_answer ?? ''),
+        ip_address,
+        device_type
+      }]);
 
     if (error) {
-      console.error('Insert background_survey error', error);
-      return new Response(JSON.stringify({ 
-        ok: false, 
-        error: error.message,
-        details: error.details || error.hint || error
-      }), {
+      console.error('Insert search_result_log error', error);
+      return new Response(JSON.stringify({ ok: false, error: error.message }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
@@ -131,7 +109,7 @@ serve(async (req) => {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (e) {
-    console.error('submit-background-survey exception', e);
+    console.error('submit-search-result-log exception', e);
     return new Response(JSON.stringify({ ok: false, error: 'Invalid JSON body' }), {
       status: 400,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
