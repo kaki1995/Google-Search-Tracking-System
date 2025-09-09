@@ -77,13 +77,16 @@ export default function SearchResultLog() {
       
       console.log('🚀 Submitting Q11-15 data:', data);
 
-      // Save questions 11-15 to search_result_log table using sessionManager
+      // Save questions 11-18 to search_result_log table using sessionManager
       const success = await sessionManager.saveResultLog(
         data.smartphone_model,
         data.storage_capacity || '',
         data.color || '',
         data.lowest_price,
-        data.website_link
+        data.website_link,
+        '', // q16 - no satisfaction rating in this component
+        data.q17_price_importance || '',
+        JSON.stringify(data.q18_smartphone_features || [])
       );
       
       if (success) {

@@ -57,7 +57,10 @@ export default function SearchResultLog() {
         data.q13_answer || '',
         data.q14_answer || '',
         data.q15_answer || '',
-        data.q16_answer || ''
+        data.q16_answer || '',
+        '', // q16 - satisfaction rating (not used in this version)
+        data.q17_price_importance || '',
+        JSON.stringify(data.q18_smartphone_features || [])
       );
 
       if (!success) {

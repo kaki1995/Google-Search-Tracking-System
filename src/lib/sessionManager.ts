@@ -306,8 +306,8 @@ class SessionManager {
     }
   }
 
-  async saveResultLog(q11: string, q12: string, q13: string, q14: string, q15: string): Promise<boolean> {
-    console.log('🔍 saveResultLog called with:', { q11, q12, q13, q14, q15 });
+  async saveResultLog(q11: string, q12: string, q13: string, q14: string, q15: string, q16: string, q17: string, q18: string): Promise<boolean> {
+    console.log('🔍 saveResultLog called with:', { q11, q12, q13, q14, q15, q16, q17, q18 });
     
     if (!this.participantId || !this.sessionId) {
       console.error('❌ Missing participant ID or session ID for result log');
@@ -323,7 +323,10 @@ class SessionManager {
       q12_answer: q12,
       q13_answer: q13,
       q14_answer: q14,
-      q15_answer: q15
+      q15_answer: q15,
+      q16_answer: q16,
+      q17_answer: q17,
+      q18_answer: q18
     });
 
     try {
@@ -335,7 +338,10 @@ class SessionManager {
           q12_answer: q12,
           q13_answer: q13,
           q14_answer: q14,
-          q15_answer: q15
+          q15_answer: q15,
+          q16_answer: q16,
+          q17_answer: q17,
+          q18_answer: q18
         }
       });
 
