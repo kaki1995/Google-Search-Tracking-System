@@ -122,6 +122,7 @@ export type Database = {
           q27_additional_details: string | null
           q28_overall_experience: string | null
           q29_recommendations: string | null
+          session_id: string
           submitted_at: string
         }
         Insert: {
@@ -140,6 +141,7 @@ export type Database = {
           q27_additional_details?: string | null
           q28_overall_experience?: string | null
           q29_recommendations?: string | null
+          session_id: string
           submitted_at?: string
         }
         Update: {
@@ -158,6 +160,7 @@ export type Database = {
           q27_additional_details?: string | null
           q28_overall_experience?: string | null
           q29_recommendations?: string | null
+          session_id?: string
           submitted_at?: string
         }
         Relationships: []
@@ -307,14 +310,13 @@ export type Database = {
           id: string
           ip_address: string | null
           participant_id: string
-          q11_answer: string | null
-          q12_answer: string | null
-          q13_answer: string | null
-          q14_answer: string | null
-          q15_answer: string | null
-          q16_answer: string | null
-          q17_answer: string | null
-          q18_answer: string | null
+          q12_smartphone_model: string | null
+          q13_storage_capacity: string | null
+          q14_color: string | null
+          q15_lowest_price: string | null
+          q16_website_link: string | null
+          q17_price_importance: string | null
+          q18_smartphone_features: string | null
           session_id: string
         }
         Insert: {
@@ -323,14 +325,13 @@ export type Database = {
           id?: string
           ip_address?: string | null
           participant_id: string
-          q11_answer?: string | null
-          q12_answer?: string | null
-          q13_answer?: string | null
-          q14_answer?: string | null
-          q15_answer?: string | null
-          q16_answer?: string | null
-          q17_answer?: string | null
-          q18_answer?: string | null
+          q12_smartphone_model?: string | null
+          q13_storage_capacity?: string | null
+          q14_color?: string | null
+          q15_lowest_price?: string | null
+          q16_website_link?: string | null
+          q17_price_importance?: string | null
+          q18_smartphone_features?: string | null
           session_id: string
         }
         Update: {
@@ -339,32 +340,16 @@ export type Database = {
           id?: string
           ip_address?: string | null
           participant_id?: string
-          q11_answer?: string | null
-          q12_answer?: string | null
-          q13_answer?: string | null
-          q14_answer?: string | null
-          q15_answer?: string | null
-          q16_answer?: string | null
-          q17_answer?: string | null
-          q18_answer?: string | null
+          q12_smartphone_model?: string | null
+          q13_storage_capacity?: string | null
+          q14_color?: string | null
+          q15_lowest_price?: string | null
+          q16_website_link?: string | null
+          q17_price_importance?: string | null
+          q18_smartphone_features?: string | null
           session_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "search_result_log_participant_id_fkey"
-            columns: ["participant_id"]
-            isOneToOne: false
-            referencedRelation: "participants"
-            referencedColumns: ["participant_id"]
-          },
-          {
-            foreignKeyName: "search_result_log_session_id_fkey"
-            columns: ["session_id"]
-            isOneToOne: false
-            referencedRelation: "search_sessions"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       search_sessions: {
         Row: {

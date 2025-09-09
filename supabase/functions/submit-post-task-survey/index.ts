@@ -57,6 +57,9 @@ serve(async (req) => {
       });
     }
 
+    // Get client info first
+    const { ip_address, device_type } = getClientInfo(req);
+
     const payload = {
       participant_id,
       q19_satisfaction: Number(responses.q19_satisfaction ?? 0),
@@ -91,8 +94,6 @@ serve(async (req) => {
         .insert([{ participant_id }]);
       if (insP) console.error('participants insert error', insP);
     }
-
-    const { ip_address, device_type } = getClientInfo(req);
 
     const { error } = await supabase
       .from('post_task_survey')

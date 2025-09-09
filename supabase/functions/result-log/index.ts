@@ -38,20 +38,19 @@ Deno.serve(async (req) => {
 
     console.log(`Saving search result log for participant: ${participant_id}, session: ${session_id}`);
 
-    // Insert into search_result_log
+    // Insert into search_result_log using new column names
     const { error: insertError } = await supabase
       .from('search_result_log')
       .insert([{
         participant_id,
         session_id,
-        q11_answer: q11_answer || null,
-        q12_answer: q12_answer || null,
-        q13_answer: q13_answer || null,
-        q14_answer: q14_answer || null,
-        q15_answer: q15_answer || null,
-        q16_answer: q16_answer || null,
-        q17_answer: q17_answer || null,
-        q18_answer: q18_answer || null,
+        q12_smartphone_model: q11_answer || null, // q11 maps to q12_smartphone_model
+        q13_storage_capacity: q12_answer || null, // q12 maps to q13_storage_capacity
+        q14_color: q13_answer || null, // q13 maps to q14_color
+        q15_lowest_price: q14_answer || null, // q14 maps to q15_lowest_price
+        q16_website_link: q15_answer || null, // q15 maps to q16_website_link
+        q17_price_importance: q17_answer || null,
+        q18_smartphone_features: q18_answer || null,
         ip_address,
         device_type
       }]);
