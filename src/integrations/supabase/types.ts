@@ -111,7 +111,17 @@ export type Database = {
           id: string
           ip_address: string | null
           participant_id: string
-          responses: Json
+          q19_satisfaction: number | null
+          q20_ease_of_use: number | null
+          q21_relevance_google: number | null
+          q22_trust: number | null
+          q23_familiarity: number | null
+          q24_effectiveness: number | null
+          q25_attention_check: number | null
+          q26_duration: string | null
+          q27_additional_details: string | null
+          q28_overall_experience: string | null
+          q29_recommendations: string | null
           submitted_at: string
         }
         Insert: {
@@ -119,7 +129,17 @@ export type Database = {
           id?: string
           ip_address?: string | null
           participant_id: string
-          responses: Json
+          q19_satisfaction?: number | null
+          q20_ease_of_use?: number | null
+          q21_relevance_google?: number | null
+          q22_trust?: number | null
+          q23_familiarity?: number | null
+          q24_effectiveness?: number | null
+          q25_attention_check?: number | null
+          q26_duration?: string | null
+          q27_additional_details?: string | null
+          q28_overall_experience?: string | null
+          q29_recommendations?: string | null
           submitted_at?: string
         }
         Update: {
@@ -127,18 +147,20 @@ export type Database = {
           id?: string
           ip_address?: string | null
           participant_id?: string
-          responses?: Json
+          q19_satisfaction?: number | null
+          q20_ease_of_use?: number | null
+          q21_relevance_google?: number | null
+          q22_trust?: number | null
+          q23_familiarity?: number | null
+          q24_effectiveness?: number | null
+          q25_attention_check?: number | null
+          q26_duration?: string | null
+          q27_additional_details?: string | null
+          q28_overall_experience?: string | null
+          q29_recommendations?: string | null
           submitted_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "post_task_survey_participant_id_fkey"
-            columns: ["participant_id"]
-            isOneToOne: false
-            referencedRelation: "participants"
-            referencedColumns: ["participant_id"]
-          },
-        ]
+        Relationships: []
       }
       queries: {
         Row: {
