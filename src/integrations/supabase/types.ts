@@ -111,17 +111,17 @@ export type Database = {
           id: string
           ip_address: string | null
           participant_id: string
-          q19_satisfaction: number | null
-          q20_ease_of_use: number | null
-          q21_relevance_google: number | null
-          q22_trust: number | null
-          q23_familiarity: number | null
-          q24_effectiveness: number | null
-          q25_attention_check: number | null
-          q26_duration: string | null
-          q27_additional_details: string | null
-          q28_overall_experience: string | null
-          q29_recommendations: string | null
+          q19_topic_familiarity: number | null
+          q20_google_satisfaction: number | null
+          q21_google_ease: number | null
+          q22_google_relevance: number | null
+          q23_google_trust: number | null
+          q24_contradictory_handling: string | null
+          q25_tool_effectiveness: number | null
+          q26_attention_check: number | null
+          q27_first_response_satisfaction: number | null
+          q28_task_duration: string | null
+          q29_future_usage_feedback: string | null
           session_id: string
           submitted_at: string
         }
@@ -130,17 +130,17 @@ export type Database = {
           id?: string
           ip_address?: string | null
           participant_id: string
-          q19_satisfaction?: number | null
-          q20_ease_of_use?: number | null
-          q21_relevance_google?: number | null
-          q22_trust?: number | null
-          q23_familiarity?: number | null
-          q24_effectiveness?: number | null
-          q25_attention_check?: number | null
-          q26_duration?: string | null
-          q27_additional_details?: string | null
-          q28_overall_experience?: string | null
-          q29_recommendations?: string | null
+          q19_topic_familiarity?: number | null
+          q20_google_satisfaction?: number | null
+          q21_google_ease?: number | null
+          q22_google_relevance?: number | null
+          q23_google_trust?: number | null
+          q24_contradictory_handling?: string | null
+          q25_tool_effectiveness?: number | null
+          q26_attention_check?: number | null
+          q27_first_response_satisfaction?: number | null
+          q28_task_duration?: string | null
+          q29_future_usage_feedback?: string | null
           session_id: string
           submitted_at?: string
         }
@@ -149,17 +149,17 @@ export type Database = {
           id?: string
           ip_address?: string | null
           participant_id?: string
-          q19_satisfaction?: number | null
-          q20_ease_of_use?: number | null
-          q21_relevance_google?: number | null
-          q22_trust?: number | null
-          q23_familiarity?: number | null
-          q24_effectiveness?: number | null
-          q25_attention_check?: number | null
-          q26_duration?: string | null
-          q27_additional_details?: string | null
-          q28_overall_experience?: string | null
-          q29_recommendations?: string | null
+          q19_topic_familiarity?: number | null
+          q20_google_satisfaction?: number | null
+          q21_google_ease?: number | null
+          q22_google_relevance?: number | null
+          q23_google_trust?: number | null
+          q24_contradictory_handling?: string | null
+          q25_tool_effectiveness?: number | null
+          q26_attention_check?: number | null
+          q27_first_response_satisfaction?: number | null
+          q28_task_duration?: string | null
+          q29_future_usage_feedback?: string | null
           session_id?: string
           submitted_at?: string
         }

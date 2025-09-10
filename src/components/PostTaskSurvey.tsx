@@ -96,17 +96,17 @@ export default function PostTaskSurvey() {
       // Remove blocking for attention check - just store the value
 
       const responses = {
-        q19_satisfaction: Number(values.google_satisfaction || 0),
-        q20_ease_of_use: Number(values.google_ease || 0),
-        q21_relevance_google: Number(values.google_relevance || 0),
-        q22_trust: Number(values.google_trust || 0),
-        q23_familiarity: Number(values.topic_familiarity || 0),
-        q24_effectiveness: Number(values.tool_effectiveness || 0),
-        q25_attention_check: att,
-        q26_duration: String(values.task_duration || ''),
-        q27_additional_details: String((values.contradictory_info_handling || []).join(', ')),
-        q28_overall_experience: '',
-        q29_recommendations: String(values.future_usage_feedback || ''),
+        q19_topic_familiarity: Number(values.topic_familiarity || 0),
+        q20_google_satisfaction: Number(values.google_satisfaction || 0),
+        q21_google_ease: Number(values.google_ease || 0),
+        q22_google_relevance: Number(values.google_relevance || 0),
+        q23_google_trust: Number(values.google_trust || 0),
+        q24_contradictory_handling: String((values.contradictory_info_handling || []).join(', ')),
+        q25_tool_effectiveness: Number(values.tool_effectiveness || 0),
+        q26_attention_check: att,
+        q27_first_response_satisfaction: Number(values.first_response_satisfaction || 0),
+        q28_task_duration: String(values.task_duration || ''),
+        q29_future_usage_feedback: String(values.future_usage_feedback || ''),
       };
 
       const { data: resp, error } = await supabase.functions.invoke('submit-post-task-survey', {
