@@ -55,8 +55,22 @@ export default function PostTaskSurvey() {
     setIsSubmitting(true);
     try {
       const values = form.getValues();
-      const participant_id = localStorage.getItem('participant_id');
-      const session_id = localStorage.getItem('session_id');
+      const participant_id = localStorage.getItem('participant_id') || sessionManager.getParticipantId();
+      let session_id = sessionManager.getSessionId() || localStorage.getItem('session_id');
+
+      // Fallback to cached session bundle
+      if (!session_id) {
+        try {
+          const cached = JSON.parse(localStorage.getItem('google_search_session') || '{}');
+          session_id = cached?.sessionId || null;
+        } catch {}
+      }
+
+      // As a last resort, try to re-ensure the session on the backend
+      if (!session_id && participant_id) {
+        const ensured = await sessionManager.ensureSession();
+        if (ensured) session_id = ensured;
+      }
 
       if (!participant_id) {
         toast({
@@ -82,17 +96,17 @@ export default function PostTaskSurvey() {
       // Remove blocking for attention check - just store the value
 
       const responses = {
-        q17_familiarity: Number(values.topic_familiarity || 0),
-        q18_satisfaction: Number(values.google_satisfaction || 0),
-        q19_ease_of_use: Number(values.google_ease || 0),
-        q20_relevance_google: Number(values.google_relevance || 0),
-        q21_trust: Number(values.google_trust || 0),
-        q22_contradictory_handling: values.contradictory_info_handling?.join(', ') || '',
-        q23_effectiveness: Number(values.tool_effectiveness || 0),
-        q24_attention_check: att,
-        q25_first_response_satisfaction: Number(values.first_response_satisfaction || 0),
+        q19_satisfaction: Number(values.google_satisfaction || 0),
+        q20_ease_of_use: Number(values.google_ease || 0),
+        q21_relevance_google: Number(values.google_relevance || 0),
+        q22_trust: Number(values.google_trust || 0),
+        q23_familiarity: Number(values.topic_familiarity || 0),
+        q24_effectiveness: Number(values.tool_effectiveness || 0),
+        q25_attention_check: att,
         q26_duration: String(values.task_duration || ''),
-        q27_future_usage: String(values.future_usage_feedback || ''),
+        q27_additional_details: String((values.contradictory_info_handling || []).join(', ')),
+        q28_overall_experience: '',
+        q29_recommendations: String(values.future_usage_feedback || ''),
       };
 
       const { data: resp, error } = await supabase.functions.invoke('submit-post-task-survey', {
