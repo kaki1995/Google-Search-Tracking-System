@@ -56,11 +56,22 @@ export default function PostTaskSurvey() {
     try {
       const values = form.getValues();
       const participant_id = localStorage.getItem('participant_id');
+      const session_id = localStorage.getItem('session_id');
 
       if (!participant_id) {
         toast({
           title: 'Missing participant',
           description: 'Participant ID not found. Please start the study from the beginning.',
+          variant: 'destructive',
+        });
+        setShowConfirmDialog(false);
+        return;
+      }
+
+      if (!session_id) {
+        toast({
+          title: 'Missing session',
+          description: 'Session ID not found. Please start the study from the beginning.',
           variant: 'destructive',
         });
         setShowConfirmDialog(false);
@@ -85,7 +96,7 @@ export default function PostTaskSurvey() {
       };
 
       const { data: resp, error } = await supabase.functions.invoke('submit-post-task-survey', {
-        body: { participant_id, responses },
+        body: { participant_id, session_id, responses },
       });
 
       if (error || !resp?.ok) {

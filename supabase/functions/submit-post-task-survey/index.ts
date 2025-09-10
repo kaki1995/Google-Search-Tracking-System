@@ -42,10 +42,16 @@ serve(async (req) => {
 
   try {
     const body = await req.json();
-    const { participant_id, responses } = body ?? {};
+    const { participant_id, session_id, responses } = body ?? {};
 
     if (!isUuid(participant_id)) {
       return new Response(JSON.stringify({ ok: false, error: 'Invalid participant_id' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    if (!isUuid(session_id)) {
+      return new Response(JSON.stringify({ ok: false, error: 'Invalid session_id' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
@@ -62,6 +68,7 @@ serve(async (req) => {
 
     const payload = {
       participant_id,
+      session_id,
       q19_satisfaction: Number(responses.q19_satisfaction ?? 0),
       q20_ease_of_use: Number(responses.q20_ease_of_use ?? 0),
       q21_relevance_google: Number(responses.q21_relevance_google ?? 0),
