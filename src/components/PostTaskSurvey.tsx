@@ -19,7 +19,6 @@ interface PostTaskSurveyForm {
   google_relevance: string;
   google_trust: string;
   topic_familiarity: string;
-  smartphone_features: string[];
   tool_effectiveness: string;
   attention_check: string;
   first_response_satisfaction: string;
@@ -38,7 +37,6 @@ export default function PostTaskSurvey() {
       google_relevance: "",
       google_trust: "",
       topic_familiarity: "",
-      smartphone_features: [],
       tool_effectiveness: "",
       attention_check: "",
       first_response_satisfaction: "",
@@ -163,56 +161,12 @@ export default function PostTaskSurvey() {
 
             <Form {...form}>
               <form className="space-y-8">
-                {/* Question 17: Price vs Technical Specs */}
+                {/* Question 17: Topic Familiarity - FIRST */}
                 <FormField control={form.control} name="topic_familiarity" rules={{
                 required: "This field is required"
               }} render={({
                 field
-              }) => <LikertScale field={field} question="When making a smartphone purchase decision, price is a more important factor to me than technical specifications." leftLabel="Strongly disagree" rightLabel="Strongly agree" questionNumber="17" />} />
-
-                {/* Question 18: Smartphone Features */}
-                <FormField control={form.control} name="smartphone_features" rules={{
-                required: "Please select at least one feature"
-              }} render={({
-                field
-              }) => <FormItem>
-                      <FormLabel className="text-base font-medium text-gray-900">
-                        18. Please choose up to 3 features that are most important to you when selecting a smartphone: <span className="text-red-500">*</span>
-                      </FormLabel>
-                      <FormControl>
-                        <div className="space-y-2">
-                          {[
-                            { value: "battery_life", label: "Battery life/ fast charging" },
-                            { value: "camera_quality", label: "Camera quality" },
-                            { value: "display_quality", label: "Display Quality" },
-                            { value: "performance", label: "Performance/ speed" },
-                            { value: "software_support", label: "Software support & updates" },
-                            { value: "storage_capacity", label: "Storage capacity" },
-                            { value: "other", label: "Other: ___________" }
-                          ].map((option) => (
-                            <label key={option.value} className="flex items-center cursor-pointer">
-                              <input
-                                type="checkbox"
-                                value={option.value}
-                                checked={field.value?.includes(option.value) || false}
-                                onChange={(e) => {
-                                  const current = Array.isArray(field.value) ? field.value : [];
-                                  if (e.target.checked && current.length < 3) {
-                                    field.onChange([...current, option.value]);
-                                  } else if (!e.target.checked) {
-                                    field.onChange(current.filter(item => item !== option.value));
-                                  }
-                                }}
-                                disabled={!field.value?.includes(option.value) && (Array.isArray(field.value) ? field.value.length : 0) >= 3}
-                                className="mr-2"
-                              />
-                              <span className="text-sm">{option.label}</span>
-                            </label>
-                          ))}
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>} />
+              }) => <LikertScale field={field} question="How familiar were you with the topic of this task before starting?" leftLabel="Not familiar at all" rightLabel="Very familiar" questionNumber="19" />} />
 
                 {/* Question 18: Google Search Satisfaction */}
                 <FormField control={form.control} name="google_satisfaction" rules={{
@@ -310,7 +264,7 @@ export default function PostTaskSurvey() {
                 field
               }) => <FormItem>
                       <FormLabel className="text-base font-medium text-gray-900">
-                        28. Approximately how much time (in minutes) did you spend on the search interface before deciding on a smartphone? <span className="text-red-500">*</span>
+                        28. Approximately how long did it take you to complete the task? <span className="text-red-500">*</span>
                       </FormLabel>
                       <FormControl>
                         <Select onValueChange={field.onChange} value={field.value}>
@@ -335,7 +289,7 @@ export default function PostTaskSurvey() {
                 field
               }) => <FormItem>
                       <FormLabel className="text-base font-medium text-gray-900">
-                        29. Thinking about your experience with this version of Google Search, would you consider using it again in the future for other shopping-related tasks? Please explain why or why not. <span className="text-red-500">*</span>
+                        29. Thinking about your experience with this version of Google Search, would you consider using it again in the future instead of your usual search method? Please explain why or why not. <span className="text-red-500">*</span>
                       </FormLabel>
                       <FormControl>
                         <Textarea 
