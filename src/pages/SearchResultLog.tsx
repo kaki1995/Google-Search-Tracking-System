@@ -227,65 +227,95 @@ export default function SearchResultLog() {
                 )}
               />
 
-              {/* Question 17: Price vs Technical Specifications */}
+              {/* Question 17: Price vs Technical Specifications - NEW */}
               <FormField
                 control={form.control}
                 name="q17_price_importance"
                 rules={{ required: "This field is required" }}
                 render={({ field }) => (
-                   <LikertScale
-                    field={field}
-                    question="When making a smartphone purchase decision, price is a more important factor to me than technical specifications."
-                    leftLabel="Strongly disagree"
-                    rightLabel="Strongly agree"
-                    questionNumber="17"
-                    required={true}
-                  />
+                  <FormItem>
+                    <FormLabel className="text-base font-medium text-gray-900">
+                      17. When making a smartphone purchase decision, price is a more important factor to me than technical specifications. <span className="text-red-500">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <div className="bg-gray-50 p-6 rounded-lg">
+                        <div className="flex items-center justify-between mb-4">
+                          <span className="text-sm text-gray-600">1 - Strongly disagree</span>
+                          <span className="text-sm text-gray-600">7 - Strongly agree</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          {[1, 2, 3, 4, 5, 6, 7].map((value) => (
+                            <div key={value} className="flex flex-col items-center">
+                              <input 
+                                type="radio" 
+                                name="q17_price_importance"
+                                value={value.toString()} 
+                                checked={field.value === value.toString()} 
+                                onChange={(e) => field.onChange(e.target.value)}
+                                className="mb-2 w-4 h-4 accent-blue-600" 
+                                id={`q17-${value}`}
+                              />
+                              <label 
+                                htmlFor={`q17-${value}`} 
+                                className="text-sm text-gray-700 cursor-pointer font-medium"
+                              >
+                                {value}
+                              </label>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
                 )}
               />
 
-              {/* Question 18: Smartphone Features */}
+              {/* Question 18: Smartphone Features - NEW */}
               <FormField
                 control={form.control}
                 name="q18_smartphone_features"
                 rules={{ required: "Please select at least one feature" }}
                 render={({ field }) => (
                   <FormItem>
-                     <FormLabel className="text-base font-medium text-gray-900">
-                       18. Please choose up to 3 features that are most important to you when selecting a smartphone: <span className="text-red-500">*</span>
-                     </FormLabel>
-                     <FormControl>
-                       <div className="space-y-2">
-                         {[
-                           { value: "battery_fast_charging", label: "Battery life/ fast charging" },
-                           { value: "camera_quality", label: "Camera quality" },
-                           { value: "display_quality", label: "Display Quality" },
-                           { value: "performance_speed", label: "Performance/ speed" },
-                           { value: "software_support_updates", label: "Software support & updates" },
-                           { value: "storage_capacity", label: "Storage capacity" },
-                           { value: "other", label: "Other: ___________" }
-                         ].map((feature) => (
-                           <label key={feature.value} className="flex items-center cursor-pointer">
-                             <input
-                               type="checkbox"
-                               value={feature.value}
-                               checked={field.value?.includes(feature.value) || false}
-                               onChange={(e) => {
-                                 const current = field.value || [];
-                                 if (e.target.checked) {
-                                   if (current.length < 3) {
-                                     field.onChange([...current, feature.value]);
-                                   }
-                                 } else {
-                                   field.onChange(current.filter(item => item !== feature.value));
-                                 }
-                               }}
-                               className="mr-3 w-4 h-4 accent-blue-600 rounded-sm"
-                               disabled={field.value?.length >= 3 && !field.value?.includes(feature.value)}
-                             />
-                             <span className="text-sm text-gray-900">{feature.label}</span>
-                           </label>
+                    <FormLabel className="text-base font-medium text-gray-900">
+                      18. Please choose up to 3 features that are most important to you when selecting a smartphone: <span className="text-red-500">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <div className="space-y-3 p-4 bg-gray-50 rounded-lg">
+                        {[
+                          { value: "battery_life", label: "☐ Battery life/ fast charging" },
+                          { value: "camera_quality", label: "☐ Camera quality" },
+                          { value: "display_quality", label: "☐ Display Quality" },
+                          { value: "performance_speed", label: "☐ Performance/ speed" },
+                          { value: "software_support", label: "☐ Software support & updates" },
+                          { value: "storage_capacity", label: "☐ Storage capacity" },
+                          { value: "other", label: "☐ Other: ___________" }
+                        ].map((feature) => (
+                          <label key={feature.value} className="flex items-center cursor-pointer hover:bg-white p-2 rounded">
+                            <input
+                              type="checkbox"
+                              value={feature.value}
+                              checked={field.value?.includes(feature.value) || false}
+                              onChange={(e) => {
+                                const current = field.value || [];
+                                if (e.target.checked) {
+                                  if (current.length < 3) {
+                                    field.onChange([...current, feature.value]);
+                                  }
+                                } else {
+                                  field.onChange(current.filter(item => item !== feature.value));
+                                }
+                              }}
+                              className="mr-3 w-4 h-4 text-blue-600 border-2 border-gray-400 rounded-sm focus:ring-blue-500"
+                              disabled={field.value?.length >= 3 && !field.value?.includes(feature.value)}
+                            />
+                            <span className="text-sm text-gray-900 select-none">{feature.label}</span>
+                          </label>
                         ))}
+                        <div className="text-xs text-gray-500 mt-2">
+                          Select up to 3 features ({(field.value?.length || 0)}/3 selected)
+                        </div>
                       </div>
                     </FormControl>
                     <FormMessage />
