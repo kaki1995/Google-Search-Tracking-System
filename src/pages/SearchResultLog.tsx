@@ -265,26 +265,26 @@ export default function SearchResultLog() {
                            { value: "storage_capacity", label: "Storage capacity" },
                            { value: "other", label: "Other: ___________" }
                          ].map((feature) => (
-                          <label key={feature.value} className="flex items-center cursor-pointer">
-                            <input
-                              type="checkbox"
-                              value={feature.value}
-                              checked={field.value?.includes(feature.value) || false}
-                              onChange={(e) => {
-                                const current = field.value || [];
-                                if (e.target.checked) {
-                                  if (current.length < 3) {
-                                    field.onChange([...current, feature.value]);
-                                  }
-                                } else {
-                                  field.onChange(current.filter(item => item !== feature.value));
-                                }
-                              }}
-                              className="mr-2"
-                              disabled={field.value?.length >= 3 && !field.value?.includes(feature.value)}
-                            />
-                            <span className="text-sm">{feature.label}</span>
-                          </label>
+                           <label key={feature.value} className="flex items-center cursor-pointer">
+                             <input
+                               type="checkbox"
+                               value={feature.value}
+                               checked={field.value?.includes(feature.value) || false}
+                               onChange={(e) => {
+                                 const current = field.value || [];
+                                 if (e.target.checked) {
+                                   if (current.length < 3) {
+                                     field.onChange([...current, feature.value]);
+                                   }
+                                 } else {
+                                   field.onChange(current.filter(item => item !== feature.value));
+                                 }
+                               }}
+                               className="mr-3 w-4 h-4 accent-blue-600 rounded-sm"
+                               disabled={field.value?.length >= 3 && !field.value?.includes(feature.value)}
+                             />
+                             <span className="text-sm text-gray-900">{feature.label}</span>
+                           </label>
                         ))}
                       </div>
                     </FormControl>
