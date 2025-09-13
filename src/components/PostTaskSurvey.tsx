@@ -263,9 +263,9 @@ export default function PostTaskSurvey() {
               }} render={({
                 field
               }) => <FormItem>
-                      <FormLabel className="text-base font-medium text-gray-900">
-                        28. Approximately how long did it take you to complete the task? <span className="text-red-500">*</span>
-                      </FormLabel>
+                     <FormLabel className="text-base font-medium text-gray-900">
+                         28. Approximately how much time (in minutes) did you spend on the search interface before deciding on a smartphone? <span className="text-red-500">*</span>
+                       </FormLabel>
                       <FormControl>
                         <Select onValueChange={field.onChange} value={field.value}>
                           <SelectTrigger>
@@ -288,9 +288,9 @@ export default function PostTaskSurvey() {
               }} render={({
                 field
               }) => <FormItem>
-                      <FormLabel className="text-base font-medium text-gray-900">
-                        29. Thinking about your experience with this version of Google Search, would you consider using it again in the future instead of your usual search method? Please explain why or why not. <span className="text-red-500">*</span>
-                      </FormLabel>
+                     <FormLabel className="text-base font-medium text-gray-900">
+                         29. Thinking about your experience with this version of Google Search, would you consider using it again in the future for other shopping-related tasks? Please explain why or why not. <span className="text-red-500">*</span>
+                       </FormLabel>
                       <FormControl>
                         <Textarea 
                           placeholder="Please explain your thoughts about using this search tool in the future"

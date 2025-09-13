@@ -233,9 +233,9 @@ export default function SearchResultLog() {
                 name="q17_price_importance"
                 rules={{ required: "This field is required" }}
                 render={({ field }) => (
-                  <LikertScale
+                   <LikertScale
                     field={field}
-                    question="The price is more important to me than the technical specifications of a smartphone."
+                    question="When making a smartphone purchase decision, price is a more important factor to me than technical specifications."
                     leftLabel="Strongly disagree"
                     rightLabel="Strongly agree"
                     questionNumber="17"
@@ -251,19 +251,20 @@ export default function SearchResultLog() {
                 rules={{ required: "Please select at least one feature" }}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-base font-medium text-gray-900">
-                      18. Please choose up to 3 features that are most important when selecting a smartphone. <span className="text-red-500">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <div className="space-y-2">
-                        {[
-                          { value: "camera", label: "Camera" },
-                          { value: "battery", label: "Battery Life" },
-                          { value: "display", label: "Display Quality" },
-                          { value: "storage", label: "Storage" },
-                          { value: "processing", label: "Processing Speed" },
-                          { value: "other", label: "Other" }
-                        ].map((feature) => (
+                     <FormLabel className="text-base font-medium text-gray-900">
+                       18. Please choose up to 3 features that are most important to you when selecting a smartphone: <span className="text-red-500">*</span>
+                     </FormLabel>
+                     <FormControl>
+                       <div className="space-y-2">
+                         {[
+                           { value: "battery_fast_charging", label: "Battery life/ fast charging" },
+                           { value: "camera_quality", label: "Camera quality" },
+                           { value: "display_quality", label: "Display Quality" },
+                           { value: "performance_speed", label: "Performance/ speed" },
+                           { value: "software_support_updates", label: "Software support & updates" },
+                           { value: "storage_capacity", label: "Storage capacity" },
+                           { value: "other", label: "Other: ___________" }
+                         ].map((feature) => (
                           <label key={feature.value} className="flex items-center cursor-pointer">
                             <input
                               type="checkbox"
