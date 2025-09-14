@@ -227,7 +227,7 @@ export default function SearchResultLog() {
                 )}
               />
 
-              {/* Question 17: Price vs Technical Specifications - NEW */}
+              {/* Question 17 */}
               <FormField
                 control={form.control}
                 name="q17_price_importance"
@@ -239,6 +239,7 @@ export default function SearchResultLog() {
                     </FormLabel>
                     <FormControl>
                       <div className="bg-gray-50 p-6 rounded-lg">
+                        <div className="text-sm text-gray-600 mb-2">Likert scale</div>
                         <div className="flex items-center justify-between mb-4">
                           <span className="text-sm text-gray-600">1 - Strongly disagree</span>
                           <span className="text-sm text-gray-600">7 - Strongly agree</span>
@@ -271,7 +272,7 @@ export default function SearchResultLog() {
                 )}
               />
 
-              {/* Question 18: Smartphone Features - NEW */}
+              {/* Question 18 */}
               <FormField
                 control={form.control}
                 name="q18_smartphone_features"
@@ -283,6 +284,7 @@ export default function SearchResultLog() {
                     </FormLabel>
                     <FormControl>
                       <div className="space-y-3 p-4 bg-gray-50 rounded-lg">
+                        <div className="text-sm text-gray-600 mb-2">Multiple-choice square checkboxes (ordered alphabetically and Other at the end)</div>
                         {[
                           { value: "battery_life", label: "☐ Battery life/ fast charging" },
                           { value: "camera_quality", label: "☐ Camera quality" },
@@ -307,7 +309,7 @@ export default function SearchResultLog() {
                                   field.onChange(current.filter(item => item !== feature.value));
                                 }
                               }}
-                              className="mr-3 w-4 h-4 text-blue-600 border-2 border-gray-400 rounded-sm focus:ring-blue-500"
+                              className="mr-3 w-4 h-4 text-blue-600 border-2 border-gray-400 rounded-sm focus:ring-blue-500 accent-blue-600"
                               disabled={field.value?.length >= 3 && !field.value?.includes(feature.value)}
                             />
                             <span className="text-sm text-gray-900 select-none">{feature.label}</span>
