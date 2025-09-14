@@ -235,7 +235,7 @@ export default function SearchResultLog() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-base font-medium text-gray-900">
-                      17. When making a smartphone purchase decision, price is a more important factor to me than technical specifications. <span className="text-red-500">*</span>
+                      When making a smartphone purchase decision, price is a more important factor to me than technical specifications. <span className="text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
                       <div className="bg-gray-50 p-6 rounded-lg">
