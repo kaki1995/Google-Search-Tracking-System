@@ -96,17 +96,17 @@ export default function PostTaskSurvey() {
       // Remove blocking for attention check - just store the value
 
       const responses = {
-        q19_topic_familiarity: Number(values.topic_familiarity || 0),
-        q20_google_satisfaction: Number(values.google_satisfaction || 0),
-        q21_google_ease: Number(values.google_ease || 0),
-        q22_google_relevance: Number(values.google_relevance || 0),
-        q23_google_trust: Number(values.google_trust || 0),
-        q24_contradictory_handling: String((values.contradictory_info_handling || []).join(', ')),
-        q25_tool_effectiveness: Number(values.tool_effectiveness || 0),
-        q26_attention_check: att,
-        q27_first_response_satisfaction: Number(values.first_response_satisfaction || 0),
-        q28_task_duration: String(values.task_duration || ''),
-        q29_future_usage_feedback: String(values.future_usage_feedback || ''),
+        q1_topic_familiarity: Number(values.topic_familiarity || 0),
+        q2_google_ease: Number(values.google_ease || 0),
+        q3_google_satisfaction: Number(values.google_satisfaction || 0),
+        q4_google_relevance: Number(values.google_relevance || 0),
+        q5_google_trust: Number(values.google_trust || 0),
+        q6_contradictory_handling: String((values.contradictory_info_handling || []).join(', ')),
+        q7_tool_effectiveness: Number(values.tool_effectiveness || 0),
+        q8_task_duration: String(values.task_duration || ''),
+        q9_first_response_satisfaction: Number(values.first_response_satisfaction || 0),
+        q10_attention_check: att,
+        q11_future_usage_feedback: String(values.future_usage_feedback || ''),
       };
 
       const { data: resp, error } = await supabase.functions.invoke('submit-post-task-survey', {
@@ -161,49 +161,49 @@ export default function PostTaskSurvey() {
 
             <Form {...form}>
               <form className="space-y-8">
-                {/* Question 17: Topic Familiarity - FIRST */}
+                {/* Question 1: Topic Familiarity (pre-study) */}
                 <FormField control={form.control} name="topic_familiarity" rules={{
                 required: "This field is required"
               }} render={({
                 field
-              }) => <LikertScale field={field} question="How familiar were you with the topic of this task before starting?" leftLabel="Not familiar at all" rightLabel="Very familiar" questionNumber="19" />} />
+              }) => <LikertScale field={field} question="How familiar were you with the topic of this task before starting?" leftLabel="Not familiar at all" rightLabel="Very familiar" questionNumber="1" />} />
 
-                {/* Question 18: Google Search Satisfaction */}
-                <FormField control={form.control} name="google_satisfaction" rules={{
-                required: "This field is required"
-              }} render={({
-                field
-              }) => <LikertScale field={field} question="How satisfied were you with your overall search experience?" leftLabel="Not satisfied at all" rightLabel="Very satisfied" questionNumber="20" />} />
-
-                {/* Question 19: Google Search Ease */}
+                {/* Question 2: Ease of use of the search interface */}
                 <FormField control={form.control} name="google_ease" rules={{
                 required: "This field is required"
               }} render={({
                 field
-              }) => <LikertScale field={field} question="How easy was it to use the search interface?" leftLabel="Not easy at all" rightLabel="Very easy" questionNumber="21" />} />
+              }) => <LikertScale field={field} question="How easy was it to use the search interface?" leftLabel="Not easy at all" rightLabel="Very easy" questionNumber="2" />} />
 
-                {/* Question 20: Google Search Relevance */}
+                {/* Question 3: Satisfaction with the overall search experience */}
+                <FormField control={form.control} name="google_satisfaction" rules={{
+                required: "This field is required"
+              }} render={({
+                field
+              }) => <LikertScale field={field} question="How satisfied were you with your overall search experience?" leftLabel="Not satisfied at all" rightLabel="Very satisfied" questionNumber="3" />} />
+
+                {/* Question 4: Relevance of the search results */}
                 <FormField control={form.control} name="google_relevance" rules={{
                 required: "This field is required"
               }} render={({
                 field
-              }) => <LikertScale field={field} question="How relevant were the search results to your query?" leftLabel="Not relevant at all" rightLabel="Very relevant" questionNumber="22" />} />
+              }) => <LikertScale field={field} question="How relevant were the search results to your query?" leftLabel="Not relevant at all" rightLabel="Very relevant" questionNumber="4" />} />
 
-                 {/* Question 21: Google Search Trust */}
+                {/* Question 5: Trust in the information provided */}
                 <FormField control={form.control} name="google_trust" rules={{
                 required: "This field is required"
               }} render={({
                 field
-              }) => <LikertScale field={field} question="To what degree do you trust the information provided by the search tool?" leftLabel="Do not trust at all" rightLabel="Trust completely" questionNumber="23" />} />
+              }) => <LikertScale field={field} question="To what degree do you trust the information provided by the search tool?" leftLabel="Do not trust at all" rightLabel="Trust completely" questionNumber="5" />} />
 
-                {/* Question 22: Contradictory Information Handling */}
+                {/* Question 6: Handling of contradictory information (multiple-choice) */}
                 <FormField control={form.control} name="contradictory_info_handling" rules={{
                 required: "Please select at least one option"
               }} render={({
                 field
               }) => <FormItem>
                       <FormLabel className="text-base font-medium text-gray-900">
-                        24. If you found contradictory information across different search results, how did you handle it? (Select all that apply) <span className="text-red-500">*</span>
+                        6. If you found contradictory information across different search results, how did you handle it? (Select all that apply) <span className="text-red-500">*</span>
                       </FormLabel>
                       <FormControl>
                         <div className="space-y-2">
@@ -238,33 +238,21 @@ export default function PostTaskSurvey() {
                       <FormMessage />
                     </FormItem>} />
 
-                {/* Question 23: Tool Effectiveness */}
+                {/* Question 7: Effectiveness of the tool in completing the task */}
                 <FormField control={form.control} name="tool_effectiveness" rules={{
                 required: "This field is required"
               }} render={({
                 field
-              }) => <LikertScale field={field} question="How effectively did the search tool help you complete the task?" leftLabel="Not effective at all" rightLabel="Very effective" questionNumber="25" />} />
+              }) => <LikertScale field={field} question="How effectively did the search tool help you complete the task?" leftLabel="Not effective at all" rightLabel="Very effective" questionNumber="7" />} />
 
-                {/* Question 24: Attention Check */}
-                <FormField control={form.control} name="attention_check" render={({
-                field
-              }) => <LikertScale field={field} question='Please select "3" for this question.' leftLabel="Strongly disagree" rightLabel="Strongly agree" questionNumber="26" />} />
-
-                {/* Question 25: First Response Satisfaction */}
-                <FormField control={form.control} name="first_response_satisfaction" rules={{
-                required: "This field is required"
-              }} render={({
-                field
-              }) => <LikertScale field={field} question="How satisfied were you with the first response?" leftLabel="Not satisfied at all" rightLabel="Very satisfied" questionNumber="27" />} />
-
-                {/* Question 26: Task Duration */}
+                {/* Question 8: Time spent on the search interface */}
                 <FormField control={form.control} name="task_duration" rules={{
                 required: "This field is required"
               }} render={({
                 field
               }) => <FormItem>
                      <FormLabel className="text-base font-medium text-gray-900">
-                         28. Approximately how much time (in minutes) did you spend on the search interface before deciding on a smartphone? <span className="text-red-500">*</span>
+                         8. Approximately how much time (in minutes) did you spend on the search interface before deciding on a smartphone? <span className="text-red-500">*</span>
                        </FormLabel>
                       <FormControl>
                         <Select onValueChange={field.onChange} value={field.value}>
@@ -282,14 +270,26 @@ export default function PostTaskSurvey() {
                       <FormMessage />
                     </FormItem>} />
 
-                {/* Question 27: Future Usage Feedback */}
+                {/* Question 9: Satisfaction with the first response */}
+                <FormField control={form.control} name="first_response_satisfaction" rules={{
+                required: "This field is required"
+              }} render={({
+                field
+              }) => <LikertScale field={field} question="How satisfied were you with the first response?" leftLabel="Not satisfied at all" rightLabel="Very satisfied" questionNumber="9" />} />
+
+                {/* Question 10: Attention check ("Please select 3") */}
+                <FormField control={form.control} name="attention_check" render={({
+                field
+              }) => <LikertScale field={field} question='Please select "3" for this question.' leftLabel="Strongly disagree" rightLabel="Strongly agree" questionNumber="10" />} />
+
+                {/* Question 11: Future usage question */}
                 <FormField control={form.control} name="future_usage_feedback" rules={{
                 required: "This field is required"
               }} render={({
                 field
               }) => <FormItem>
                      <FormLabel className="text-base font-medium text-gray-900">
-                         29. Thinking about your experience with this version of Google Search, would you consider using it again in the future for other shopping-related tasks? Please explain why or why not. <span className="text-red-500">*</span>
+                         11. Would you consider using this tool again for shopping-related tasks? Why or why not? <span className="text-red-500">*</span>
                        </FormLabel>
                       <FormControl>
                         <Textarea 
