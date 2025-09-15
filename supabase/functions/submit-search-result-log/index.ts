@@ -91,8 +91,9 @@ serve(async (req) => {
         q14_answer: String(responses.q14_answer ?? ''),
         q15_answer: String(responses.q15_answer ?? ''),
         q16_answer: String(responses.q16_answer ?? ''),
-        q17_answer: String(responses.q17_answer ?? ''),
-        q18_answer: String(responses.q18_answer ?? ''),
+  q17_answer: String(responses.q17_answer ?? ''),
+  q18_answer: Array.isArray(responses.q18_answer) ? JSON.stringify(responses.q18_answer) : String(responses.q18_answer ?? ''),
+  q18_other_text: typeof responses.q18_other_text === 'string' ? responses.q18_other_text : '',
         ip_address,
         device_type
       }]);

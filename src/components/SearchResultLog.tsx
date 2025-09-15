@@ -223,7 +223,7 @@ export default function SearchResultLog() {
               render={({ field }) => (
                 <LikertScale
                   field={field}
-                  question="The price is more important to me than the technical specifications of a smartphone."
+                  question="When making a smartphone purchase decision, price is a more important factor to me than technical specifications."
                   leftLabel="Strongly disagree"
                   rightLabel="Strongly agree"
                   questionNumber="17"
@@ -237,53 +237,69 @@ export default function SearchResultLog() {
               control={form.control}
               name="q18_smartphone_features"
               rules={{ required: "Please select at least one feature" }}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-base font-medium text-gray-900">
-                    18. Please choose up to 3 features that are most important when selecting a smartphone. <span className="text-red-500">*</span>
-                  </FormLabel>
-                  <FormControl>
-                    <div className="space-y-3">
-                      {[
-                        { value: "camera", label: "Camera" },
-                        { value: "battery", label: "Battery Life" },
-                        { value: "display", label: "Display Quality" },
-                        { value: "storage", label: "Storage" },
-                        { value: "processing", label: "Processing Speed" },
-                        { value: "other", label: "Other" }
-                      ].map((feature) => (
-                        <div key={feature.value} className="flex items-center space-x-2">
-                          <Checkbox
-                            id={feature.value}
-                            checked={field.value?.includes(feature.value) || false}
-                            onCheckedChange={(checked) => {
-                              const current = field.value || [];
-                              if (checked) {
-                                if (current.length < 3) {
-                                  field.onChange([...current, feature.value]);
+              render={({ field }) => {
+                // Alphabetically sorted except 'Other' last
+                const features = [
+                  { value: "battery", label: "Battery life/ fast charging" },
+                  { value: "camera", label: "Camera quality" },
+                  { value: "display", label: "Display Quality" },
+                  { value: "performance", label: "Performance/ speed" },
+                  { value: "software", label: "Software support & updates" },
+                  { value: "storage", label: "Storage capacity" }
+                ].sort((a, b) => a.label.localeCompare(b.label));
+                features.push({ value: "other", label: "Other" });
+                return (
+                  <FormItem>
+                    <FormLabel className="text-base font-medium text-gray-900">
+                      18. Please choose up to 3 features that are most important to you when selecting a smartphone. <span className="text-red-500">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <div className="space-y-3">
+                        {features.map((feature) => (
+                          <div key={feature.value} className="flex items-center space-x-2">
+                            <Checkbox
+                              id={feature.value}
+                              checked={field.value?.includes(feature.value) || false}
+                              onCheckedChange={(checked) => {
+                                const current = field.value || [];
+                                if (checked) {
+                                  if (current.length < 3) {
+                                    field.onChange([...current, feature.value]);
+                                  }
+                                } else {
+                                  field.onChange(current.filter(item => item !== feature.value));
                                 }
-                              } else {
-                                field.onChange(current.filter(item => item !== feature.value));
-                              }
-                            }}
-                            disabled={field.value?.length >= 3 && !field.value?.includes(feature.value)}
-                          />
-                          <label
-                            htmlFor={feature.value}
-                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                          >
-                            {feature.label}
-                          </label>
-                        </div>
-                      ))}
-                      {field.value?.length >= 3 && (
-                        <p className="text-sm text-gray-600">Maximum 3 features selected</p>
-                      )}
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+                              }}
+                              disabled={field.value?.length >= 3 && !field.value?.includes(feature.value)}
+                              className="h-5 w-5 rounded-none border border-gray-400" // force square
+                            />
+                            <label
+                              htmlFor={feature.value}
+                              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                            >
+                              {feature.label}
+                            </label>
+                            {feature.value === "other" && field.value?.includes("other") && (
+                              <input
+                                type="text"
+                                className="ml-2 border rounded px-2 py-1 text-sm"
+                                placeholder="Please specify"
+                                value={form.getValues("q18_other_text") || ""}
+                                onChange={e => form.setValue("q18_other_text", e.target.value)}
+                              />
+                            )}
+                          </div>
+                        ))}
+                        {field.value?.length >= 3 && (
+                          <p className="text-sm text-gray-600">Maximum 3 features selected</p>
+                        )}
+                        <p className="text-sm text-gray-600">Selected: {field.value?.length || 0}/3</p>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                );
+              }}
             />
 
             {/* Buttons */}
