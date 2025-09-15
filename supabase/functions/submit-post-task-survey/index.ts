@@ -68,6 +68,7 @@ serve(async (req) => {
 
     const payload = {
       participant_id,
+      session_id,
       responses: {
         q19_topic_familiarity: Number(responses.q19_topic_familiarity ?? 0),
         q20_google_ease: Number(responses.q20_google_ease ?? 0),
