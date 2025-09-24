@@ -266,7 +266,7 @@ export default function PostTaskSurvey() {
                 <FormField control={form.control} name="q29_future_usage_feedback" rules={{ required: "This field is required" }} render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-base font-medium text-gray-900">
-                      29. Thinking about your experience with this conversational search tool, would you consider using it again in the future for other shopping-related tasks? Please explain why or why not. <span className="text-red-500">*</span>
+                      29. Thinking about your experience with this version of Google Search, would you consider using it again in the future for other shopping-related tasks? Please explain why or why not. <span className="text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
                       <Textarea 
