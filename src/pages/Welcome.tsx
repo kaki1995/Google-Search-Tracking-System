@@ -139,9 +139,9 @@ export default function Welcome() {
       <div className="absolute inset-0 bg-black bg-opacity-20"></div>
       <div className="max-w-4xl mx-auto relative z-10">
         {/* Content */}
-        <div className="bg-white bg-opacity-95 backdrop-blur-sm rounded-lg shadow-lg p-8 md:p-12 lg:p-16">
+        <div className="bg-white bg-opacity-95 backdrop-blur-sm rounded-lg shadow-lg p-8 md:p-12 lg:p-16 text-left">
           {/* Header with Logos */}
-          <div className="text-center mb-8">
+          <div className="mb-8 text-left">
             <div className="flex items-center justify-center gap-8 mb-6">
               {/* Google Logo */}
               <div className="flex items-center">
@@ -155,12 +155,12 @@ export default function Welcome() {
           </div>
           {/* Title */}
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-semibold text-gray-900 mb-6">
+            <h1 className="text-3xl font-semibold text-gray-900 mb-6 text-center">
               Welcome to Our Project Study
             </h1>
           </div>
           {/* Content */}
-          <div className="text-base leading-7 text-gray-700 space-y-4 mx-auto text-justify">
+          <div className="text-base leading-7 text-gray-700 space-y-4 mx-auto text-left">
             <p>
               Thank you for your interest in participating! 🙋
             </p>
