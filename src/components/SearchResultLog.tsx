@@ -218,21 +218,49 @@ export default function SearchResultLog() {
                 </FormItem>} />
 
             {/* Question 17: Price vs Technical Specifications */}
-            <FormField
-              control={form.control}
-              name="q17_price_importance"
-              rules={{ required: "This field is required" }}
-              render={({ field }) => (
-                <LikertScale
-                  field={field}
-                  question="When making a smartphone purchase decision, price is a more important factor to me than technical specifications."
-                  leftLabel="Strongly disagree"
-                  rightLabel="Strongly agree"
-                  questionNumber="17"
-                  required={true}
-                />
-              )}
-            />
+            <div className="w-full py-6">
+              <FormField
+                control={form.control}
+                name="q17_price_importance"
+                rules={{ required: "This field is required" }}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-base font-medium text-gray-900 mb-2 block">
+                      17. When making a smartphone purchase decision, price is a more important factor to me than technical specifications. <span className="text-red-500">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <div className="w-full flex flex-col items-center">
+                        <div className="w-full">
+                          <div className="flex w-full justify-between mb-2">
+                            {[1,2,3,4,5,6,7].map((value) => (
+                              <span key={value} className="text-xs text-center" style={{ width: '14.2%' }}>
+                                {value === 1 ? '1 – Strongly Disagree' : value === 7 ? '7 – Strongly Agree' : value}
+                              </span>
+                            ))}
+                          </div>
+                          <div className="flex w-full justify-between">
+                            {[1,2,3,4,5,6,7].map((value) => (
+                              <label key={value} className="flex flex-col items-center" style={{ width: '14.2%' }}>
+                                <input
+                                  type="radio"
+                                  name="q17_price_importance"
+                                  value={value.toString()}
+                                  checked={field.value === value.toString()}
+                                  onChange={e => field.onChange(e.target.value)}
+                                  className="w-5 h-5"
+                                  id={`q17_price_importance-${value}`}
+                                />
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             {/* Question 18: Smartphone Features */}
             <FormField
