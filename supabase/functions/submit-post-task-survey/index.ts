@@ -69,19 +69,30 @@ serve(async (req) => {
     const payload = {
       participant_id,
       session_id,
-      responses: {
-        q19_topic_familiarity: Number(responses.q19_topic_familiarity ?? 0),
-        q20_google_ease: Number(responses.q20_google_ease ?? 0),
-        q21_google_satisfaction: Number(responses.q21_google_satisfaction ?? 0),
-        q22_google_relevance: Number(responses.q22_google_relevance ?? 0),
-        q23_google_trust: Number(responses.q23_google_trust ?? 0),
-        q24_contradictory_handling: String(responses.q24_contradictory_handling ?? ''),
-        q25_tool_effectiveness: Number(responses.q25_tool_effectiveness ?? 0),
-        q26_task_duration: String(responses.q26_task_duration ?? ''),
-        q27_first_response_satisfaction: Number(responses.q27_first_response_satisfaction ?? 0),
-        q28_attention_check: Number(responses.q28_attention_check ?? 0),
-        q29_future_usage_feedback: String(responses.q29_future_usage_feedback ?? '')
-      }
+      q1_task_easy: Number(responses.q1_task_easy ?? 0),
+      q2_task_quick: Number(responses.q2_task_quick ?? 0),
+      q3_task_familiar: Number(responses.q3_task_familiar ?? 0),
+      q4_tool_reliable: Number(responses.q4_tool_reliable ?? 0),
+      q5_tool_practical: Number(responses.q5_tool_practical ?? 0),
+      q6_tool_like: Number(responses.q6_tool_like ?? 0),
+      q7_tool_easy_use: Number(responses.q7_tool_easy_use ?? 0),
+      q8_tool_clear_interaction: Number(responses.q8_tool_clear_interaction ?? 0),
+      q9_tool_control: Number(responses.q9_tool_control ?? 0),
+      q10_tool_provides_info: Number(responses.q10_tool_provides_info ?? 0),
+      q11_tool_helps_complete: Number(responses.q11_tool_helps_complete ?? 0),
+      q12_tool_useful: Number(responses.q12_tool_useful ?? 0),
+      q13_tool_too_much_info: Number(responses.q13_tool_too_much_info ?? 0),
+      q14_tool_hard_focus: Number(responses.q14_tool_hard_focus ?? 0),
+      q15_results_accurate: Number(responses.q15_results_accurate ?? 0),
+      q16_results_trustworthy: Number(responses.q16_results_trustworthy ?? 0),
+      q17_results_complete: Number(responses.q17_results_complete ?? 0),
+      q18_results_relevant: Number(responses.q18_results_relevant ?? 0),
+      q19_results_useful: Number(responses.q19_results_useful ?? 0),
+      q20_purchase_likelihood: Number(responses.q20_purchase_likelihood ?? 0),
+      q21_contradictory_handling: Array.isArray(responses.q21_contradictory_handling) ? responses.q21_contradictory_handling : [],
+      q22_attention_check: Number(responses.q22_attention_check ?? 0),
+      q23_time_spent: String(responses.q23_time_spent ?? ''),
+      q24_future_usage_feedback: String(responses.q24_future_usage_feedback ?? '')
     };
 
     // REMOVED: Question 22 validation restriction - store value without blocking progress

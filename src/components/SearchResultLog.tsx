@@ -18,6 +18,7 @@ interface SearchLogForm {
   website_link: string;
   q17_price_importance: string;
   q18_smartphone_features: string[];
+  q18_other_text?: string;
 }
 export default function SearchResultLog() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -30,7 +31,8 @@ export default function SearchResultLog() {
       lowest_price: "",
       website_link: "",
       q17_price_importance: "",
-      q18_smartphone_features: []
+      q18_smartphone_features: [],
+      q18_other_text: ""
     }
   });
 

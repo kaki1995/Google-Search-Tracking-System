@@ -111,7 +111,7 @@ serve(async (req) => {
   } catch (error) {
     console.error('Unexpected error in load-responses:', error);
     return new Response(
-      JSON.stringify({ ok: false, error: 'Internal server error', details: error.message }),
+      JSON.stringify({ ok: false, error: 'Internal server error', details: (error as Error).message }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
     )
   }

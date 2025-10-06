@@ -87,79 +87,106 @@ export type Database = {
       participants: {
         Row: {
           created_at: string
-          device_type: string | null
-          ip_address: string | null
           participant_id: string
         }
         Insert: {
           created_at?: string
-          device_type?: string | null
-          ip_address?: string | null
           participant_id?: string
         }
         Update: {
           created_at?: string
-          device_type?: string | null
-          ip_address?: string | null
           participant_id?: string
         }
         Relationships: []
       }
       post_task_survey: {
         Row: {
-          device_type: string | null
           id: string
-          ip_address: string | null
           participant_id: string
-          q19_topic_familiarity: number | null
-          q20_google_satisfaction: number | null
-          q21_google_ease: number | null
-          q22_google_relevance: number | null
-          q23_google_trust: number | null
-          q24_contradictory_handling: string | null
-          q25_tool_effectiveness: number | null
-          q26_attention_check: number | null
-          q27_first_response_satisfaction: number | null
-          q28_task_duration: string | null
-          q29_future_usage_feedback: string | null
+          q1_task_easy: number | null
+          q10_tool_provides_info: number | null
+          q11_tool_helps_complete: number | null
+          q12_tool_useful: number | null
+          q13_tool_too_much_info: number | null
+          q14_tool_hard_focus: number | null
+          q15_results_accurate: number | null
+          q16_results_trustworthy: number | null
+          q17_results_complete: number | null
+          q18_results_relevant: number | null
+          q19_results_useful: number | null
+          q2_task_quick: number | null
+          q20_purchase_likelihood: number | null
+          q21_contradictory_handling: string[] | null
+          q22_attention_check: number | null
+          q23_time_spent: string | null
+          q24_future_usage_feedback: string | null
+          q3_task_familiar: number | null
+          q4_tool_reliable: number | null
+          q5_tool_practical: number | null
+          q6_tool_like: number | null
+          q7_tool_easy_use: number | null
+          q8_tool_clear_interaction: number | null
+          q9_tool_control: number | null
           session_id: string
           submitted_at: string
         }
         Insert: {
-          device_type?: string | null
           id?: string
-          ip_address?: string | null
           participant_id: string
-          q19_topic_familiarity?: number | null
-          q20_google_satisfaction?: number | null
-          q21_google_ease?: number | null
-          q22_google_relevance?: number | null
-          q23_google_trust?: number | null
-          q24_contradictory_handling?: string | null
-          q25_tool_effectiveness?: number | null
-          q26_attention_check?: number | null
-          q27_first_response_satisfaction?: number | null
-          q28_task_duration?: string | null
-          q29_future_usage_feedback?: string | null
+          q1_task_easy?: number | null
+          q10_tool_provides_info?: number | null
+          q11_tool_helps_complete?: number | null
+          q12_tool_useful?: number | null
+          q13_tool_too_much_info?: number | null
+          q14_tool_hard_focus?: number | null
+          q15_results_accurate?: number | null
+          q16_results_trustworthy?: number | null
+          q17_results_complete?: number | null
+          q18_results_relevant?: number | null
+          q19_results_useful?: number | null
+          q2_task_quick?: number | null
+          q20_purchase_likelihood?: number | null
+          q21_contradictory_handling?: string[] | null
+          q22_attention_check?: number | null
+          q23_time_spent?: string | null
+          q24_future_usage_feedback?: string | null
+          q3_task_familiar?: number | null
+          q4_tool_reliable?: number | null
+          q5_tool_practical?: number | null
+          q6_tool_like?: number | null
+          q7_tool_easy_use?: number | null
+          q8_tool_clear_interaction?: number | null
+          q9_tool_control?: number | null
           session_id: string
           submitted_at?: string
         }
         Update: {
-          device_type?: string | null
           id?: string
-          ip_address?: string | null
           participant_id?: string
-          q19_topic_familiarity?: number | null
-          q20_google_satisfaction?: number | null
-          q21_google_ease?: number | null
-          q22_google_relevance?: number | null
-          q23_google_trust?: number | null
-          q24_contradictory_handling?: string | null
-          q25_tool_effectiveness?: number | null
-          q26_attention_check?: number | null
-          q27_first_response_satisfaction?: number | null
-          q28_task_duration?: string | null
-          q29_future_usage_feedback?: string | null
+          q1_task_easy?: number | null
+          q10_tool_provides_info?: number | null
+          q11_tool_helps_complete?: number | null
+          q12_tool_useful?: number | null
+          q13_tool_too_much_info?: number | null
+          q14_tool_hard_focus?: number | null
+          q15_results_accurate?: number | null
+          q16_results_trustworthy?: number | null
+          q17_results_complete?: number | null
+          q18_results_relevant?: number | null
+          q19_results_useful?: number | null
+          q2_task_quick?: number | null
+          q20_purchase_likelihood?: number | null
+          q21_contradictory_handling?: string[] | null
+          q22_attention_check?: number | null
+          q23_time_spent?: string | null
+          q24_future_usage_feedback?: string | null
+          q3_task_familiar?: number | null
+          q4_tool_reliable?: number | null
+          q5_tool_practical?: number | null
+          q6_tool_like?: number | null
+          q7_tool_easy_use?: number | null
+          q8_tool_clear_interaction?: number | null
+          q9_tool_control?: number | null
           session_id?: string
           submitted_at?: string
         }
