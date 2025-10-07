@@ -488,19 +488,19 @@ export default function PostTaskSurvey() {
                     </FormItem>
                   )} />
                 {/* Buttons */}
-                <div className="flex flex-wrap justify-between items-center gap-3 pt-8 w-full">
+                <div className="flex flex-wrap justify-between items-center gap-2 pt-8 w-full">
                   <Button 
                     type="button" 
                     variant="outline" 
                     onClick={() => navigate('/search-result-log')}
-                    className="flex-1 min-w-[140px] max-w-[48%] px-4 py-2 text-sm font-medium border-2"
+                    className="px-5 py-2 text-xs md:px-8 md:py-3 md:text-sm font-medium border rounded-lg min-w-[110px] md:min-w-[160px] max-w-[45%] md:max-w-[220px]"
                   >
                     Previous Page
                   </Button>
                   <Button 
                     type="button" 
                     onClick={handleConfirmSubmission} 
-                    className="flex-1 min-w-[140px] max-w-[48%] px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
+                    className="px-5 py-2 text-xs md:px-8 md:py-3 md:text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg min-w-[110px] md:min-w-[160px] max-w-[45%] md:max-w-[220px]"
                   >
                     Submit Survey
                   </Button>
