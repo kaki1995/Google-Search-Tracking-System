@@ -61,7 +61,7 @@ Deno.serve(async (req) => {
         JSON.stringify({ 
           ok: false, 
             error: 'Failed to save search result log',
-            details: insertError.message || insertError.error || insertError
+            details: insertError.message || insertError
         }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );

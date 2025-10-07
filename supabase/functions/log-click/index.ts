@@ -110,13 +110,18 @@ Deno.serve(async (req) => {
 
     if (queryData) {
       const { data: allSessionClicks } = await supabase
-        .from('query_clicks')
-        .select('qc.id')
-        .from('query_clicks')
-        .innerJoin('queries q', 'qc.query_id', 'q.id')
-        .eq('q.session_id', queryData.session_id);
+        .from('queries')
+        .select('id')
+        .eq('session_id', queryData.session_id);
 
-      const totalSessionClicks = allSessionClicks?.length || 0;
+      const sessionQueryIds = allSessionClicks?.map(q => q.id) || [];
+      
+      const { data: sessionClicks } = await supabase
+        .from('query_clicks')
+        .select('id')
+        .in('query_id', sessionQueryIds);
+
+      const totalSessionClicks = sessionClicks?.length || 0;
 
       await supabase
         .from('search_sessions')
