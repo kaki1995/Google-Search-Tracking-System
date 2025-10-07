@@ -177,11 +177,23 @@ export default function PostTaskSurvey() {
                     <thead>
                       <tr>
                         <th className="text-left text-base pb-2" style={{ width: '35%', fontWeight: 400 }}>Statement</th>
-                        {[1,2,3,4,5,6,7].map((value) => (
-                          <th key={value} className="text-center text-xs pb-2" style={{ width: '10.3%', fontWeight: 400 }}>
-                            {value === 1 ? '1 – Strongly Disagree' : value === 7 ? '7 – Strongly Agree' : value}
-                          </th>
-                        ))}
+                        <th colSpan={7} className="p-0">
+                          <div className="grid grid-cols-7 gap-0 w-full" style={{tableLayout:'fixed'}}>
+                            {[1,2,3,4,5,6,7].map((value) => (
+                              <div key={value} className="flex flex-col items-center justify-center">
+                                {value === 1 ? (
+                                  <span className="text-xs font-normal text-center pb-2">1 – Strongly Disagree</span>
+                                ) : value === 7 ? (
+                                  <span className="text-xs font-normal text-center pb-2">
+                                    7 – Strongly<br />Agree
+                                  </span>
+                                ) : (
+                                  <span className="text-xs font-normal text-center pb-2">{value}</span>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
@@ -191,17 +203,19 @@ export default function PostTaskSurvey() {
                             <span className="mr-2">19.</span> The task was easy to complete. <span className="text-red-500">*</span>
                           </td>
                           {[1,2,3,4,5,6,7].map((value) => (
-                            <td key={value} className="text-center px-2 py-1" style={{ verticalAlign: 'middle' }}>
-                              <input
-                                type="radio"
-                                name="q1_task_easy"
-                                value={value.toString()}
-                                checked={field.value === value.toString()}
-                                onChange={e => field.onChange(e.target.value)}
-                                className="w-5 h-5"
-                                id={`q1_task_easy-${value}`}
-                                style={{ margin: '0 auto', display: 'block' }}
-                              />
+                            <td key={value} className="p-0" style={{width:'14.28%',tableLayout:'fixed',verticalAlign:'middle'}}>
+                              <div className="flex flex-col items-center justify-center">
+                                <input
+                                  type="radio"
+                                  name="q1_task_easy"
+                                  value={value.toString()}
+                                  checked={field.value === value.toString()}
+                                  onChange={e => field.onChange(e.target.value)}
+                                  className="w-5 h-5 rounded-full border-2 border-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                                  id={`q1_task_easy-${value}`}
+                                  style={{margin:'8px auto',display:'block'}}
+                                />
+                              </div>
                             </td>
                           ))}
                         </tr>
@@ -212,17 +226,19 @@ export default function PostTaskSurvey() {
                             <span className="mr-2">20.</span> The task took little time to finish. <span className="text-red-500">*</span>
                           </td>
                           {[1,2,3,4,5,6,7].map((value) => (
-                            <td key={value} className="text-center px-2 py-1" style={{ verticalAlign: 'middle' }}>
-                              <input
-                                type="radio"
-                                name="q2_task_quick"
-                                value={value.toString()}
-                                checked={field.value === value.toString()}
-                                onChange={e => field.onChange(e.target.value)}
-                                className="w-5 h-5"
-                                id={`q2_task_quick-${value}`}
-                                style={{ margin: '0 auto', display: 'block' }}
-                              />
+                            <td key={value} className="p-0" style={{width:'14.28%',tableLayout:'fixed',verticalAlign:'middle'}}>
+                              <div className="flex flex-col items-center justify-center">
+                                <input
+                                  type="radio"
+                                  name="q2_task_quick"
+                                  value={value.toString()}
+                                  checked={field.value === value.toString()}
+                                  onChange={e => field.onChange(e.target.value)}
+                                  className="w-5 h-5 rounded-full border-2 border-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                                  id={`q2_task_quick-${value}`}
+                                  style={{margin:'8px auto',display:'block'}}
+                                />
+                              </div>
                             </td>
                           ))}
                         </tr>
@@ -233,17 +249,19 @@ export default function PostTaskSurvey() {
                             <span className="mr-2">21.</span> I was familiar with this type of task. <span className="text-red-500">*</span>
                           </td>
                           {[1,2,3,4,5,6,7].map((value) => (
-                            <td key={value} className="text-center px-2 py-1" style={{ verticalAlign: 'middle' }}>
-                              <input
-                                type="radio"
-                                name="q3_task_familiar"
-                                value={value.toString()}
-                                checked={field.value === value.toString()}
-                                onChange={e => field.onChange(e.target.value)}
-                                className="w-5 h-5"
-                                id={`q3_task_familiar-${value}`}
-                                style={{ margin: '0 auto', display: 'block' }}
-                              />
+                            <td key={value} className="p-0" style={{width:'14.28%',tableLayout:'fixed',verticalAlign:'middle'}}>
+                              <div className="flex flex-col items-center justify-center">
+                                <input
+                                  type="radio"
+                                  name="q3_task_familiar"
+                                  value={value.toString()}
+                                  checked={field.value === value.toString()}
+                                  onChange={e => field.onChange(e.target.value)}
+                                  className="w-5 h-5 rounded-full border-2 border-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                                  id={`q3_task_familiar-${value}`}
+                                  style={{margin:'8px auto',display:'block'}}
+                                />
+                              </div>
                             </td>
                           ))}
                         </tr>
@@ -286,17 +304,19 @@ export default function PostTaskSurvey() {
                               <span className="mr-2">{22 + idx}.</span> {item.text} <span className="text-red-500">*</span>
                             </td>
                             {[1,2,3,4,5,6,7].map((value) => (
-                              <td key={value} className="text-center px-2 py-1" style={{ verticalAlign: 'middle' }}>
-                                <input
-                                  type="radio"
-                                  name={item.name}
-                                  value={value.toString()}
-                                  checked={field.value === value.toString()}
-                                  onChange={e => field.onChange(e.target.value)}
-                                  className="w-5 h-5"
-                                  id={`${item.name}-${value}`}
-                                  style={{ margin: '0 auto', display: 'block' }}
-                                />
+                              <td key={value} className="p-0" style={{width:'14.28%',tableLayout:'fixed',verticalAlign:'middle'}}>
+                                <div className="flex flex-col items-center justify-center">
+                                  <input
+                                    type="radio"
+                                    name={item.name}
+                                    value={value.toString()}
+                                    checked={field.value === value.toString()}
+                                    onChange={e => field.onChange(e.target.value)}
+                                    className="w-5 h-5 rounded-full border-2 border-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                                    id={`${item.name}-${value}`}
+                                    style={{margin:'8px auto',display:'block'}}
+                                  />
+                                </div>
                               </td>
                             ))}
                           </tr>
@@ -327,7 +347,7 @@ export default function PostTaskSurvey() {
                         { name: "q17_results_complete", text: "The results are complete." },
                         { name: "q18_results_relevant", text: "The search results are relevant to my needs." },
                         { name: "q19_results_useful", text: "The search results are useful to me." },
-                        { name: "q22_attention_check", text: 'Please select "3" for this question.' }
+                        { name: "q22_attention_check", text: 'Please select "3" for this statement.' }
                       ].map((item, idx) => (
                         <FormField key={item.name} control={form.control} name={item.name as keyof PostTaskSurveyForm} rules={{ required: "This field is required" }} render={({ field }) => (
                           <tr className="border-b border-gray-200">
