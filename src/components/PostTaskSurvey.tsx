@@ -176,13 +176,9 @@ export default function PostTaskSurvey() {
                   <table className="w-full border-separate" style={{ borderSpacing: 0 }}>
                     <thead>
                       <tr>
-                                    <th className="text-left pb-2" style={{ width: '35%', fontWeight: 400 }}>
-                                      <span className="text-[13px] md:text-[16px]" style={{fontSize: '16px'}}>
-                            Statement
-                          </span>
-                        </th>
+                        <th className="text-left text-[13px] pb-2" style={{ width: '35%', fontWeight: 400 }}>Statement</th>
                         {[1,2,3,4,5,6,7].map((value) => (
-                          <th key={value} className={`text-center pb-2 font-normal ${value === 1 || value === 7 ? 'text-[11px] md:text-[14px]' : 'text-[13px] md:text-[16px]'}`} style={{ width: '9%', fontWeight: 400 }}>
+                          <th key={value} className={`text-center pb-2 font-normal ${value === 1 || value === 7 ? 'text-[11px]' : 'text-[13px]'}`} style={{ width: '9%', fontWeight: 400 }}>
                             {value === 1 ? <span className="block leading-tight">1<br /><span className="text-[12px]">Strongly Disagree</span></span>
                               : value === 7 ? <span className="block leading-tight">7<br /><span className="text-[12px]">Strongly Agree</span></span>
                               : value}
@@ -194,7 +190,7 @@ export default function PostTaskSurvey() {
                <FormField control={form.control} name="q1_task_easy" rules={{ required: "This field is required" }} render={({ field }) => (
                         <tr className="border-b border-gray-200">
                           <td className="text-left text-[14px] py-3 pr-0 whitespace-normal" style={{ verticalAlign: 'top', lineHeight: 1.3, wordBreak: 'break-word', width: '35%', fontWeight: 400, padding: '12px 8px' }}>
-                            <span className="mr-2">19.</span> <span className="text-[13px] md:text-[16px]">The task was easy to complete.</span> <span className="text-red-500">*</span>
+                            <span className="mr-2">19.</span> <span className="text-[13px]">The task was easy to complete.</span> <span className="text-red-500">*</span>
                           </td>
                           {[1,2,3,4,5,6,7].map((value) => (
                             <td key={value} className="text-center px-1 py-1" style={{ verticalAlign: 'middle', padding: '0 2px' }}>
@@ -215,7 +211,7 @@ export default function PostTaskSurvey() {
                       <FormField control={form.control} name="q2_task_quick" rules={{ required: "This field is required" }} render={({ field }) => (
                         <tr className="border-b border-gray-200">
                           <td className="text-left text-[14px] py-3 pr-0 whitespace-normal" style={{ verticalAlign: 'top', lineHeight: 1.3, wordBreak: 'break-word', fontWeight: 400, padding: '12px 8px' }}>
-                            <span className="mr-2">20.</span> <span className="text-[13px] md:text-[16px]">The task took little time to finish.</span> <span className="text-red-500">*</span>
+                            <span className="mr-2">20.</span> <span className="text-[13px]">The task took little time to finish.</span> <span className="text-red-500">*</span>
                           </td>
                           {[1,2,3,4,5,6,7].map((value) => (
                             <td key={value} className="text-center px-1 py-1" style={{ verticalAlign: 'middle', padding: '0 2px' }}>
@@ -236,7 +232,7 @@ export default function PostTaskSurvey() {
                       <FormField control={form.control} name="q3_task_familiar" rules={{ required: "This field is required" }} render={({ field }) => (
                         <tr className="border-b border-gray-200">
                           <td className="text-left text-[14px] py-3 pr-0 whitespace-normal" style={{ verticalAlign: 'top', lineHeight: 1.3, wordBreak: 'break-word', fontWeight: 400, padding: '12px 8px' }}>
-                            <span className="mr-2">21.</span> <span className="text-[13px] md:text-[16px]">I was familiar with this type of task.</span> <span className="text-red-500">*</span>
+                            <span className="mr-2">21.</span> <span className="text-[13px]">I was familiar with this type of task.</span> <span className="text-red-500">*</span>
                           </td>
                           {[1,2,3,4,5,6,7].map((value) => (
                             <td key={value} className="text-center px-1 py-1" style={{ verticalAlign: 'middle', padding: '0 2px' }}>
@@ -291,7 +287,7 @@ export default function PostTaskSurvey() {
                         <FormField key={item.name} control={form.control} name={item.name as keyof PostTaskSurveyForm} rules={{ required: "This field is required" }} render={({ field }) => (
                           <tr className="border-b border-gray-200">
                             <td className="text-left text-[14px] py-3 pr-0 whitespace-normal" style={{ verticalAlign: 'top', lineHeight: 1.3, wordBreak: 'break-word', width: '35%', fontWeight: 400, padding: '12px 8px' }}>
-                              <span className="mr-2">{22 + idx}.</span> <span className="text-[13px] md:text-[16px]">{item.text}</span> <span className="text-red-500">*</span>
+                              <span className="mr-2">{22 + idx}.</span> <span className="text-[13px]">{item.text}</span> <span className="text-red-500">*</span>
                             </td>
                             {[1,2,3,4,5,6,7].map((value) => (
                               <td key={value} className="text-center px-1 py-1" style={{ verticalAlign: 'middle', padding: '0 2px' }}>
@@ -340,7 +336,7 @@ export default function PostTaskSurvey() {
                         <FormField key={item.name} control={form.control} name={item.name as keyof PostTaskSurveyForm} rules={{ required: "This field is required" }} render={({ field }) => (
                           <tr className="border-b border-gray-200">
                             <td className="text-left text-[14px] py-3 pr-0 whitespace-normal" style={{ verticalAlign: 'top', lineHeight: 1.3, wordBreak: 'break-word', width: '35%', fontWeight: 400, padding: '12px 8px' }}>
-                              <span className="mr-2">{33 + idx}.</span> <span className="text-[13px] md:text-[16px]">{item.text}</span> <span className="text-red-500">*</span>
+                              <span className="mr-2">{33 + idx}.</span> <span className="text-[13px]">{item.text}</span> <span className="text-red-500">*</span>
                             </td>
                             {[1,2,3,4,5,6,7].map((value) => (
                               <td key={value} className="text-center px-1 py-1" style={{ verticalAlign: 'middle', padding: '0 2px' }}>
