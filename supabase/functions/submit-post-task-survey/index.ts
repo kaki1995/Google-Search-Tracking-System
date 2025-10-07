@@ -88,9 +88,9 @@ serve(async (req) => {
       q35_results_complete: Number(responses.q17_results_complete ?? 0),
       q36_results_relevant: Number(responses.q18_results_relevant ?? 0),
       q37_results_useful: Number(responses.q19_results_useful ?? 0),
-      q38_purchase_likelihood: Number(responses.q20_purchase_likelihood ?? 0),
+      q38_attention_check: Number(responses.q22_attention_check ?? 0),
       q39_contradictory_handling: Array.isArray(responses.q21_contradictory_handling) ? responses.q21_contradictory_handling : [],
-      q40_attention_check: Number(responses.q22_attention_check ?? 0),
+      q40_purchase_likelihood: Number(responses.q20_purchase_likelihood ?? 0),
       q41_time_spent: String(responses.q23_time_spent ?? ''),
       q42_future_usage_feedback: String(responses.q24_future_usage_feedback ?? '')
     };
