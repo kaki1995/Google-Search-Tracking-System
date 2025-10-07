@@ -88,8 +88,6 @@ export default function PostTaskSurvey() {
       const values = form.getValues();
       const session_id = sessionManager.getSessionId();
       const participant_id = sessionManager.getParticipantId();
-      console.log('DEBUG: session_id', session_id);
-      console.log('DEBUG: participant_id', participant_id);
       if (!session_id) {
         toast({
           title: 'Missing session',
@@ -126,12 +124,9 @@ export default function PostTaskSurvey() {
         q23_time_spent: String(values.q23_time_spent || ''),
         q24_future_usage_feedback: String(values.q24_future_usage_feedback || ''),
       };
-      console.log('DEBUG: responses', responses);
       const { data: resp, error } = await supabase.functions.invoke('submit-post-task-survey', {
         body: { participant_id, session_id, responses },
       });
-      console.log('DEBUG: supabase response', resp);
-      console.log('DEBUG: supabase error', error);
       if (error || !resp?.ok) {
         const msg = error?.message || resp?.error || 'Failed to submit post-task survey';
         throw new Error(msg);

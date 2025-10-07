@@ -111,8 +111,10 @@ Deno.serve(async (req) => {
     if (queryData) {
       const { data: allSessionClicks } = await supabase
         .from('query_clicks')
-        .select('id')
-        .eq('query_id', queryData.id);
+        .select('qc.id')
+        .from('query_clicks')
+        .innerJoin('queries q', 'qc.query_id', 'q.id')
+        .eq('q.session_id', queryData.session_id);
 
       const totalSessionClicks = allSessionClicks?.length || 0;
 
