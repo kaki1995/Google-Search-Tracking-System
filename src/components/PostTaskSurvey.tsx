@@ -326,8 +326,7 @@ export default function PostTaskSurvey() {
                         { name: "q16_results_trustworthy", text: "I can trust the results." },
                         { name: "q17_results_complete", text: "The results are complete." },
                         { name: "q18_results_relevant", text: "The search results are relevant to my needs." },
-                        { name: "q19_results_useful", text: "The search results are useful to me." },
-                        { name: "q22_attention_check", text: 'Please select "3" for this statement.' }
+                        { name: "q19_results_useful", text: "The search results are useful to me." }
                       ].map((item, idx) => (
                         <FormField key={item.name} control={form.control} name={item.name as keyof PostTaskSurveyForm} rules={{ required: "This field is required" }} render={({ field }) => (
                           <tr className="border-b border-gray-200">
@@ -356,6 +355,45 @@ export default function PostTaskSurvey() {
                 </div>
 
                 {/* Purchase Intention Section */}
+                <div className="space-y-6 pt-8">
+                  {/* Purchase Intention Likert Table */}
+                  <FormField control={form.control} name="q20_purchase_likelihood" rules={{ required: "This field is required" }} render={({ field }) => (
+                    <div className="mb-8">
+                      <div className="text-base font-semibold text-left mb-4" style={{ lineHeight: 1.3, fontWeight: 500 }}>
+                        <span className="mr-2">38.</span> If you were to buy a new smartphone now, how likely is it that you would choose the one you selected during this task? <span className="text-red-500">*</span>
+                      </div>
+                      <table className="w-full border-separate" style={{ borderSpacing: 0 }}>
+                        <thead>
+                          <tr>
+                            {[1,2,3,4,5,6,7].map((value) => (
+                              <th key={value} className="text-center text-xs pb-2" style={{ width: `${100/7}%`, fontWeight: 400 }}>
+                                {value === 1 ? '1 – Strongly Disagree' : value === 7 ? '7 – Strongly Agree' : value}
+                              </th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr className="border-b border-gray-200">
+                            {[1,2,3,4,5,6,7].map((value) => (
+                              <td key={value} className="text-center px-2 py-1" style={{ verticalAlign: 'middle' }}>
+                                <input
+                                  type="radio"
+                                  name="q20_purchase_likelihood"
+                                  value={value.toString()}
+                                  checked={field.value === value.toString()}
+                                  onChange={e => field.onChange(e.target.value)}
+                                  className="w-5 h-5"
+                                  id={`q20_purchase_likelihood-${value}`}
+                                  style={{ margin: '0 auto', display: 'block' }}
+                                />
+                              </td>
+                            ))}
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  )} />
+                </div>
 
                 {/* Additional Questions Section */}
                 <div className="space-y-6 pt-8">
@@ -398,11 +436,12 @@ export default function PostTaskSurvey() {
                       <FormMessage />
                     </FormItem>
                   )} />
-                  {/* Purchase Intention Likert Table */}
-                  <FormField control={form.control} name="q20_purchase_likelihood" rules={{ required: "This field is required" }} render={({ field }) => (
+
+                  {/* Q22 - Attention Check */}
+                  <FormField control={form.control} name="q22_attention_check" rules={{ required: "This field is required" }} render={({ field }) => (
                     <div className="mb-8">
                       <div className="text-base font-semibold text-left mb-4" style={{ lineHeight: 1.3, fontWeight: 500 }}>
-                        <span className="mr-2">40.</span> If you were to buy a new smartphone now, how likely is it that you would choose the one you selected during this task? <span className="text-red-500">*</span>
+                        <span className="mr-2">40.</span> Please select "3" for this statement. <span className="text-red-500">*</span>
                       </div>
                       <table className="w-full border-separate" style={{ borderSpacing: 0 }}>
                         <thead>
@@ -420,12 +459,12 @@ export default function PostTaskSurvey() {
                               <td key={value} className="text-center px-2 py-1" style={{ verticalAlign: 'middle' }}>
                                 <input
                                   type="radio"
-                                  name="q20_purchase_likelihood"
+                                  name="q22_attention_check"
                                   value={value.toString()}
                                   checked={field.value === value.toString()}
                                   onChange={e => field.onChange(e.target.value)}
                                   className="w-5 h-5"
-                                  id={`q20_purchase_likelihood-${value}`}
+                                  id={`q22_attention_check-${value}`}
                                   style={{ margin: '0 auto', display: 'block' }}
                                 />
                               </td>
@@ -435,7 +474,6 @@ export default function PostTaskSurvey() {
                       </table>
                     </div>
                   )} />
-
 
                   {/* Q23 - Time Spent */}
                   <FormField control={form.control} name="q23_time_spent" rules={{ required: "This field is required" }} render={({ field }) => (
