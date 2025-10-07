@@ -177,10 +177,10 @@ export default function PostTaskSurvey() {
                     <thead>
                       <tr>
                                     <th className="text-left pb-2" style={{ width: '35%', fontWeight: 400 }}>
-                                      <span className="text-[13px] md:text-[16px]" style={{fontSize: '16px'}}>
-                            Statement
-                          </span>
-                        </th>
+                                      <span className="text-[14px]" style={{fontSize: '14px'}}>
+                                        Statement
+                                      </span>
+                                    </th>
                         {[1,2,3,4,5,6,7].map((value) => (
                           <th key={value} className={`text-center pb-2 font-normal ${value === 1 || value === 7 ? 'text-[11px] md:text-[14px]' : 'text-[13px] md:text-[16px]'}`} style={{ width: '9%', fontWeight: 400 }}>
                             {value === 1 ? <span className="block leading-tight">1<br /><span className="text-[12px]">Strongly Disagree</span></span>
@@ -320,7 +320,11 @@ export default function PostTaskSurvey() {
                   <table className="w-full border-separate" style={{ borderSpacing: 0 }}>
                     <thead>
                       <tr>
-                        <th className="text-left text-base pb-2" style={{ width: '35%', fontWeight: 400 }}>Statement</th>
+                        <th className="text-left pb-2" style={{ width: '35%', fontWeight: 400 }}>
+                          <span className="text-[14px]" style={{fontSize: '14px'}}>
+                            Statement
+                          </span>
+                        </th>
                         {[1,2,3,4,5,6,7].map((value) => (
                           <th key={value} className="text-center text-xs pb-2" style={{ width: '10.3%', fontWeight: 400 }}>
                             {value === 1 ? '1 – Strongly Disagree' : value === 7 ? '7 – Strongly Agree' : value}
