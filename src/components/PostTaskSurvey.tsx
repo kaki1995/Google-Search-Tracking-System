@@ -172,7 +172,7 @@ export default function PostTaskSurvey() {
               <form className="space-y-8">
                 {/* Task Section */}
                 <div className="space-y-6">
-                  <h2 className="text-left text-base pb-2 w-full font-bold">Please indicate how much you agree or disagree with the following statements about your search task.</h2>
+                  <h2 className="text-left text-base pb-2 w-full font-medium">Please indicate how much you agree or disagree with the following statements about your search task.</h2>
                   <table className="w-full border-separate" style={{ borderSpacing: 0 }}>
                     <thead>
                       <tr>
@@ -187,8 +187,8 @@ export default function PostTaskSurvey() {
                     <tbody>
                <FormField control={form.control} name="q1_task_easy" rules={{ required: "This field is required" }} render={({ field }) => (
                         <tr className="border-b border-gray-200">
-                  <td className="text-left text-base py-2 pr-0 whitespace-normal" style={{ verticalAlign: 'top', lineHeight: 1.3, wordBreak: 'break-word', width: '35%', fontWeight: 400, fontWeight: 400 }}>
-                            The task was easy to complete. <span className="text-red-500">*</span>
+                  <td className="text-left text-base py-2 pr-0 whitespace-normal" style={{ verticalAlign: 'top', lineHeight: 1.3, wordBreak: 'break-word', width: '35%', fontWeight: 400 }}>
+                            <span className="mr-2">19.</span> The task was easy to complete. <span className="text-red-500">*</span>
                           </td>
                           {[1,2,3,4,5,6,7].map((value) => (
                             <td key={value} className="text-center px-2 py-1" style={{ verticalAlign: 'middle' }}>
@@ -209,7 +209,7 @@ export default function PostTaskSurvey() {
                       <FormField control={form.control} name="q2_task_quick" rules={{ required: "This field is required" }} render={({ field }) => (
                         <tr className="border-b border-gray-200">
                           <td className="text-left text-base py-2 pr-0 whitespace-normal" style={{ verticalAlign: 'top', lineHeight: 1.3, wordBreak: 'break-word', fontWeight: 400 }}>
-                            The task took little time to finish. <span className="text-red-500">*</span>
+                            <span className="mr-2">20.</span> The task took little time to finish. <span className="text-red-500">*</span>
                           </td>
                           {[1,2,3,4,5,6,7].map((value) => (
                             <td key={value} className="text-center px-2 py-1" style={{ verticalAlign: 'middle' }}>
@@ -230,7 +230,7 @@ export default function PostTaskSurvey() {
                       <FormField control={form.control} name="q3_task_familiar" rules={{ required: "This field is required" }} render={({ field }) => (
                         <tr className="border-b border-gray-200">
                           <td className="text-left text-base py-2 pr-0 whitespace-normal" style={{ verticalAlign: 'top', lineHeight: 1.3, wordBreak: 'break-word', fontWeight: 400 }}>
-                            I was familiar with this type of task. <span className="text-red-500">*</span>
+                            <span className="mr-2">21.</span> I was familiar with this type of task. <span className="text-red-500">*</span>
                           </td>
                           {[1,2,3,4,5,6,7].map((value) => (
                             <td key={value} className="text-center px-2 py-1" style={{ verticalAlign: 'middle' }}>
@@ -254,7 +254,7 @@ export default function PostTaskSurvey() {
 
                 {/* Search Tool Section */}
                 <div className="space-y-6 pt-8">
-                  <h2 className="text-left text-base pb-2 w-full font-bold">Please indicate how much you agree or disagree with the following statements about the search tool.</h2>
+                  <h2 className="text-left text-base pb-2 w-full font-medium">Please indicate how much you agree or disagree with the following statements about the search tool.</h2>
                   <table className="w-full border-separate" style={{ borderSpacing: 0 }}>
                     <thead>
                       <tr>
@@ -267,7 +267,7 @@ export default function PostTaskSurvey() {
                       </tr>
                     </thead>
                     <tbody>
-                      {[
+                      {[ 
                         { name: "q4_tool_reliable", text: "I consider the search tool reliable." },
                         { name: "q5_tool_practical", text: "The search tool is practical for my needs." },
                         { name: "q6_tool_like", text: "Overall, I like the search tool." },
@@ -283,7 +283,7 @@ export default function PostTaskSurvey() {
                         <FormField key={item.name} control={form.control} name={item.name as keyof PostTaskSurveyForm} rules={{ required: "This field is required" }} render={({ field }) => (
                           <tr className="border-b border-gray-200">
                             <td className="text-left text-base py-2 pr-0 whitespace-normal" style={{ verticalAlign: 'top', lineHeight: 1.3, wordBreak: 'break-word', width: '35%', fontWeight: 400 }}>
-                              {item.text} <span className="text-red-500">*</span>
+                              <span className="mr-2">{22 + idx}.</span> {item.text} <span className="text-red-500">*</span>
                             </td>
                             {[1,2,3,4,5,6,7].map((value) => (
                               <td key={value} className="text-center px-2 py-1" style={{ verticalAlign: 'middle' }}>
@@ -308,7 +308,7 @@ export default function PostTaskSurvey() {
 
                 {/* Search Results Section */}
                 <div className="space-y-6 pt-8">
-                  <h2 className="text-left text-base pb-2 w-full font-bold">Please indicate how much you agree or disagree with the following statements about the search results provided by the tool.</h2>
+                  <h2 className="text-left text-base pb-2 w-full font-medium">Please indicate how much you agree or disagree with the following statements about the search results provided by the tool.</h2>
                   <table className="w-full border-separate" style={{ borderSpacing: 0 }}>
                     <thead>
                       <tr>
@@ -321,7 +321,7 @@ export default function PostTaskSurvey() {
                       </tr>
                     </thead>
                     <tbody>
-                      {[
+                      {[ 
                         { name: "q15_results_accurate", text: "The information provided is accurate." },
                         { name: "q16_results_trustworthy", text: "I can trust the results." },
                         { name: "q17_results_complete", text: "The results are complete." },
@@ -332,7 +332,7 @@ export default function PostTaskSurvey() {
                         <FormField key={item.name} control={form.control} name={item.name as keyof PostTaskSurveyForm} rules={{ required: "This field is required" }} render={({ field }) => (
                           <tr className="border-b border-gray-200">
                             <td className="text-left text-base py-2 pr-0 whitespace-normal" style={{ verticalAlign: 'top', lineHeight: 1.3, wordBreak: 'break-word', width: '35%', fontWeight: 400 }}>
-                              {item.text} <span className="text-red-500">*</span>
+                              <span className="mr-2">{33 + idx}.</span> {item.text} <span className="text-red-500">*</span>
                             </td>
                             {[1,2,3,4,5,6,7].map((value) => (
                               <td key={value} className="text-center px-2 py-1" style={{ verticalAlign: 'middle' }}>
@@ -359,49 +359,11 @@ export default function PostTaskSurvey() {
 
                 {/* Additional Questions Section */}
                 <div className="space-y-6 pt-8">
-                  <h2 className="text-left text-base pb-2 w-full font-bold">Additional Questions</h2>
-                  {/* Purchase Intention Likert Table */}
-                  <FormField control={form.control} name="q20_purchase_likelihood" rules={{ required: "This field is required" }} render={({ field }) => (
-                    <div className="mb-8">
-                      <div className="text-base font-semibold text-left mb-4" style={{ lineHeight: 1.3, fontWeight: 500 }}>
-                        If you were to buy a new smartphone now, how likely is it that you would choose the one you selected during this task? <span className="text-red-500">*</span>
-                      </div>
-                      <table className="w-full border-separate" style={{ borderSpacing: 0 }}>
-                        <thead>
-                          <tr>
-                            {[1,2,3,4,5,6,7].map((value) => (
-                              <th key={value} className="text-center text-xs pb-2" style={{ width: `${100/7}%`, fontWeight: 400 }}>
-                                {value === 1 ? '1 – Strongly Disagree' : value === 7 ? '7 – Strongly Agree' : value}
-                              </th>
-                            ))}
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr className="border-b border-gray-200">
-                            {[1,2,3,4,5,6,7].map((value) => (
-                              <td key={value} className="text-center px-2 py-1" style={{ verticalAlign: 'middle' }}>
-                                <input
-                                  type="radio"
-                                  name="q20_purchase_likelihood"
-                                  value={value.toString()}
-                                  checked={field.value === value.toString()}
-                                  onChange={e => field.onChange(e.target.value)}
-                                  className="w-5 h-5"
-                                  id={`q20_purchase_likelihood-${value}`}
-                                  style={{ margin: '0 auto', display: 'block' }}
-                                />
-                              </td>
-                            ))}
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  )} />
                   {/* Q21 - Contradictory Information */}
                   <FormField control={form.control} name="q21_contradictory_handling" rules={{ required: "Please select at least one option" }} render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-base text-gray-900">
-                        If you found contradictory information across different search results, how did you handle it? (Select all that apply) <span className="text-red-500">*</span>
+                        <span className="mr-2">39.</span> If you found contradictory information across different search results, how did you handle it? (Select all that apply) <span className="text-red-500">*</span>
                       </FormLabel>
                       <FormControl>
                         <div className="space-y-2 bg-gray-50 p-4 rounded-lg">
@@ -436,13 +398,50 @@ export default function PostTaskSurvey() {
                       <FormMessage />
                     </FormItem>
                   )} />
+                  {/* Purchase Intention Likert Table */}
+                  <FormField control={form.control} name="q20_purchase_likelihood" rules={{ required: "This field is required" }} render={({ field }) => (
+                    <div className="mb-8">
+                      <div className="text-base font-semibold text-left mb-4" style={{ lineHeight: 1.3, fontWeight: 500 }}>
+                        <span className="mr-2">40.</span> If you were to buy a new smartphone now, how likely is it that you would choose the one you selected during this task? <span className="text-red-500">*</span>
+                      </div>
+                      <table className="w-full border-separate" style={{ borderSpacing: 0 }}>
+                        <thead>
+                          <tr>
+                            {[1,2,3,4,5,6,7].map((value) => (
+                              <th key={value} className="text-center text-xs pb-2" style={{ width: `${100/7}%`, fontWeight: 400 }}>
+                                {value === 1 ? '1 – Strongly Disagree' : value === 7 ? '7 – Strongly Agree' : value}
+                              </th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr className="border-b border-gray-200">
+                            {[1,2,3,4,5,6,7].map((value) => (
+                              <td key={value} className="text-center px-2 py-1" style={{ verticalAlign: 'middle' }}>
+                                <input
+                                  type="radio"
+                                  name="q20_purchase_likelihood"
+                                  value={value.toString()}
+                                  checked={field.value === value.toString()}
+                                  onChange={e => field.onChange(e.target.value)}
+                                  className="w-5 h-5"
+                                  id={`q20_purchase_likelihood-${value}`}
+                                  style={{ margin: '0 auto', display: 'block' }}
+                                />
+                              </td>
+                            ))}
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  )} />
 
 
                   {/* Q23 - Time Spent */}
                   <FormField control={form.control} name="q23_time_spent" rules={{ required: "This field is required" }} render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-base font-medium text-gray-900">
-                        Approximately how much time (in minutes) did you spend on the search interface before deciding on a smartphone? <span className="text-red-500">*</span>
+                        <span className="mr-2">41.</span> Approximately how much time (in minutes) did you spend on the search interface before deciding on a smartphone? <span className="text-red-500">*</span>
                       </FormLabel>
                       <FormControl>
                         <div className="space-y-2 bg-gray-50 p-4 rounded-lg">
@@ -472,7 +471,7 @@ export default function PostTaskSurvey() {
                   <FormField control={form.control} name="q24_future_usage_feedback" rules={{ required: "This field is required" }} render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-base font-medium text-gray-900">
-                        Thinking about your experience with this version of Google Search, would you consider using it again in the future for other shopping-related tasks? Please explain why or why not. <span className="text-red-500">*</span>
+                        <span className="mr-2">42.</span> Thinking about your experience with this version of Google Search, would you consider using it again in the future for other shopping-related tasks? Please explain why or why not. <span className="text-red-500">*</span>
                       </FormLabel>
                       <FormControl>
                         <Textarea 
