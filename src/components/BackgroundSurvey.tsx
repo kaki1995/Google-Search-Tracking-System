@@ -406,19 +406,18 @@ export default function BackgroundSurvey() {
             }} render={({
               field
             }) => <FormItem>
-                    <FormLabel className="text-base font-medium text-gray-900 mb-3 block">
+                    <FormLabel className="text-base font-medium text-gray-900">
                       7. How familiar are you with AI chatbots such as ChatGPT? <span className="text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
-                      <div className="bg-gray-100 rounded-lg p-3">
-                        <div className="flex items-center justify-between text-[10px] text-gray-600 mb-2">
-                          <span>Not familiar at all</span>
-                          <span>Extremely familiar</span>
+                      <div className="bg-gray-50 p-4 rounded-lg">
+                        <div className="flex items-center justify-between mb-4">
+                          <span className="text-sm text-gray-600">1-Not familiar at all</span>
+                          <span className="text-sm text-gray-600">7-Extremely familiar</span>
                         </div>
-                        <div className="flex justify-between gap-1">
+                        <div className="flex justify-between items-center">
                           {[1, 2, 3, 4, 5, 6, 7].map((value) => (
-                            <label key={value} className="flex flex-col items-center cursor-pointer">
-                              <span className="text-xs mb-1">{value}</span>
+                            <div key={value} className="flex flex-col items-center">
                               <input 
                                 type="radio" 
                                 name="experience_scale_q7" 
@@ -428,10 +427,16 @@ export default function BackgroundSurvey() {
                                   field.onChange(e);
                                   handleSaveResponses(form.getValues());
                                 }}
-                                className="w-4 h-4" 
+                                className="mb-1 w-4 h-4" 
                                 id={`q7-${value}`}
                               />
-                            </label>
+                              <label 
+                                htmlFor={`q7-${value}`} 
+                                className="text-sm text-gray-600 cursor-pointer"
+                              >
+                                {value}
+                              </label>
+                            </div>
                           ))}
                         </div>
                       </div>
@@ -445,19 +450,18 @@ export default function BackgroundSurvey() {
             }} render={({
               field
             }) => <FormItem>
-                    <FormLabel className="text-base font-medium text-gray-900 mb-3 block">
+                    <FormLabel className="text-base font-medium text-gray-900">
                       8. Please choose 1 – Strongly Disagree as your answer to this question. <span className="text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
-                      <div className="bg-gray-100 rounded-lg p-3">
-                        <div className="flex items-center justify-between text-[10px] text-gray-600 mb-2">
-                          <span>Strongly Disagree</span>
-                          <span>Strongly Agree</span>
+                      <div className="bg-gray-50 p-4 rounded-lg">
+                        <div className="flex items-center justify-between mb-4">
+                          <span className="text-sm text-gray-600">1-Strongly Disagree</span>
+                          <span className="text-sm text-gray-600">7-Strongly Agree</span>
                         </div>
-                        <div className="flex justify-between gap-1">
+                        <div className="flex justify-between items-center">
                           {[1, 2, 3, 4, 5, 6, 7].map((value) => (
-                            <label key={value} className="flex flex-col items-center cursor-pointer">
-                              <span className="text-xs mb-1">{value}</span>
+                            <div key={value} className="flex flex-col items-center">
                               <input 
                                 type="radio" 
                                 name="familiarity_scale_q8" 
@@ -467,10 +471,16 @@ export default function BackgroundSurvey() {
                                   field.onChange(e);
                                   handleSaveResponses(form.getValues());
                                 }}
-                                className="w-4 h-4" 
+                                className="mb-1 w-4 h-4" 
                                 id={`q8-${value}`}
                               />
-                            </label>
+                              <label 
+                                htmlFor={`q8-${value}`} 
+                                className="text-sm text-gray-600 cursor-pointer"
+                              >
+                                {value}
+                              </label>
+                            </div>
                           ))}
                         </div>
                       </div>

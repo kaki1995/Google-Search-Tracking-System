@@ -225,30 +225,34 @@ export default function SearchResultLog() {
                 rules={{ required: "This field is required" }}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-base font-medium text-gray-900 mb-3 block">
+                    <FormLabel className="text-base font-medium text-gray-900 mb-2 block">
                       17. When making a smartphone purchase decision, price is a more important factor to you than technical specifications? <span className="text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
-                      <div className="bg-gray-100 rounded-lg p-3">
-                        <div className="flex justify-between items-center text-[10px] text-gray-600 mb-2">
-                          <span>Strongly Disagree</span>
-                          <span>Strongly Agree</span>
-                        </div>
-                        <div className="flex justify-between gap-1">
-                          {[1,2,3,4,5,6,7].map((value) => (
-                            <label key={value} className="flex flex-col items-center cursor-pointer">
-                              <span className="text-xs mb-1">{value}</span>
-                              <input
-                                type="radio"
-                                name="q17_price_importance"
-                                value={value.toString()}
-                                checked={field.value === value.toString()}
-                                onChange={e => field.onChange(e.target.value)}
-                                className="w-4 h-4"
-                                id={`q17_price_importance-${value}`}
-                              />
-                            </label>
-                          ))}
+                      <div className="w-full flex flex-col items-center">
+                        <div className="w-full">
+                          <div className="flex w-full justify-between mb-2">
+                            {[1,2,3,4,5,6,7].map((value) => (
+                              <span key={value} className="text-xs text-center" style={{ width: '14.2%' }}>
+                                {value === 1 ? '1 – Strongly Disagree' : value === 7 ? '7 – Strongly Agree' : value}
+                              </span>
+                            ))}
+                          </div>
+                          <div className="flex w-full justify-between">
+                            {[1,2,3,4,5,6,7].map((value) => (
+                              <label key={value} className="flex flex-col items-center" style={{ width: '14.2%' }}>
+                                <input
+                                  type="radio"
+                                  name="q17_price_importance"
+                                  value={value.toString()}
+                                  checked={field.value === value.toString()}
+                                  onChange={e => field.onChange(e.target.value)}
+                                  className="w-5 h-5"
+                                  id={`q17_price_importance-${value}`}
+                                />
+                              </label>
+                            ))}
+                          </div>
                         </div>
                       </div>
                     </FormControl>
