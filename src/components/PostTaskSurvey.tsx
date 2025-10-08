@@ -266,8 +266,8 @@ export default function PostTaskSurvey() {
                         </p>
                         <div className="bg-gray-100 rounded-lg p-3">
                           <div className="flex justify-between items-center text-[10px] text-gray-600 mb-2">
-                            <span>Strongly Disagree</span>
-                            <span>Strongly Agree</span>
+                            <span>1 - Strongly Disagree</span>
+                            <span>7 - Strongly Agree</span>
                           </div>
                           <div className="flex justify-between gap-1">
                             {[1,2,3,4,5,6,7].map((value) => (
@@ -294,8 +294,8 @@ export default function PostTaskSurvey() {
                         </p>
                         <div className="bg-gray-100 rounded-lg p-3">
                           <div className="flex justify-between items-center text-[10px] text-gray-600 mb-2">
-                            <span>Strongly Disagree</span>
-                            <span>Strongly Agree</span>
+                            <span>1 - Strongly Disagree</span>
+                            <span>7 - Strongly Agree</span>
                           </div>
                           <div className="flex justify-between gap-1">
                             {[1,2,3,4,5,6,7].map((value) => (
@@ -322,9 +322,9 @@ export default function PostTaskSurvey() {
                         </p>
                         <div className="bg-gray-100 rounded-lg p-3">
                           <div className="flex justify-between items-center text-[10px] text-gray-600 mb-2">
-                            <span>Strongly Disagree</span>
-                            <span>Strongly Agree</span>
-                          </div>
+                              <span>1 - Strongly Disagree</span>
+                              <span>7 - Strongly Agree</span>
+                            </div>
                           <div className="flex justify-between gap-1">
                             {[1,2,3,4,5,6,7].map((value) => (
                               <label key={value} className="flex flex-col items-center cursor-pointer">
@@ -422,8 +422,8 @@ export default function PostTaskSurvey() {
                           </p>
                           <div className="bg-gray-100 rounded-lg p-3">
                             <div className="flex justify-between items-center text-[10px] text-gray-600 mb-2">
-                              <span>Strongly Disagree</span>
-                              <span>Strongly Agree</span>
+                              <span>1 - Strongly Disagree</span>
+                              <span>7 - Strongly Agree</span>
                             </div>
                             <div className="flex justify-between gap-1">
                               {[1,2,3,4,5,6,7].map((value) => (
@@ -515,8 +515,8 @@ export default function PostTaskSurvey() {
                           </p>
                           <div className="bg-gray-100 rounded-lg p-3">
                             <div className="flex justify-between items-center text-[10px] text-gray-600 mb-2">
-                              <span>Strongly Disagree</span>
-                              <span>Strongly Agree</span>
+                              <span>1 - Strongly Disagree</span>
+                              <span>7 - Strongly Agree</span>
                             </div>
                             <div className="flex justify-between gap-1">
                               {[1,2,3,4,5,6,7].map((value) => (
