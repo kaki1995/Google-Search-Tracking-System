@@ -595,7 +595,7 @@ export default function PostTaskSurvey() {
                           <tr>
                             {[1,2,3,4,5,6,7].map((value) => (
                               <th key={value} className="text-center text-xs pb-2" style={{ width: `${100/7}%`, fontWeight: 400 }}>
-                                {value === 1 ? '1 – Strongly Disagree' : value === 7 ? '7 – Strongly Agree' : value}
+                                {value === 1 ? '1 - Very Unlikely' : value === 7 ? '7 - Very Likely' : value}
                               </th>
                             ))}
                           </tr>
@@ -622,8 +622,8 @@ export default function PostTaskSurvey() {
                       {/* Mobile layout */}
                       <div className="md:hidden bg-gray-100 rounded-lg p-3">
                         <div className="flex justify-between items-center text-[10px] text-gray-600 mb-2">
-                          <span>Strongly Disagree</span>
-                          <span>Strongly Agree</span>
+                          <span>1 - Very Unlikely</span>
+                          <span>7 - Very Likely</span>
                         </div>
                         <div className="flex justify-between gap-1">
                           {[1,2,3,4,5,6,7].map((value) => (
