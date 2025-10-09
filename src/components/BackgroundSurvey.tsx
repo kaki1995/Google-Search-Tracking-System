@@ -411,32 +411,26 @@ export default function BackgroundSurvey() {
                     </FormLabel>
                     <FormControl>
                       <div className="bg-gray-50 p-4 rounded-lg">
-                        <div className="flex items-center justify-between mb-4">
-                          <span className="text-sm text-gray-600">1-Not familiar at all</span>
-                          <span className="text-sm text-gray-600">7-Extremely familiar</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          {[1, 2, 3, 4, 5, 6, 7].map((value) => (
-                            <div key={value} className="flex flex-col items-center">
-                              <input 
-                                type="radio" 
-                                name="experience_scale_q7" 
-                                value={value.toString()} 
-                                checked={field.value === value.toString()} 
-                                onChange={(e) => {
-                                  field.onChange(e);
-                                  handleSaveResponses(form.getValues());
-                                }}
-                                className="mb-1 w-4 h-4" 
-                                id={`q7-${value}`}
-                              />
-                              <label 
-                                htmlFor={`q7-${value}`} 
-                                className="text-sm text-gray-600 cursor-pointer"
-                              >
-                                {value}
-                              </label>
+                        <div className="grid grid-cols-7 text-center text-[12px] text-gray-700 mb-3">
+                          {[1,2,3,4,5,6,7].map((value) => (
+                            <div key={value} className="flex justify-center">
+                              {value === 1 ? '1 - Not familiar at all' : value === 7 ? '7 - Extremely familiar' : value}
                             </div>
+                          ))}
+                        </div>
+                        <div className="grid grid-cols-7 gap-0">
+                          {[1,2,3,4,5,6,7].map((value) => (
+                            <label key={value} htmlFor={`q7-${value}`} className="flex justify-center py-1 cursor-pointer">
+                              <input
+                                type="radio"
+                                name="experience_scale_q7"
+                                id={`q7-${value}`}
+                                value={value.toString()}
+                                checked={field.value === value.toString()}
+                                onChange={(e) => { field.onChange(e); handleSaveResponses(form.getValues()); }}
+                                className="w-4 h-4"
+                              />
+                            </label>
                           ))}
                         </div>
                       </div>
@@ -455,32 +449,26 @@ export default function BackgroundSurvey() {
                     </FormLabel>
                     <FormControl>
                       <div className="bg-gray-50 p-4 rounded-lg">
-                        <div className="flex items-center justify-between mb-4">
-                          <span className="text-sm text-gray-600">1-Strongly Disagree</span>
-                          <span className="text-sm text-gray-600">7-Strongly Agree</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          {[1, 2, 3, 4, 5, 6, 7].map((value) => (
-                            <div key={value} className="flex flex-col items-center">
-                              <input 
-                                type="radio" 
-                                name="familiarity_scale_q8" 
-                                value={value.toString()} 
-                                checked={field.value === value.toString()} 
-                                onChange={(e) => {
-                                  field.onChange(e);
-                                  handleSaveResponses(form.getValues());
-                                }}
-                                className="mb-1 w-4 h-4" 
-                                id={`q8-${value}`}
-                              />
-                              <label 
-                                htmlFor={`q8-${value}`} 
-                                className="text-sm text-gray-600 cursor-pointer"
-                              >
-                                {value}
-                              </label>
+                        <div className="grid grid-cols-7 text-center text-[12px] text-gray-700 mb-3">
+                          {[1,2,3,4,5,6,7].map((value) => (
+                            <div key={value} className="flex justify-center">
+                              {value === 1 ? '1 - Strongly Disagree' : value === 7 ? '7 - Strongly Agree' : value}
                             </div>
+                          ))}
+                        </div>
+                        <div className="grid grid-cols-7 gap-0">
+                          {[1,2,3,4,5,6,7].map((value) => (
+                            <label key={value} htmlFor={`q8-${value}`} className="flex justify-center py-1 cursor-pointer">
+                              <input
+                                type="radio"
+                                name="familiarity_scale_q8"
+                                id={`q8-${value}`}
+                                value={value.toString()}
+                                checked={field.value === value.toString()}
+                                onChange={(e) => { field.onChange(e); handleSaveResponses(form.getValues()); }}
+                                className="w-4 h-4"
+                              />
+                            </label>
                           ))}
                         </div>
                       </div>
