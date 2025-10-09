@@ -160,8 +160,8 @@ export default function PostTaskSurvey() {
               Search Experience Feedback
             </h1>
             <div className="mb-4 md:mb-6 p-3 md:p-4 rounded-lg border border-blue-200 bg-sky-100">
-              <p className="text-gray-700 text-base md:text-lg flex items-start gap-2">
-                <span className="text-blue-600 text-lg md:text-xl flex-shrink-0">📝</span>
+              <p className="text-gray-700 text-xs md:text-sm flex items-start gap-2">
+                <span className="text-blue-600 text-base md:text-lg flex-shrink-0">📝</span>
                 <span className="text-justify">
                   Please answer the following questions based on your search experience in this study.<br />
                   (You may return to the previous page using the "Previous Page" button if needed.)
@@ -172,20 +172,20 @@ export default function PostTaskSurvey() {
               <form className="space-y-6 md:space-y-8">
                 {/* Task Section */}
                 <div className="space-y-4 md:space-y-6">
-                  <h2 className="text-left text-lg md:text-xl pb-2 w-full font-medium">Please indicate how much you agree or disagree with the following statements about your search task.</h2>
+                  <h2 className="text-left text-sm md:text-base pb-2 w-full font-medium">Please indicate how much you agree or disagree with the following statements about your search task.</h2>
                   {/* Desktop table - hidden on mobile */}
                   <table className="hidden md:table w-full border-separate" style={{ borderSpacing: 0 }}>
                     <thead>
                       <tr>
-                        <th className="text-left pb-2" style={{ width: '35%', fontWeight: 400 }}>
-                          <span className="text-[16px]" style={{fontSize: '16px'}}>
-                            Statement
-                          </span>
-                        </th>
+                                    <th className="text-left pb-2" style={{ width: '35%', fontWeight: 400 }}>
+                                      <span className="text-[14px]" style={{fontSize: '14px'}}>
+                                        Statement
+                                      </span>
+                                    </th>
                         {[1,2,3,4,5,6,7].map((value) => (
-                          <th key={value} className={`text-center pb-2 font-normal ${value === 1 || value === 7 ? 'text-[14px] md:text-[16px]' : 'text-[15px] md:text-[18px]'}`} style={{ width: '9%', fontWeight: 400 }}>
-                            {value === 1 ? <span className="block leading-tight">1<br /><span className="text-[14px]">Strongly Disagree</span></span>
-                              : value === 7 ? <span className="block leading-tight">7<br /><span className="text-[14px]">Strongly Agree</span></span>
+                          <th key={value} className={`text-center pb-2 font-normal ${value === 1 || value === 7 ? 'text-[11px] md:text-[14px]' : 'text-[13px] md:text-[16px]'}`} style={{ width: '9%', fontWeight: 400 }}>
+                            {value === 1 ? <span className="block leading-tight">1<br /><span className="text-[12px]">Strongly Disagree</span></span>
+                              : value === 7 ? <span className="block leading-tight">7<br /><span className="text-[12px]">Strongly Agree</span></span>
                               : value}
                           </th>
                         ))}
@@ -194,10 +194,8 @@ export default function PostTaskSurvey() {
                     <tbody>
                <FormField control={form.control} name="q1_task_easy" rules={{ required: "This field is required" }} render={({ field }) => (
                         <tr className="border-b border-gray-200">
-                          <td className="align-top text-[14px] py-2 pr-0 text-left whitespace-normal" style={{ verticalAlign: 'top', lineHeight: 1.3, wordBreak: 'break-word' }}>
-                            <FormLabel className="font-normal text-[14px] text-left block" style={{ lineHeight: 1.3 }}>
-                              <span className="mr-2">19.</span> The task was easy to complete. <span className="text-red-500">*</span>
-                            </FormLabel>
+                          <td className="text-left text-[14px] py-3 pr-0 whitespace-normal" style={{ verticalAlign: 'top', lineHeight: 1.3, wordBreak: 'break-word', width: '35%', fontWeight: 400, padding: '12px 8px' }}>
+                            <span className="mr-2">19.</span> <span className="text-[13px] md:text-[16px]">The task was easy to complete.</span> <span className="text-red-500">*</span>
                           </td>
                           {[1,2,3,4,5,6,7].map((value) => (
                             <td key={value} className="text-center px-1 py-1" style={{ verticalAlign: 'middle', padding: '0 2px' }}>
@@ -217,10 +215,8 @@ export default function PostTaskSurvey() {
                       )} />
                       <FormField control={form.control} name="q2_task_quick" rules={{ required: "This field is required" }} render={({ field }) => (
                         <tr className="border-b border-gray-200">
-                          <td className="align-top text-[14px] py-2 pr-0 text-left whitespace-normal" style={{ verticalAlign: 'top', lineHeight: 1.3, wordBreak: 'break-word' }}>
-                            <FormLabel className="font-normal text-[14px] text-left block" style={{ lineHeight: 1.3 }}>
-                              <span className="mr-2">20.</span> The task took little time to finish. <span className="text-red-500">*</span>
-                            </FormLabel>
+                          <td className="text-left text-[14px] py-3 pr-0 whitespace-normal" style={{ verticalAlign: 'top', lineHeight: 1.3, wordBreak: 'break-word', fontWeight: 400, padding: '12px 8px' }}>
+                            <span className="mr-2">20.</span> <span className="text-[13px] md:text-[16px]">The task took little time to finish.</span> <span className="text-red-500">*</span>
                           </td>
                           {[1,2,3,4,5,6,7].map((value) => (
                             <td key={value} className="text-center px-1 py-1" style={{ verticalAlign: 'middle', padding: '0 2px' }}>
@@ -240,10 +236,8 @@ export default function PostTaskSurvey() {
                       )} />
                       <FormField control={form.control} name="q3_task_familiar" rules={{ required: "This field is required" }} render={({ field }) => (
                         <tr className="border-b border-gray-200">
-                          <td className="align-top text-[14px] py-2 pr-0 text-left whitespace-normal" style={{ verticalAlign: 'top', lineHeight: 1.3, wordBreak: 'break-word' }}>
-                            <FormLabel className="font-normal text-[14px] text-left block" style={{ lineHeight: 1.3 }}>
-                              <span className="mr-2">21.</span> I was familiar with this type of task. <span className="text-red-500">*</span>
-                            </FormLabel>
+                          <td className="text-left text-[14px] py-3 pr-0 whitespace-normal" style={{ verticalAlign: 'top', lineHeight: 1.3, wordBreak: 'break-word', fontWeight: 400, padding: '12px 8px' }}>
+                            <span className="mr-2">21.</span> <span className="text-[13px] md:text-[16px]">I was familiar with this type of task.</span> <span className="text-red-500">*</span>
                           </td>
                           {[1,2,3,4,5,6,7].map((value) => (
                             <td key={value} className="text-center px-1 py-1" style={{ verticalAlign: 'middle', padding: '0 2px' }}>
@@ -354,15 +348,15 @@ export default function PostTaskSurvey() {
 
                 {/* Search Tool Section */}
                 <div className="space-y-4 md:space-y-6 pt-6 md:pt-8">
-                  <h2 className="text-left text-lg md:text-xl pb-2 w-full font-medium">Please indicate how much you agree or disagree with the following statements about the search tool.</h2>
+                  <h2 className="text-left text-sm md:text-base pb-2 w-full font-medium">Please indicate how much you agree or disagree with the following statements about the search tool.</h2>
                   <table className="hidden md:table w-full border-separate" style={{ borderSpacing: 0 }}>
                     <thead>
                       <tr>
-                        <th className="text-left text-[16px] pb-2" style={{ width: '35%', fontWeight: 400 }}>Statement</th>
+                        <th className="text-left text-[14px] pb-2" style={{ width: '35%', fontWeight: 400 }}>Statement</th>
                         {[1,2,3,4,5,6,7].map((value) => (
-                          <th key={value} className={`text-center pb-2 font-normal ${value === 1 || value === 7 ? 'text-[14px]' : 'text-[16px]'}`} style={{ width: '9%', fontWeight: 400 }}>
-                            {value === 1 ? <span className="block leading-tight">1<br /><span className="text-[14px]">Strongly Disagree</span></span>
-                              : value === 7 ? <span className="block leading-tight">7<br /><span className="text-[14px]">Strongly Agree</span></span>
+                          <th key={value} className={`text-center pb-2 font-normal ${value === 1 || value === 7 ? 'text-[12px]' : 'text-[14px]'}`} style={{ width: '9%', fontWeight: 400 }}>
+                            {value === 1 ? <span className="block leading-tight">1<br /><span className="text-[12px]">Strongly Disagree</span></span>
+                              : value === 7 ? <span className="block leading-tight">7<br /><span className="text-[12px]">Strongly Agree</span></span>
                               : value}
                           </th>
                         ))}
@@ -384,10 +378,8 @@ export default function PostTaskSurvey() {
                       ].map((item, idx) => (
                         <FormField key={item.name} control={form.control} name={item.name as keyof PostTaskSurveyForm} rules={{ required: "This field is required" }} render={({ field }) => (
                           <tr className="border-b border-gray-200">
-                            <td className="align-top text-[14px] py-2 pr-0 text-left whitespace-normal" style={{ verticalAlign: 'top', lineHeight: 1.3, wordBreak: 'break-word', width: '35%', fontWeight: 400, padding: '12px 8px' }}>
-                              <FormLabel className="font-normal text-[14px] text-left block" style={{ lineHeight: 1.3 }}>
-                                <span className="mr-2">{22 + idx}.</span> {item.text} <span className="text-red-500">*</span>
-                              </FormLabel>
+                            <td className="text-left text-[14px] py-3 pr-0 whitespace-normal" style={{ verticalAlign: 'top', lineHeight: 1.3, wordBreak: 'break-word', width: '35%', fontWeight: 400, padding: '12px 8px' }}>
+                              <span className="mr-2">{22 + idx}.</span> <span className="text-[13px] md:text-[16px]">{item.text}</span> <span className="text-red-500">*</span>
                             </td>
                             {[1,2,3,4,5,6,7].map((value) => (
                               <td key={value} className="text-center px-1 py-1" style={{ verticalAlign: 'middle', padding: '0 2px' }}>
@@ -396,10 +388,10 @@ export default function PostTaskSurvey() {
                                   name={item.name}
                                   value={value.toString()}
                                   checked={field.value === value.toString()}
-                                  onChange={(e) => field.onChange(e.target.value)}
+                                  onChange={e => field.onChange(e.target.value)}
                                   className="w-4 h-4 md:w-5 md:h-5"
                                   id={`${item.name}-${value}`}
-                                  style={{ display: 'block' }}
+                                  style={{ margin: '0 auto', display: 'block' }}
                                 />
                               </td>
                             ))}
@@ -442,7 +434,7 @@ export default function PostTaskSurvey() {
                                     name={item.name}
                                     value={value.toString()}
                                     checked={field.value === value.toString()}
-                                    onChange={(e) => field.onChange(e.target.value)}
+                                    onChange={e => field.onChange(e.target.value)}
                                     className="w-4 h-4"
                                   />
                                 </label>
@@ -457,12 +449,12 @@ export default function PostTaskSurvey() {
 
                 {/* Search Results Section */}
                 <div className="space-y-4 md:space-y-6 pt-6 md:pt-8">
-                  <h2 className="text-left text-lg md:text-xl pb-2 w-full font-medium">Please indicate how much you agree or disagree with the following statements about the search results provided by the tool.</h2>
+                  <h2 className="text-left text-sm md:text-base pb-2 w-full font-medium">Please indicate how much you agree or disagree with the following statements about the search results provided by the tool.</h2>
                   <table className="hidden md:table w-full border-separate" style={{ borderSpacing: 0 }}>
                     <thead>
                       <tr>
                         <th className="text-left pb-2" style={{ width: '35%', fontWeight: 400 }}>
-                          <span className="text-[16px]" style={{fontSize: '16px'}}>
+                          <span className="text-[14px]" style={{fontSize: '14px'}}>
                             Statement
                           </span>
                         </th>
@@ -484,10 +476,8 @@ export default function PostTaskSurvey() {
                       ].map((item, idx) => (
                         <FormField key={item.name} control={form.control} name={item.name as keyof PostTaskSurveyForm} rules={{ required: "This field is required" }} render={({ field }) => (
                           <tr className="border-b border-gray-200">
-                            <td className="align-top text-[14px] py-2 pr-0 text-left whitespace-normal" style={{ verticalAlign: 'top', lineHeight: 1.3, wordBreak: 'break-word', width: '35%', fontWeight: 400, padding: '12px 8px' }}>
-                              <FormLabel className="font-normal text-[14px] text-left block" style={{ lineHeight: 1.3 }}>
-                                <span className="mr-2">{33 + idx}.</span> {item.text} <span className="text-red-500">*</span>
-                              </FormLabel>
+                            <td className="text-left text-[14px] py-3 pr-0 whitespace-normal" style={{ verticalAlign: 'top', lineHeight: 1.3, wordBreak: 'break-word', width: '35%', fontWeight: 400, padding: '12px 8px' }}>
+                              <span className="mr-2">{33 + idx}.</span> <span className="text-[13px] md:text-[16px]">{item.text}</span> <span className="text-red-500">*</span>
                             </td>
                             {[1,2,3,4,5,6,7].map((value) => (
                               <td key={value} className="text-center px-1 py-1" style={{ verticalAlign: 'middle', padding: '0 2px' }}>
