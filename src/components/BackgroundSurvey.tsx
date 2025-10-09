@@ -202,7 +202,7 @@ export default function BackgroundSurvey() {
   };
   // ...existing code...
   return (
-    <div className="min-h-screen relative bg-background py-8 px-6 md:px-8 lg:px-12"
+    <div className="min-h-screen relative bg-white md:bg-background py-8 px-6 md:px-8 lg:px-12"
       style={{
         backgroundImage: "url('/mountain-background.jpg')",
         backgroundSize: 'cover',
@@ -210,7 +210,7 @@ export default function BackgroundSurvey() {
         backgroundRepeat: 'no-repeat'
       }}>
       {/* Background overlay for better text readability */}
-      <div className="absolute inset-0 bg-black bg-opacity-20"></div>
+      <div className="absolute inset-0 bg-black bg-opacity-20 hidden md:block"></div>
 
       <div className="max-w-4xl mx-auto relative z-10">
         <div className="bg-white bg-opacity-95 backdrop-blur-sm shadow-lg p-8 md:p-12 lg:p-16 rounded-lg">
@@ -406,11 +406,12 @@ export default function BackgroundSurvey() {
             }} render={({
               field
             }) => <FormItem>
-                    <FormLabel className="text-base font-medium text-gray-900">
+                    <FormLabel className="text-base md:text-base font-medium text-gray-900">
                       7. How familiar are you with AI chatbots such as ChatGPT? <span className="text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
-                      <div className="bg-gray-50 p-4 rounded-lg">
+                      {/* Desktop version */}
+                      <div className="hidden md:block bg-gray-50 p-4 rounded-lg">
                         <div className="grid grid-cols-7 text-center text-[12px] text-gray-700 mb-3">
                           {[1,2,3,4,5,6,7].map((value) => (
                             <div key={value} className="flex justify-center">
@@ -434,6 +435,27 @@ export default function BackgroundSurvey() {
                           ))}
                         </div>
                       </div>
+                      {/* Mobile version */}
+                      <div className="md:hidden">
+                        <div className="bg-gray-100 rounded-lg p-3">
+                          <div className="flex justify-between gap-1">
+                            {[1,2,3,4,5,6,7].map((value) => (
+                              <label key={value} htmlFor={`q7-mobile-${value}`} className="flex flex-col items-center cursor-pointer">
+                                <span className="text-xs text-gray-600 mb-1">{value}</span>
+                                <input
+                                  type="radio"
+                                  name="experience_scale_q7"
+                                  id={`q7-mobile-${value}`}
+                                  value={value.toString()}
+                                  checked={field.value === value.toString()}
+                                  onChange={(e) => { field.onChange(e); handleSaveResponses(form.getValues()); }}
+                                  className="w-5 h-5"
+                                />
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>} />
@@ -444,11 +466,12 @@ export default function BackgroundSurvey() {
             }} render={({
               field
             }) => <FormItem>
-                    <FormLabel className="text-base font-medium text-gray-900">
+                    <FormLabel className="text-base md:text-base font-medium text-gray-900">
                       8. Please choose 1 – Strongly Disagree as your answer to this question. <span className="text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
-                      <div className="bg-gray-50 p-4 rounded-lg">
+                      {/* Desktop version */}
+                      <div className="hidden md:block bg-gray-50 p-4 rounded-lg">
                         <div className="grid grid-cols-7 text-center text-[12px] text-gray-700 mb-3">
                           {[1,2,3,4,5,6,7].map((value) => (
                             <div key={value} className="flex justify-center">
@@ -470,6 +493,27 @@ export default function BackgroundSurvey() {
                               />
                             </label>
                           ))}
+                        </div>
+                      </div>
+                      {/* Mobile version */}
+                      <div className="md:hidden">
+                        <div className="bg-gray-100 rounded-lg p-3">
+                          <div className="flex justify-between gap-1">
+                            {[1,2,3,4,5,6,7].map((value) => (
+                              <label key={value} htmlFor={`q8-mobile-${value}`} className="flex flex-col items-center cursor-pointer">
+                                <span className="text-xs text-gray-600 mb-1">{value}</span>
+                                <input
+                                  type="radio"
+                                  name="familiarity_scale_q8"
+                                  id={`q8-mobile-${value}`}
+                                  value={value.toString()}
+                                  checked={field.value === value.toString()}
+                                  onChange={(e) => { field.onChange(e); handleSaveResponses(form.getValues()); }}
+                                  className="w-5 h-5"
+                                />
+                              </label>
+                            ))}
+                          </div>
                         </div>
                       </div>
                     </FormControl>

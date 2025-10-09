@@ -114,7 +114,7 @@ export default function SearchResultLog() {
       setIsSubmitting(false);
     }
   };
-  return <div className="min-h-screen relative bg-background py-8 px-6 md:px-8 lg:px-12"
+  return <div className="min-h-screen relative bg-white md:bg-background py-8 px-6 md:px-8 lg:px-12"
       style={{
         backgroundImage: "url('/mountain-background.jpg')",
         backgroundSize: 'cover',
@@ -122,7 +122,7 @@ export default function SearchResultLog() {
         backgroundRepeat: 'no-repeat'
       }}>
       {/* Background overlay for better text readability */}
-      <div className="absolute inset-0 bg-black bg-opacity-20"></div>
+      <div className="absolute inset-0 bg-black bg-opacity-20 hidden md:block"></div>
       
       <div className="max-w-4xl mx-auto relative z-10">
         <div className="bg-white bg-opacity-95 backdrop-blur-sm rounded-lg shadow-lg p-8 md:p-12 lg:p-16">
@@ -225,12 +225,13 @@ export default function SearchResultLog() {
                 rules={{ required: "This field is required" }}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-base font-medium text-gray-900 mb-2 block">
+                    <FormLabel className="text-base md:text-base font-medium text-gray-900 mb-2 block">
                       17. When making a smartphone purchase decision, price is a more important factor to you than technical specifications? <span className="text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
                       <div className="w-full flex flex-col items-center">
-                        <div className="w-full">
+                        {/* Desktop version */}
+                        <div className="hidden md:block w-full">
                           <div className="flex w-full justify-between mb-2">
                             {[1,2,3,4,5,6,7].map((value) => (
                               <span key={value} className="text-xs text-center" style={{ width: '14.2%' }}>
@@ -248,10 +249,32 @@ export default function SearchResultLog() {
                                   checked={field.value === value.toString()}
                                   onChange={e => field.onChange(e.target.value)}
                                   className="w-5 h-5"
-                                  id={`q17_price_importance-${value}`}
+                                  id={`q17-${value}`}
+                                  style={{ margin: '0 auto', display: 'block' }}
                                 />
                               </label>
                             ))}
+                          </div>
+                        </div>
+                        {/* Mobile version */}
+                        <div className="md:hidden w-full">
+                          <div className="bg-gray-100 rounded-lg p-3">
+                            <div className="flex justify-between gap-1">
+                              {[1,2,3,4,5,6,7].map((value) => (
+                                <label key={value} className="flex flex-col items-center cursor-pointer">
+                                  <span className="text-xs text-gray-600 mb-1">{value}</span>
+                                  <input
+                                    type="radio"
+                                    name="q17_price_importance"
+                                    value={value.toString()}
+                                    checked={field.value === value.toString()}
+                                    onChange={e => field.onChange(e.target.value)}
+                                    className="w-5 h-5"
+                                    id={`q17-mobile-${value}`}
+                                  />
+                                </label>
+                              ))}
+                            </div>
                           </div>
                         </div>
                       </div>

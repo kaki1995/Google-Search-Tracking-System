@@ -71,7 +71,7 @@ export default function TaskInstructions() {
   };
 
   return (
-    <div className="min-h-screen relative bg-background py-8 px-6 md:px-8 lg:px-12"
+    <div className="min-h-screen relative bg-white md:bg-background py-8 px-6 md:px-8 lg:px-12"
       style={{
         backgroundImage: "url('/mountain-background.jpg')",
         backgroundSize: 'cover',
@@ -79,7 +79,7 @@ export default function TaskInstructions() {
         backgroundRepeat: 'no-repeat'
       }}>
       {/* Background overlay for better text readability */}
-      <div className="absolute inset-0 bg-black bg-opacity-20"></div>
+      <div className="absolute inset-0 bg-black bg-opacity-20 hidden md:block"></div>
       
       <div className="max-w-4xl mx-auto relative z-10">
         <div className="bg-white bg-opacity-95 backdrop-blur-sm rounded-lg shadow-lg p-8 md:p-12 lg:p-16">
