@@ -34,14 +34,14 @@ export default function LikertScale({
           </tr>
         </thead>
         <tbody>
-          <tr className="border-b border-gray-200">
+          <tr className="border-b border-gray-200 bg-gray-100 rounded-lg">
             <td className="align-top text-base py-2 pr-0 text-left whitespace-normal" style={{ verticalAlign: 'top', lineHeight: 1.3, wordBreak: 'break-word' }}>
               <FormLabel className="font-normal text-base text-left block" style={{ lineHeight: 1.3 }}>
                 {question} {required && <span className="text-red-500">*</span>}
               </FormLabel>
             </td>
             {[1,2,3,4,5,6,7].map((value) => (
-              <td key={value} className="text-center px-2 py-1" style={{ verticalAlign: 'middle' }}>
+              <td key={value} className="text-center px-2 py-1 text-sm md:text-base" style={{ verticalAlign: 'middle' }}>
                 <input
                   type="radio"
                   name={`question-${questionNumber}`}
