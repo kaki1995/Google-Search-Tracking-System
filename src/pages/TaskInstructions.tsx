@@ -71,31 +71,26 @@ export default function TaskInstructions() {
   };
 
   return (
-    <div className="min-h-screen relative bg-white md:bg-background py-6 px-4 md:py-8 md:px-6 lg:px-12"
+    <div className="min-h-screen relative bg-background py-8 px-6 md:px-8 lg:px-12"
       style={{
-        backgroundImage: "none"
-      }}
-      >
-      {/* Background overlay for better text readability - desktop only */}
-      <div className="hidden md:block absolute inset-0 bg-black bg-opacity-20" 
-        style={{
-          backgroundImage: "url('/mountain-background.jpg')",
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat'
-        }}
-      ></div>
+        backgroundImage: "url('/mountain-background.jpg')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}>
+      {/* Background overlay for better text readability */}
+      <div className="absolute inset-0 bg-black bg-opacity-20"></div>
       
       <div className="max-w-4xl mx-auto relative z-10">
-        <div className="bg-white md:bg-opacity-95 md:backdrop-blur-sm rounded-lg shadow-lg p-6 md:p-8 lg:p-12">
-          <h1 className="text-xl md:text-2xl font-bold text-center mb-6 md:mb-8 text-foreground">
+        <div className="bg-white bg-opacity-95 backdrop-blur-sm rounded-lg shadow-lg p-8 md:p-12 lg:p-16">
+          <h1 className="text-2xl font-bold text-center mb-8 text-foreground">
             Task Instructions
           </h1>
           
-          <div className="border border-blue-200 rounded-lg p-4 md:p-6 mb-6 md:mb-8 bg-sky-100">
+          <div className="border border-blue-200 rounded-lg p-6 mb-8 bg-sky-100">
             <div className="flex items-start gap-3">
               <span className="text-blue-600 text-lg">📋</span>
-              <div className="text-sm md:text-base text-gray-700">
+              <div className="text-base text-gray-700">
                 <p className="font-semibold mb-3">Your Task:</p>
                 <p className="text-justify mb-4">
                   Imagine you are planning to buy a new laptop for work and personal use. 

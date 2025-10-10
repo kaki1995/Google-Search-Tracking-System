@@ -128,25 +128,20 @@ export default function Welcome() {
   };
 
   return (
-    <div className="min-h-screen relative bg-white md:bg-background py-6 px-4 md:py-8 md:px-6 lg:px-12"
+    <div className="min-h-screen relative bg-background py-8 px-6 md:px-8 lg:px-12"
       style={{
-        backgroundImage: "none"
-      }}
-      >
-      {/* Background overlay for better text readability - desktop only */}
-      <div className="hidden md:block absolute inset-0 bg-black bg-opacity-20" 
-        style={{
-          backgroundImage: "url('/mountain-background.jpg')",
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat'
-        }}
-      ></div>
+        backgroundImage: "url('/mountain-background.jpg')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}>
+      {/* Background overlay for better text readability */}
+      <div className="absolute inset-0 bg-black bg-opacity-20"></div>
       <div className="max-w-4xl mx-auto relative z-10">
         {/* Content */}
-        <div className="bg-white md:bg-opacity-95 md:backdrop-blur-sm rounded-lg shadow-lg p-6 md:p-8 lg:p-12">
+        <div className="bg-white bg-opacity-95 backdrop-blur-sm rounded-lg shadow-lg p-8 md:p-12 lg:p-16">
           {/* Header with Logos */}
-          <div className="text-center mb-6 md:mb-8">
+          <div className="text-center mb-8">
             <div className="flex items-center justify-center gap-8 mb-6">
               {/* Google Logo */}
               <div className="flex items-center">
@@ -159,13 +154,13 @@ export default function Welcome() {
             </div>
           </div>
           {/* Title */}
-          <div className="text-center mb-6 md:mb-8">
-            <h1 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-4 md:mb-6">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-semibold text-gray-900 mb-6">
               Welcome to Our Project Study
             </h1>
           </div>
           {/* Content */}
-          <div className="text-sm md:text-base leading-6 md:leading-7 text-gray-700 space-y-3 md:space-y-4 mx-auto text-justify">
+          <div className="text-base leading-7 text-gray-700 space-y-4 mx-auto text-justify">
             <p>
               Thank you for your interest in participating! 🙋
             </p>
