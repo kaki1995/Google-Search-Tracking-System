@@ -418,9 +418,9 @@ export default function BackgroundSurvey() {
                           <span className="text-sm text-gray-600">1-Not familiar at all</span>
                           <span className="text-sm text-gray-600">7-Extremely familiar</span>
                         </div>
-                        <div className="flex md:hidden flex-row justify-between items-center mb-3 w-full">
+                        <div className="flex md:hidden flex-col gap-2 mb-3">
                           <span className="text-xs text-gray-600">1-Not familiar at all</span>
-                          <span className="text-xs text-gray-600">7-Extremely familiar</span>
+                          <span className="text-xs text-gray-600 text-right">7-Extremely familiar</span>
                         </div>
                         <div className="flex justify-between items-center gap-1">
                           {[1, 2, 3, 4, 5, 6, 7].map((value) => (
@@ -466,9 +466,9 @@ export default function BackgroundSurvey() {
                           <span className="text-sm text-gray-600">1-Strongly Disagree</span>
                           <span className="text-sm text-gray-600">7-Strongly Agree</span>
                         </div>
-                        <div className="flex md:hidden flex-row justify-between items-center mb-3 w-full">
+                        <div className="flex md:hidden flex-col gap-2 mb-3">
                           <span className="text-xs text-gray-600">1-Strongly Disagree</span>
-                          <span className="text-xs text-gray-600">7-Strongly Agree</span>
+                          <span className="text-xs text-gray-600 text-right">7-Strongly Agree</span>
                         </div>
                         <div className="flex justify-between items-center gap-1">
                           {[1, 2, 3, 4, 5, 6, 7].map((value) => (
