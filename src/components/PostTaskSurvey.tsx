@@ -146,28 +146,23 @@ export default function PostTaskSurvey() {
 
   return (
     <>
-      <div className="min-h-screen relative bg-white md:bg-background py-6 px-4 md:py-8 md:px-6 lg:px-12"
+      <div className="min-h-screen relative bg-white md:bg-background py-4 px-4 md:py-8 md:px-6 lg:px-12"
         style={{
-          backgroundImage: "none"
-        }}
-        >
-        {/* Background overlay for better text readability - desktop only */}
-        <div className="hidden md:block absolute inset-0 bg-black bg-opacity-20" 
-          style={{
-            backgroundImage: "url('/mountain-background.jpg')",
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat'
-          }}
-        ></div>
+          backgroundImage: "url('/mountain-background.jpg')",
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          fontSize: '16px'
+        }}>
+        <div className="absolute inset-0 bg-black bg-opacity-20 hidden md:block"></div>
         <div className="max-w-4xl mx-auto relative z-10">
-          <div className="bg-white md:bg-opacity-95 md:backdrop-blur-sm rounded-lg shadow-lg p-6 md:p-8 lg:p-12">
-            <h1 className="text-xl md:text-3xl font-semibold text-center mb-6 md:mb-8 text-foreground">
+          <div className="bg-white md:bg-opacity-95 md:backdrop-blur-sm rounded-lg md:shadow-lg p-4 md:p-12 lg:p-16 text-[16px]" style={{fontSize: '16px'}}>
+            <h1 className="text-2xl md:text-3xl font-semibold text-center mb-6 md:mb-8 text-foreground">
               Search Experience Feedback
             </h1>
-            <div className="mb-6 p-4 rounded-lg border border-blue-200 bg-sky-100">
-              <p className="text-gray-700 text-xs md:text-sm flex items-start gap-2">
-                <span className="text-blue-600 text-lg flex-shrink-0">📝</span>
+            <div className="mb-4 md:mb-6 p-3 md:p-4 rounded-lg border border-blue-200 bg-sky-100">
+              <p className="text-gray-700 text-base md:text-lg flex items-start gap-2">
+                <span className="text-blue-600 text-lg md:text-xl flex-shrink-0">📝</span>
                 <span className="text-justify">
                   Please answer the following questions based on your search experience in this study.<br />
                   (You may return to the previous page using the "Previous Page" button if needed.)
@@ -178,22 +173,21 @@ export default function PostTaskSurvey() {
               <form className="space-y-6 md:space-y-8">
                 {/* Task Section */}
                 <div className="space-y-4 md:space-y-6">
-                  <h2 className="text-left text-sm md:text-base pb-2 w-full font-medium">Please indicate how much you agree or disagree with the following statements about your search task.</h2>
-                  
-                  {/* Desktop table */}
+                  <h2 className="text-left text-lg md:text-xl pb-2 w-full font-medium">Please indicate how much you agree or disagree with the following statements about your search task.</h2>
+                  {/* Desktop table - hidden on mobile */}
                   <table className="hidden md:table w-full border-separate" style={{ borderSpacing: 0 }}>
                     <thead>
                       <tr>
-                                    <th className="text-left pb-2" style={{ width: '35%', fontWeight: 400 }}>
-                                      <span className="text-[14px]" style={{fontSize: '14px'}}>
-                                        Statement
-                                      </span>
-                                    </th>
+                        <th className="text-left pb-2" style={{ width: '35%', fontWeight: 400 }}>
+                          <span className="text-[16px]" style={{fontSize: '16px'}}>
+                            Statement
+                          </span>
+                        </th>
                         {[1,2,3,4,5,6,7].map((value) => (
-                          <th key={value} className={`text-center pb-2 font-normal ${value === 1 || value === 7 ? 'text-[11px] md:text-[14px]' : 'text-[13px] md:text-[16px]'}`} style={{ width: '9%', fontWeight: 400 }}>
-                            {value === 1 ? <span className="block leading-tight">1<br /><span className="text-[12px]">Strongly Disagree</span></span>
-                              : value === 7 ? <span className="block leading-tight">7<br /><span className="text-[12px]">Strongly Agree</span></span>
-                              : value}
+                          <th key={value} className={`text-center pb-2 font-normal`} style={{ width: '9%', fontWeight: 400, fontSize: '16px' }}>
+                            {value === 1 ? <span className="block leading-tight" style={{fontSize: '16px'}}>1 - Strongly Disagree</span>
+                              : value === 7 ? <span className="block leading-tight" style={{fontSize: '16px'}}>7 - Strongly Agree</span>
+                              : <span style={{fontSize: '16px'}}>{value}</span>}
                           </th>
                         ))}
                       </tr>
@@ -201,8 +195,10 @@ export default function PostTaskSurvey() {
                     <tbody>
                <FormField control={form.control} name="q1_task_easy" rules={{ required: "This field is required" }} render={({ field }) => (
                         <tr className="border-b border-gray-200">
-                          <td className="text-left text-[14px] py-3 pr-0 whitespace-normal" style={{ verticalAlign: 'top', lineHeight: 1.3, wordBreak: 'break-word', width: '35%', fontWeight: 400, padding: '12px 8px' }}>
-                            <span className="mr-2">19.</span> <span className="text-[13px] md:text-[16px]">The task was easy to complete.</span> <span className="text-red-500">*</span>
+                          <td className="align-top text-[15px] py-2 pr-0 text-left whitespace-normal" style={{ verticalAlign: 'top', lineHeight: 1.3, wordBreak: 'break-word' }}>
+                            <FormLabel className="font-normal text-[15px] text-left block" style={{ lineHeight: 1.3 }}>
+                              <span className="mr-2" style={{fontSize: '16px'}}>19.</span> <span style={{fontSize: '16px'}}>The task was easy to complete.</span> <span className="text-red-500" style={{fontSize: '16px'}}>*</span>
+                            </FormLabel>
                           </td>
                           {[1,2,3,4,5,6,7].map((value) => (
                             <td key={value} className="text-center px-1 py-1" style={{ verticalAlign: 'middle', padding: '0 2px' }}>
@@ -214,7 +210,7 @@ export default function PostTaskSurvey() {
                                 onChange={e => field.onChange(e.target.value)}
                                 className="w-4 h-4 md:w-5 md:h-5"
                                 id={`q1_task_easy-${value}`}
-                                style={{ margin: '0 auto', display: 'block' }}
+                                style={{ margin: '0 auto', display: 'block', fontSize: '16px' }}
                               />
                             </td>
                           ))}
@@ -222,8 +218,10 @@ export default function PostTaskSurvey() {
                       )} />
                       <FormField control={form.control} name="q2_task_quick" rules={{ required: "This field is required" }} render={({ field }) => (
                         <tr className="border-b border-gray-200">
-                          <td className="text-left text-[14px] py-3 pr-0 whitespace-normal" style={{ verticalAlign: 'top', lineHeight: 1.3, wordBreak: 'break-word', fontWeight: 400, padding: '12px 8px' }}>
-                            <span className="mr-2">20.</span> <span className="text-[13px] md:text-[16px]">The task took little time to finish.</span> <span className="text-red-500">*</span>
+                          <td className="align-top text-[15px] py-2 pr-0 text-left whitespace-normal" style={{ verticalAlign: 'top', lineHeight: 1.3, wordBreak: 'break-word' }}>
+                            <FormLabel className="font-normal text-[15px] text-left block" style={{ lineHeight: 1.3 }}>
+                              <span className="mr-2" style={{fontSize: '16px'}}>20.</span> <span style={{fontSize: '16px'}}>The task took little time to finish.</span> <span className="text-red-500" style={{fontSize: '16px'}}>*</span>
+                            </FormLabel>
                           </td>
                           {[1,2,3,4,5,6,7].map((value) => (
                             <td key={value} className="text-center px-1 py-1" style={{ verticalAlign: 'middle', padding: '0 2px' }}>
@@ -243,8 +241,10 @@ export default function PostTaskSurvey() {
                       )} />
                       <FormField control={form.control} name="q3_task_familiar" rules={{ required: "This field is required" }} render={({ field }) => (
                         <tr className="border-b border-gray-200">
-                          <td className="text-left text-[14px] py-3 pr-0 whitespace-normal" style={{ verticalAlign: 'top', lineHeight: 1.3, wordBreak: 'break-word', fontWeight: 400, padding: '12px 8px' }}>
-                            <span className="mr-2">21.</span> <span className="text-[13px] md:text-[16px]">I was familiar with this type of task.</span> <span className="text-red-500">*</span>
+                          <td className="align-top text-[15px] py-2 pr-0 text-left whitespace-normal" style={{ verticalAlign: 'top', lineHeight: 1.3, wordBreak: 'break-word' }}>
+                            <FormLabel className="font-normal text-[15px] text-left block" style={{ lineHeight: 1.3 }}>
+                              <span className="mr-2" style={{fontSize: '16px'}}>21.</span> <span style={{fontSize: '16px'}}>I was familiar with this type of task.</span> <span className="text-red-500" style={{fontSize: '16px'}}>*</span>
+                            </FormLabel>
                           </td>
                           {[1,2,3,4,5,6,7].map((value) => (
                             <td key={value} className="text-center px-1 py-1" style={{ verticalAlign: 'middle', padding: '0 2px' }}>
@@ -264,18 +264,22 @@ export default function PostTaskSurvey() {
                       )} />
                     </tbody>
                   </table>
-                  
-                  {/* Mobile version */}
+                  {/* Mobile layout - stacked */}
                   <div className="md:hidden space-y-4">
                     <FormField control={form.control} name="q1_task_easy" rules={{ required: "This field is required" }} render={({ field }) => (
                       <div className="space-y-2">
-                        <div className="text-sm font-normal">
-                          <span className="mr-2">19.</span>The task was easy to complete. <span className="text-red-500">*</span>
-                        </div>
+                        <p className="text-sm font-normal leading-tight" style={{ fontSize: '16px' }}>
+                          <span className="mr-1.5">19.</span>The task was easy to complete. <span className="text-red-500">*</span>
+                        </p>
                         <div className="bg-gray-100 rounded-lg p-3">
-                          <div className="flex justify-between items-center gap-1">
+                          <div className="flex justify-between items-center text-[10px] text-gray-600 mb-2">
+                            <span>1 - Strongly Disagree</span>
+                            <span>7 - Strongly Agree</span>
+                          </div>
+                          <div className="flex justify-between gap-1">
                             {[1,2,3,4,5,6,7].map((value) => (
-                              <label key={value} className="flex flex-col items-center gap-1">
+                              <label key={value} className="flex flex-col items-center cursor-pointer">
+                                <span className="mb-1" style={{fontSize: '16px'}}>{value}</span>
                                 <input
                                   type="radio"
                                   name="q1_task_easy"
@@ -283,25 +287,28 @@ export default function PostTaskSurvey() {
                                   checked={field.value === value.toString()}
                                   onChange={e => field.onChange(e.target.value)}
                                   className="w-4 h-4"
-                                  id={`q1_task_easy-mobile-${value}`}
+                                  style={{fontSize: '16px'}}
                                 />
-                                <span className="text-xs text-gray-600">{value}</span>
                               </label>
                             ))}
                           </div>
                         </div>
                       </div>
                     )} />
-                    
                     <FormField control={form.control} name="q2_task_quick" rules={{ required: "This field is required" }} render={({ field }) => (
                       <div className="space-y-2">
-                        <div className="text-sm font-normal">
-                          <span className="mr-2">20.</span>The task took little time to finish. <span className="text-red-500">*</span>
-                        </div>
+                        <p className="text-sm font-normal leading-tight" style={{ fontSize: '16px' }}>
+                          <span className="mr-1.5">20.</span>The task took little time to finish. <span className="text-red-500">*</span>
+                        </p>
                         <div className="bg-gray-100 rounded-lg p-3">
-                          <div className="flex justify-between items-center gap-1">
+                          <div className="flex justify-between items-center text-[10px] text-gray-600 mb-2">
+                            <span>1 - Strongly Disagree</span>
+                            <span>7 - Strongly Agree</span>
+                          </div>
+                          <div className="flex justify-between gap-1">
                             {[1,2,3,4,5,6,7].map((value) => (
-                              <label key={value} className="flex flex-col items-center gap-1">
+                              <label key={value} className="flex flex-col items-center cursor-pointer">
+                                <span className="text-xs mb-1">{value}</span>
                                 <input
                                   type="radio"
                                   name="q2_task_quick"
@@ -309,25 +316,27 @@ export default function PostTaskSurvey() {
                                   checked={field.value === value.toString()}
                                   onChange={e => field.onChange(e.target.value)}
                                   className="w-4 h-4"
-                                  id={`q2_task_quick-mobile-${value}`}
                                 />
-                                <span className="text-xs text-gray-600">{value}</span>
                               </label>
                             ))}
                           </div>
                         </div>
                       </div>
                     )} />
-                    
                     <FormField control={form.control} name="q3_task_familiar" rules={{ required: "This field is required" }} render={({ field }) => (
                       <div className="space-y-2">
-                        <div className="text-sm font-normal">
-                          <span className="mr-2">21.</span>I was familiar with this type of task. <span className="text-red-500">*</span>
-                        </div>
+                        <p className="text-sm font-normal leading-tight" style={{ fontSize: '16px' }}>
+                          <span className="mr-1.5">21.</span>I was familiar with this type of task. <span className="text-red-500">*</span>
+                        </p>
                         <div className="bg-gray-100 rounded-lg p-3">
-                          <div className="flex justify-between items-center gap-1">
+                          <div className="flex justify-between items-center text-[10px] text-gray-600 mb-2">
+                              <span>1 - Strongly Disagree</span>
+                              <span>7 - Strongly Agree</span>
+                            </div>
+                          <div className="flex justify-between gap-1">
                             {[1,2,3,4,5,6,7].map((value) => (
-                              <label key={value} className="flex flex-col items-center gap-1">
+                              <label key={value} className="flex flex-col items-center cursor-pointer">
+                                <span className="text-xs mb-1">{value}</span>
                                 <input
                                   type="radio"
                                   name="q3_task_familiar"
@@ -335,9 +344,7 @@ export default function PostTaskSurvey() {
                                   checked={field.value === value.toString()}
                                   onChange={e => field.onChange(e.target.value)}
                                   className="w-4 h-4"
-                                  id={`q3_task_familiar-mobile-${value}`}
                                 />
-                                <span className="text-xs text-gray-600">{value}</span>
                               </label>
                             ))}
                           </div>
@@ -348,18 +355,20 @@ export default function PostTaskSurvey() {
                 </div>
 
                 {/* Search Tool Section */}
-                <div className="space-y-4 md:space-y-6 pt-6 md:pt-8">
-                  <h2 className="text-left text-sm md:text-base pb-2 w-full font-medium">Please indicate how much you agree or disagree with the following statements about the search tool.</h2>
-                  
-                  {/* Desktop table */}
+                <div className="space-y-4 md:space-y-6">
+                  <h2 className="text-left text-lg md:text-xl pb-2 w-full font-medium">Please indicate how much you agree or disagree with the following statements about the search tool.</h2>
                   <table className="hidden md:table w-full border-separate" style={{ borderSpacing: 0 }}>
                     <thead>
                       <tr>
-                        <th className="text-left text-[14px] pb-2" style={{ width: '35%', fontWeight: 400 }}>Statement</th>
+                        <th className="text-left pb-2" style={{ width: '35%', fontWeight: 400 }}>
+                          <span className="text-[16px]" style={{fontSize: '16px'}}>
+                            Statement
+                          </span>
+                        </th>
                         {[1,2,3,4,5,6,7].map((value) => (
-                          <th key={value} className={`text-center pb-2 font-normal ${value === 1 || value === 7 ? 'text-[12px]' : 'text-[14px]'}`} style={{ width: '9%', fontWeight: 400 }}>
-                            {value === 1 ? <span className="block leading-tight">1<br /><span className="text-[12px]">Strongly Disagree</span></span>
-                              : value === 7 ? <span className="block leading-tight">7<br /><span className="text-[12px]">Strongly Agree</span></span>
+                          <th key={value} className={`text-center pb-2 font-normal text-[15px]`} style={{ width: '9%', fontWeight: 400 }}>
+                            {value === 1 ? <span className="block leading-tight">1 - Strongly Disagree</span>
+                              : value === 7 ? <span className="block leading-tight">7 - Strongly Agree</span>
                               : value}
                           </th>
                         ))}
@@ -381,8 +390,10 @@ export default function PostTaskSurvey() {
                       ].map((item, idx) => (
                         <FormField key={item.name} control={form.control} name={item.name as keyof PostTaskSurveyForm} rules={{ required: "This field is required" }} render={({ field }) => (
                           <tr className="border-b border-gray-200">
-                            <td className="text-left text-[14px] py-3 pr-0 whitespace-normal" style={{ verticalAlign: 'top', lineHeight: 1.3, wordBreak: 'break-word', width: '35%', fontWeight: 400, padding: '12px 8px' }}>
-                              <span className="mr-2">{22 + idx}.</span> <span className="text-[13px] md:text-[16px]">{item.text}</span> <span className="text-red-500">*</span>
+                            <td className="align-top text-[15px] py-2 pr-0 text-left whitespace-normal" style={{ verticalAlign: 'top', lineHeight: 1.3, wordBreak: 'break-word' }}>
+                              <FormLabel className="font-normal text-[15px] text-left block" style={{ lineHeight: 1.3 }}>
+                                <span className="mr-2" style={{fontSize: '16px'}}>{22 + idx}.</span> <span style={{fontSize: '16px'}}>{item.text}</span> <span className="text-red-500" style={{fontSize: '16px'}}>*</span>
+                              </FormLabel>
                             </td>
                             {[1,2,3,4,5,6,7].map((value) => (
                               <td key={value} className="text-center px-1 py-1" style={{ verticalAlign: 'middle', padding: '0 2px' }}>
@@ -391,10 +402,10 @@ export default function PostTaskSurvey() {
                                   name={item.name}
                                   value={value.toString()}
                                   checked={field.value === value.toString()}
-                                  onChange={e => field.onChange(e.target.value)}
+                                  onChange={(e) => field.onChange(e.target.value)}
                                   className="w-4 h-4 md:w-5 md:h-5"
                                   id={`${item.name}-${value}`}
-                                  style={{ margin: '0 auto', display: 'block' }}
+                                  style={{ margin: '0 auto', display: 'block', fontSize: '16px' }}
                                 />
                               </td>
                             ))}
@@ -403,41 +414,44 @@ export default function PostTaskSurvey() {
                       ))}
                     </tbody>
                   </table>
-                  
-                  {/* Mobile version */}
+                  {/* Mobile layout for search tool */}
                   <div className="md:hidden space-y-4">
                     {[ 
-                      { name: "q4_tool_reliable", number: 22, text: "I consider the search tool reliable." },
-                      { name: "q5_tool_practical", number: 23, text: "The search tool is practical for my needs." },
-                      { name: "q6_tool_like", number: 24, text: "Overall, I like the search tool." },
-                      { name: "q7_tool_easy_use", number: 25, text: "The search tool is easy to use." },
-                      { name: "q8_tool_clear_interaction", number: 26, text: "The search tool offers clear and understandable interaction." },
-                      { name: "q9_tool_control", number: 27, text: "It is easy to make the search tool do what I want it to do." },
-                      { name: "q10_tool_provides_info", number: 28, text: "The search tool provides me with the information I need." },
-                      { name: "q11_tool_helps_complete", number: 29, text: "The search tool makes it easier for me to complete my task." },
-                      { name: "q12_tool_useful", number: 30, text: "Overall, I find the search tool useful." },
-                      { name: "q13_tool_too_much_info", number: 31, text: "The tool gave me too much information to make a clear decision." },
-                      { name: "q14_tool_hard_focus", number: 32, text: "The large volume of information made it difficult to focus on what was important." }
+                      { name: "q4_tool_reliable", num: 22, text: "I consider the search tool reliable." },
+                      { name: "q5_tool_practical", num: 23, text: "The search tool is practical for my needs." },
+                      { name: "q6_tool_like", num: 24, text: "Overall, I like the search tool." },
+                      { name: "q7_tool_easy_use", num: 25, text: "The search tool is easy to use." },
+                      { name: "q8_tool_clear_interaction", num: 26, text: "The search tool offers clear and understandable interaction." },
+                      { name: "q9_tool_control", num: 27, text: "It is easy to make the search tool do what I want it to do." },
+                      { name: "q10_tool_provides_info", num: 28, text: "The search tool provides me with the information I need." },
+                      { name: "q11_tool_helps_complete", num: 29, text: "The search tool makes it easier for me to complete my task." },
+                      { name: "q12_tool_useful", num: 30, text: "Overall, I find the search tool useful." },
+                      { name: "q13_tool_too_much_info", num: 31, text: "The tool gave me too much information to make a clear decision." },
+                      { name: "q14_tool_hard_focus", num: 32, text: "The large volume of information made it difficult to focus on what was important." }
                     ].map((item) => (
                       <FormField key={item.name} control={form.control} name={item.name as keyof PostTaskSurveyForm} rules={{ required: "This field is required" }} render={({ field }) => (
                         <div className="space-y-2">
-                          <div className="text-sm font-normal">
-                            <span className="mr-2">{item.number}.</span>{item.text} <span className="text-red-500">*</span>
-                          </div>
+                          <p className="text-sm font-normal leading-tight" style={{ fontSize: '16px' }}>
+                            <span className="mr-1.5">{item.num}.</span>{item.text} <span className="text-red-500">*</span>
+                          </p>
                           <div className="bg-gray-100 rounded-lg p-3">
-                            <div className="flex justify-between items-center gap-1">
+                            <div className="flex justify-between items-center text-[10px] text-gray-600 mb-2">
+                              <span>1 - Strongly Disagree</span>
+                              <span>7 - Strongly Agree</span>
+                            </div>
+                            <div className="flex justify-between gap-1">
                               {[1,2,3,4,5,6,7].map((value) => (
-                                <label key={value} className="flex flex-col items-center gap-1">
+                                <label key={value} className="flex flex-col items-center cursor-pointer">
+                                  <span className="mb-1" style={{fontSize: '16px'}}>{value}</span>
                                   <input
                                     type="radio"
                                     name={item.name}
                                     value={value.toString()}
                                     checked={field.value === value.toString()}
-                                    onChange={e => field.onChange(e.target.value)}
+                                    onChange={(e) => field.onChange(e.target.value)}
                                     className="w-4 h-4"
-                                    id={`${item.name}-mobile-${value}`}
+                                    style={{fontSize: '16px'}}
                                   />
-                                  <span className="text-xs text-gray-600">{value}</span>
                                 </label>
                               ))}
                             </div>
@@ -449,38 +463,39 @@ export default function PostTaskSurvey() {
                 </div>
 
                 {/* Search Results Section */}
-                <div className="space-y-4 md:space-y-6 pt-6 md:pt-8">
-                  <h2 className="text-left text-sm md:text-base pb-2 w-full font-medium">Please indicate how much you agree or disagree with the following statements about the search results provided by the tool.</h2>
-                  
-                  {/* Desktop table */}
+                <div className="space-y-4 md:space-y-6">
+                  <h2 className="text-left text-lg md:text-xl pb-2 w-full font-medium">Please indicate how much you agree or disagree with the following statements about the search results provided by the tool.</h2>
                   <table className="hidden md:table w-full border-separate" style={{ borderSpacing: 0 }}>
                     <thead>
                       <tr>
                         <th className="text-left pb-2" style={{ width: '35%', fontWeight: 400 }}>
-                          <span className="text-[14px]" style={{fontSize: '14px'}}>
+                          <span className="text-[16px]" style={{fontSize: '16px'}}>
                             Statement
                           </span>
                         </th>
                         {[1,2,3,4,5,6,7].map((value) => (
-                          <th key={value} className="text-center text-xs pb-2" style={{ width: '10.3%', fontWeight: 400 }}>
-                            {value === 1 ? '1 – Strongly Disagree' : value === 7 ? '7 – Strongly Agree' : value}
+                          <th key={value} className={`text-center pb-2 font-normal text-[15px]`} style={{ width: '9%', fontWeight: 400 }}>
+                            {value === 1 ? <span className="block leading-tight">1 - Strongly Disagree</span>
+                              : value === 7 ? <span className="block leading-tight">7 - Strongly Agree</span>
+                              : value}
                           </th>
                         ))}
                       </tr>
                     </thead>
                     <tbody>
                       {[ 
-                        { name: "q15_results_accurate", text: "The information provided is accurate." },
-                        { name: "q16_results_trustworthy", text: "I can trust the results." },
-                        { name: "q17_results_complete", text: "The results are complete." },
-                        { name: "q18_results_relevant", text: "The search results are relevant to my needs." },
-                        { name: "q19_results_useful", text: "The search results are useful to me." },
-                        { name: "q22_attention_check", text: 'Please select "3" for this statement.' }
+                        { name: "q15_results_accurate", text: "The search results were accurate." },
+                        { name: "q16_results_trustworthy", text: "The search results were trustworthy." },
+                        { name: "q17_results_complete", text: "The search results were complete." },
+                        { name: "q18_results_relevant", text: "The search results were relevant to my query." },
+                        { name: "q19_results_useful", text: "The search results were useful for my task." }
                       ].map((item, idx) => (
                         <FormField key={item.name} control={form.control} name={item.name as keyof PostTaskSurveyForm} rules={{ required: "This field is required" }} render={({ field }) => (
                           <tr className="border-b border-gray-200">
-                            <td className="text-left text-[14px] py-3 pr-0 whitespace-normal" style={{ verticalAlign: 'top', lineHeight: 1.3, wordBreak: 'break-word', width: '35%', fontWeight: 400, padding: '12px 8px' }}>
-                              <span className="mr-2">{33 + idx}.</span> <span className="text-[13px] md:text-[16px]">{item.text}</span> <span className="text-red-500">*</span>
+                            <td className="align-top text-[15px] py-2 pr-0 text-left whitespace-normal" style={{ verticalAlign: 'top', lineHeight: 1.3, wordBreak: 'break-word' }}>
+                              <FormLabel className="font-normal text-[15px] text-left block" style={{ lineHeight: 1.3 }}>
+                                <span className="mr-2" style={{fontSize: '16px'}}>{29 + idx}.</span> <span style={{fontSize: '16px'}}>{item.text}</span> <span className="text-red-500" style={{fontSize: '16px'}}>*</span>
+                              </FormLabel>
                             </td>
                             {[1,2,3,4,5,6,7].map((value) => (
                               <td key={value} className="text-center px-1 py-1" style={{ verticalAlign: 'middle', padding: '0 2px' }}>
@@ -501,26 +516,29 @@ export default function PostTaskSurvey() {
                       ))}
                     </tbody>
                   </table>
-                  
-                  {/* Mobile version */}
+                  {/* Mobile layout for search results */}
                   <div className="md:hidden space-y-4">
                     {[ 
-                      { name: "q15_results_accurate", number: 33, text: "The information provided is accurate." },
-                      { name: "q16_results_trustworthy", number: 34, text: "I can trust the results." },
-                      { name: "q17_results_complete", number: 35, text: "The results are complete." },
-                      { name: "q18_results_relevant", number: 36, text: "The search results are relevant to my needs." },
-                      { name: "q19_results_useful", number: 37, text: "The search results are useful to me." },
-                      { name: "q22_attention_check", number: 38, text: 'Please select "3" for this statement.' }
+                      { name: "q15_results_accurate", num: 33, text: "The search results were accurate." },
+                      { name: "q16_results_trustworthy", num: 34, text: "The search results were trustworthy." },
+                      { name: "q17_results_complete", num: 35, text: "The search results were complete." },
+                      { name: "q18_results_relevant", num: 36, text: "The search results were relevant to my query." },
+                      { name: "q19_results_useful", num: 37, text: "The search results were useful for my task." }
                     ].map((item) => (
                       <FormField key={item.name} control={form.control} name={item.name as keyof PostTaskSurveyForm} rules={{ required: "This field is required" }} render={({ field }) => (
                         <div className="space-y-2">
-                          <div className="text-sm font-normal">
-                            <span className="mr-2">{item.number}.</span>{item.text} <span className="text-red-500">*</span>
-                          </div>
+                          <p className="text-sm font-normal leading-tight" style={{ fontSize: '16px' }}>
+                            <span className="mr-1.5">{item.num}.</span>{item.text} <span className="text-red-500">*</span>
+                          </p>
                           <div className="bg-gray-100 rounded-lg p-3">
-                            <div className="flex justify-between items-center gap-1">
+                            <div className="flex justify-between items-center text-[10px] text-gray-600 mb-2">
+                              <span>1 - Strongly Disagree</span>
+                              <span>7 - Strongly Agree</span>
+                            </div>
+                            <div className="flex justify-between gap-1">
                               {[1,2,3,4,5,6,7].map((value) => (
-                                <label key={value} className="flex flex-col items-center gap-1">
+                                <label key={value} className="flex flex-col items-center cursor-pointer">
+                                  <span className="text-xs mb-1">{value}</span>
                                   <input
                                     type="radio"
                                     name={item.name}
@@ -528,9 +546,7 @@ export default function PostTaskSurvey() {
                                     checked={field.value === value.toString()}
                                     onChange={e => field.onChange(e.target.value)}
                                     className="w-4 h-4"
-                                    id={`${item.name}-mobile-${value}`}
                                   />
-                                  <span className="text-xs text-gray-600">{value}</span>
                                 </label>
                               ))}
                             </div>
@@ -587,17 +603,16 @@ export default function PostTaskSurvey() {
                   {/* Purchase Intention Likert Table */}
                   <FormField control={form.control} name="q20_purchase_likelihood" rules={{ required: "This field is required" }} render={({ field }) => (
                     <div className="mb-6 md:mb-8">
-                      <div className="text-sm md:text-base font-semibold text-left mb-4" style={{ lineHeight: 1.3, fontWeight: 500 }}>
+                      <div className="text-sm md:text-base font-semibold text-left mb-3 md:mb-4" style={{ lineHeight: 1.3, fontWeight: 500 }}>
                         <span className="mr-2">40.</span> If you were to buy a new smartphone now, how likely is it that you would choose the one you selected during this task? <span className="text-red-500">*</span>
                       </div>
-                      
                       {/* Desktop table */}
                       <table className="hidden md:table w-full border-separate" style={{ borderSpacing: 0 }}>
                         <thead>
                           <tr>
                             {[1,2,3,4,5,6,7].map((value) => (
                               <th key={value} className="text-center text-xs pb-2" style={{ width: `${100/7}%`, fontWeight: 400 }}>
-                                {value === 1 ? '1 – Strongly Disagree' : value === 7 ? '7 – Strongly Agree' : value}
+                                {value === 1 ? '1 - Very Unlikely' : value === 7 ? '7 - Very Likely' : value}
                               </th>
                             ))}
                           </tr>
@@ -621,12 +636,16 @@ export default function PostTaskSurvey() {
                           </tr>
                         </tbody>
                       </table>
-                      
-                      {/* Mobile version */}
+                      {/* Mobile layout */}
                       <div className="md:hidden bg-gray-100 rounded-lg p-3">
-                        <div className="flex justify-between items-center gap-1">
+                        <div className="flex justify-between items-center text-[10px] text-gray-600 mb-2">
+                          <span>1 - Very Unlikely</span>
+                          <span>7 - Very Likely</span>
+                        </div>
+                        <div className="flex justify-between gap-1">
                           {[1,2,3,4,5,6,7].map((value) => (
-                            <label key={value} className="flex flex-col items-center gap-1">
+                            <label key={value} className="flex flex-col items-center cursor-pointer">
+                              <span className="text-xs mb-1">{value}</span>
                               <input
                                 type="radio"
                                 name="q20_purchase_likelihood"
@@ -634,9 +653,7 @@ export default function PostTaskSurvey() {
                                 checked={field.value === value.toString()}
                                 onChange={e => field.onChange(e.target.value)}
                                 className="w-4 h-4"
-                                id={`q20_purchase_likelihood-mobile-${value}`}
                               />
-                              <span className="text-xs text-gray-600">{value}</span>
                             </label>
                           ))}
                         </div>
@@ -692,7 +709,7 @@ export default function PostTaskSurvey() {
                     </FormItem>
                   )} />
                 {/* Buttons */}
-                <div className="flex flex-wrap justify-between items-center gap-2 pt-8 w-full">
+                <div className="flex flex-wrap justify-between items-center gap-2 pt-6 md:pt-8 w-full">
                   <Button 
                     type="button" 
                     variant="outline" 

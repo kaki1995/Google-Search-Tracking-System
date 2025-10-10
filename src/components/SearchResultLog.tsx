@@ -244,27 +244,30 @@ export default function SearchResultLog() {
                               </span>
                             ))}
                           </div>
-                          {/* Mobile: statement first, then buttons with labels */}
-                          <div className="md:hidden mb-3 space-y-2">
-                            <div className="text-xs text-gray-600">1 – Strongly Disagree</div>
-                            <div className="text-xs text-gray-600 text-right">7 – Strongly Agree</div>
-                          </div>
-                          {/* Buttons with grey background on mobile */}
-                          <div className="flex w-full justify-between bg-gray-100 md:bg-transparent rounded-lg p-2 md:p-0">
-                            {[1,2,3,4,5,6,7].map((value) => (
-                              <label key={value} className="flex flex-col items-center gap-1" style={{ width: '14.2%' }}>
-                                <input
-                                  type="radio"
-                                  name="q17_price_importance"
-                                  value={value.toString()}
-                                  checked={field.value === value.toString()}
-                                  onChange={e => field.onChange(e.target.value)}
-                                  className="w-4 h-4 md:w-5 md:h-5"
-                                  id={`q17_price_importance-${value}`}
-                                />
-                                <span className="text-xs md:hidden text-gray-600">{value}</span>
-                              </label>
-                            ))}
+                          {/* Mobile: statement first, then buttons with labels inside grey box */}
+                          <div className="md:hidden mb-3 w-full">
+                            <div className="bg-gray-100 rounded-lg p-2">
+                              <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%'}}>
+                                <span className="text-xs text-gray-600" style={{flex: 1, textAlign: 'left'}}>1 – Strongly Disagree</span>
+                                <span className="text-xs text-gray-600" style={{flex: 1, textAlign: 'right'}}>7 – Strongly Agree</span>
+                              </div>
+                              <div className="flex w-full justify-between mt-2">
+                                {[1,2,3,4,5,6,7].map((value) => (
+                                  <label key={value} className="flex flex-col items-center gap-1" style={{ width: '14.2%' }}>
+                                    <input
+                                      type="radio"
+                                      name="q17_price_importance"
+                                      value={value.toString()}
+                                      checked={field.value === value.toString()}
+                                      onChange={e => field.onChange(e.target.value)}
+                                      className="w-4 h-4 md:w-5 md:h-5"
+                                      id={`q17_price_importance-${value}`}
+                                    />
+                                    <span className="text-xs md:hidden text-gray-600">{value}</span>
+                                  </label>
+                                ))}
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>
