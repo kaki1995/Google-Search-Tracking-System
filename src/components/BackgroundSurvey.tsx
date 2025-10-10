@@ -202,32 +202,29 @@ export default function BackgroundSurvey() {
   };
   // ...existing code...
   return (
-    <div className="min-h-screen relative bg-white md:bg-background py-6 px-4 md:py-8 md:px-6 lg:px-12"
+    <div className="min-h-screen relative bg-white md:bg-background py-8 px-6 md:px-8 lg:px-12"
       style={{
-        backgroundImage: "none"
-      }}
-      >
-      {/* Background overlay for better text readability - desktop only */}
-      <div className="hidden md:block absolute inset-0 bg-black bg-opacity-20" 
-        style={{
-          backgroundImage: "url('/mountain-background.jpg')",
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat'
-        }}
-      ></div>
+        backgroundImage: "url('/mountain-background.jpg')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}>
+      {/* Background overlay for better text readability */}
+      <div className="absolute inset-0 bg-black bg-opacity-20 hidden md:block"></div>
 
       <div className="max-w-4xl mx-auto relative z-10">
-        <div className="bg-white md:bg-opacity-95 md:backdrop-blur-sm shadow-lg p-6 md:p-8 lg:p-12 rounded-lg">
-          <h1 className="text-xl md:text-2xl font-bold text-center mb-6 md:mb-8 text-foreground">
+        <div className="bg-white bg-opacity-95 backdrop-blur-sm shadow-lg p-8 md:p-12 lg:p-16 rounded-lg">
+          <h1 className="text-2xl font-bold text-center mb-8 text-foreground">
             Your Personal Background
           </h1>
 
+          {/* Auto-save status indicator removed as requested */}
+
           {/* Information Box with Person Emoji */}
-          <div className="border border-blue-200 rounded-lg p-4 mb-6 md:mb-8 bg-sky-100">
+          <div className="border border-blue-200 rounded-lg p-4 mb-8 bg-sky-100">
             <div className="flex items-start gap-3">
               <span className="text-blue-600 text-lg">👤</span>
-              <span className="text-sm md:text-base text-gray-700 text-justify">
+              <span className="text-base text-gray-700 text-justify">
                 Please answer the following questions to help us better understand your background. All responses are anonymous and used for research purposes only.
               </span>
             </div>
@@ -241,7 +238,7 @@ export default function BackgroundSurvey() {
             }} render={({
               field
             }) => <FormItem>
-                    <FormLabel className="text-sm md:text-base font-medium text-gray-900">
+                    <FormLabel className="text-base font-medium text-gray-900">
                       1. What is your age group? <span className="text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
@@ -274,7 +271,7 @@ export default function BackgroundSurvey() {
             }} render={({
               field
             }) => <FormItem>
-                    <FormLabel className="text-sm md:text-base font-medium text-gray-900">
+                    <FormLabel className="text-base font-medium text-gray-900">
                       2. What is your gender? <span className="text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
@@ -304,7 +301,7 @@ export default function BackgroundSurvey() {
             }} render={({
               field
             }) => <FormItem>
-                    <FormLabel className="text-sm md:text-base font-medium text-gray-900">
+                    <FormLabel className="text-base font-medium text-gray-900">
                       3. What is your highest level of education? <span className="text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
@@ -334,7 +331,7 @@ export default function BackgroundSurvey() {
             }} render={({
               field
             }) => <FormItem>
-                    <FormLabel className="text-sm md:text-base font-medium text-gray-900">
+                    <FormLabel className="text-base font-medium text-gray-900">
                       4. What is your current employment status? <span className="text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
@@ -365,7 +362,7 @@ export default function BackgroundSurvey() {
             }} render={({
               field
             }) => <FormItem>
-                    <FormLabel className="text-sm md:text-base font-medium text-gray-900">
+                    <FormLabel className="text-base font-medium text-gray-900">
                       5. What is your nationality? <span className="text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
@@ -387,7 +384,7 @@ export default function BackgroundSurvey() {
             }} render={({
               field
             }) => <FormItem>
-                    <FormLabel className="text-sm md:text-base font-medium text-gray-900">
+                    <FormLabel className="text-base font-medium text-gray-900">
                       6. What is your current country of residence? <span className="text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
@@ -409,42 +406,54 @@ export default function BackgroundSurvey() {
             }} render={({
               field
             }) => <FormItem>
-                    <FormLabel className="text-sm md:text-base font-medium text-gray-900">
+                    <FormLabel className="text-base md:text-base font-medium text-gray-900">
                       7. How familiar are you with AI chatbots such as ChatGPT? <span className="text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
-                      <div className="bg-gray-50 p-3 md:p-4 rounded-lg">
-                        <div className="hidden md:flex items-center justify-between mb-4">
-                          <span className="text-sm text-gray-600">1-Not familiar at all</span>
-                          <span className="text-sm text-gray-600">7-Extremely familiar</span>
-                        </div>
-                        <div className="flex md:hidden flex-row justify-between items-center mb-3 w-full">
-                          <span className="text-xs text-gray-600">1-Not familiar at all</span>
-                          <span className="text-xs text-gray-600">7-Extremely familiar</span>
-                        </div>
-                        <div className="flex justify-between items-center gap-1">
-                          {[1, 2, 3, 4, 5, 6, 7].map((value) => (
-                            <div key={value} className="flex flex-col items-center">
-                              <input 
-                                type="radio" 
-                                name="experience_scale_q7" 
-                                value={value.toString()} 
-                                checked={field.value === value.toString()} 
-                                onChange={(e) => {
-                                  field.onChange(e);
-                                  handleSaveResponses(form.getValues());
-                                }}
-                                className="mb-1 w-4 h-4 md:w-4 md:h-4" 
-                                id={`q7-${value}`}
-                              />
-                              <label 
-                                htmlFor={`q7-${value}`} 
-                                className="text-xs md:text-sm text-gray-600 cursor-pointer"
-                              >
-                                {value}
-                              </label>
+                      {/* Desktop version */}
+                      <div className="hidden md:block bg-gray-50 p-4 rounded-lg">
+                        <div className="grid grid-cols-7 text-center text-[12px] text-gray-700 mb-3">
+                          {[1,2,3,4,5,6,7].map((value) => (
+                            <div key={value} className="flex justify-center">
+                              {value === 1 ? '1 - Not familiar at all' : value === 7 ? '7 - Extremely familiar' : value}
                             </div>
                           ))}
+                        </div>
+                        <div className="grid grid-cols-7 gap-0">
+                          {[1,2,3,4,5,6,7].map((value) => (
+                            <label key={value} htmlFor={`q7-${value}`} className="flex justify-center py-1 cursor-pointer">
+                              <input
+                                type="radio"
+                                name="experience_scale_q7"
+                                id={`q7-${value}`}
+                                value={value.toString()}
+                                checked={field.value === value.toString()}
+                                onChange={(e) => { field.onChange(e); handleSaveResponses(form.getValues()); }}
+                                className="w-4 h-4"
+                              />
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+                      {/* Mobile version */}
+                      <div className="md:hidden">
+                        <div className="bg-gray-100 rounded-lg p-3">
+                          <div className="flex justify-between gap-1">
+                            {[1,2,3,4,5,6,7].map((value) => (
+                              <label key={value} htmlFor={`q7-mobile-${value}`} className="flex flex-col items-center cursor-pointer">
+                                <span className="text-xs text-gray-600 mb-1">{value}</span>
+                                <input
+                                  type="radio"
+                                  name="experience_scale_q7"
+                                  id={`q7-mobile-${value}`}
+                                  value={value.toString()}
+                                  checked={field.value === value.toString()}
+                                  onChange={(e) => { field.onChange(e); handleSaveResponses(form.getValues()); }}
+                                  className="w-5 h-5"
+                                />
+                              </label>
+                            ))}
+                          </div>
                         </div>
                       </div>
                     </FormControl>
@@ -457,42 +466,54 @@ export default function BackgroundSurvey() {
             }} render={({
               field
             }) => <FormItem>
-                    <FormLabel className="text-sm md:text-base font-medium text-gray-900">
+                    <FormLabel className="text-base md:text-base font-medium text-gray-900">
                       8. Please choose 1 – Strongly Disagree as your answer to this question. <span className="text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
-                      <div className="bg-gray-50 p-3 md:p-4 rounded-lg">
-                        <div className="hidden md:flex items-center justify-between mb-4">
-                          <span className="text-sm text-gray-600">1-Strongly Disagree</span>
-                          <span className="text-sm text-gray-600">7-Strongly Agree</span>
-                        </div>
-                        <div className="flex md:hidden flex-row justify-between items-center mb-3 w-full">
-                          <span className="text-xs text-gray-600">1-Strongly Disagree</span>
-                          <span className="text-xs text-gray-600">7-Strongly Agree</span>
-                        </div>
-                        <div className="flex justify-between items-center gap-1">
-                          {[1, 2, 3, 4, 5, 6, 7].map((value) => (
-                            <div key={value} className="flex flex-col items-center">
-                              <input 
-                                type="radio" 
-                                name="familiarity_scale_q8" 
-                                value={value.toString()} 
-                                checked={field.value === value.toString()} 
-                                onChange={(e) => {
-                                  field.onChange(e);
-                                  handleSaveResponses(form.getValues());
-                                }}
-                                className="mb-1 w-4 h-4 md:w-4 md:h-4" 
-                                id={`q8-${value}`}
-                              />
-                              <label 
-                                htmlFor={`q8-${value}`} 
-                                className="text-xs md:text-sm text-gray-600 cursor-pointer"
-                              >
-                                {value}
-                              </label>
+                      {/* Desktop version */}
+                      <div className="hidden md:block bg-gray-50 p-4 rounded-lg">
+                        <div className="grid grid-cols-7 text-center text-[12px] text-gray-700 mb-3">
+                          {[1,2,3,4,5,6,7].map((value) => (
+                            <div key={value} className="flex justify-center">
+                              {value === 1 ? '1 - Strongly Disagree' : value === 7 ? '7 - Strongly Agree' : value}
                             </div>
                           ))}
+                        </div>
+                        <div className="grid grid-cols-7 gap-0">
+                          {[1,2,3,4,5,6,7].map((value) => (
+                            <label key={value} htmlFor={`q8-${value}`} className="flex justify-center py-1 cursor-pointer">
+                              <input
+                                type="radio"
+                                name="familiarity_scale_q8"
+                                id={`q8-${value}`}
+                                value={value.toString()}
+                                checked={field.value === value.toString()}
+                                onChange={(e) => { field.onChange(e); handleSaveResponses(form.getValues()); }}
+                                className="w-4 h-4"
+                              />
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+                      {/* Mobile version */}
+                      <div className="md:hidden">
+                        <div className="bg-gray-100 rounded-lg p-3">
+                          <div className="flex justify-between gap-1">
+                            {[1,2,3,4,5,6,7].map((value) => (
+                              <label key={value} htmlFor={`q8-mobile-${value}`} className="flex flex-col items-center cursor-pointer">
+                                <span className="text-xs text-gray-600 mb-1">{value}</span>
+                                <input
+                                  type="radio"
+                                  name="familiarity_scale_q8"
+                                  id={`q8-mobile-${value}`}
+                                  value={value.toString()}
+                                  checked={field.value === value.toString()}
+                                  onChange={(e) => { field.onChange(e); handleSaveResponses(form.getValues()); }}
+                                  className="w-5 h-5"
+                                />
+                              </label>
+                            ))}
+                          </div>
                         </div>
                       </div>
                     </FormControl>
@@ -505,7 +526,7 @@ export default function BackgroundSurvey() {
             }} render={({
               field
             }) => <FormItem>
-                    <FormLabel className="text-sm md:text-base font-medium text-gray-900">
+                    <FormLabel className="text-base font-medium text-gray-900">
                       9. On average, how often do you use AI chatbots per week? <span className="text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
