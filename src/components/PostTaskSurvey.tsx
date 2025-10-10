@@ -261,21 +261,25 @@ export default function PostTaskSurvey() {
                   <div className="md:hidden space-y-4">
                     <FormField control={form.control} name="q1_task_easy" rules={{ required: "This field is required" }} render={({ field }) => (
                       <div className="space-y-2">
-                        <p className="text-base font-normal leading-tight">
+                        <p className="text-sm font-normal leading-tight">
                           <span className="mr-1.5">19.</span>The task was easy to complete. <span className="text-red-500">*</span>
                         </p>
                         <div className="bg-gray-100 rounded-lg p-3">
+                          <div className="flex justify-between items-center text-[10px] text-gray-600 mb-2">
+                            <span>1 - Strongly Disagree</span>
+                            <span>7 - Strongly Agree</span>
+                          </div>
                           <div className="flex justify-between gap-1">
                             {[1,2,3,4,5,6,7].map((value) => (
                               <label key={value} className="flex flex-col items-center cursor-pointer">
-                                <span className="text-xs text-gray-600 mb-1">{value}</span>
+                                <span className="text-xs mb-1">{value}</span>
                                 <input
                                   type="radio"
                                   name="q1_task_easy"
                                   value={value.toString()}
                                   checked={field.value === value.toString()}
                                   onChange={e => field.onChange(e.target.value)}
-                                  className="w-5 h-5"
+                                  className="w-4 h-4"
                                 />
                               </label>
                             ))}
@@ -285,21 +289,25 @@ export default function PostTaskSurvey() {
                     )} />
                     <FormField control={form.control} name="q2_task_quick" rules={{ required: "This field is required" }} render={({ field }) => (
                       <div className="space-y-2">
-                        <p className="text-base font-normal leading-tight">
+                        <p className="text-sm font-normal leading-tight">
                           <span className="mr-1.5">20.</span>The task took little time to finish. <span className="text-red-500">*</span>
                         </p>
                         <div className="bg-gray-100 rounded-lg p-3">
+                          <div className="flex justify-between items-center text-[10px] text-gray-600 mb-2">
+                            <span>1 - Strongly Disagree</span>
+                            <span>7 - Strongly Agree</span>
+                          </div>
                           <div className="flex justify-between gap-1">
                             {[1,2,3,4,5,6,7].map((value) => (
                               <label key={value} className="flex flex-col items-center cursor-pointer">
-                                <span className="text-xs text-gray-600 mb-1">{value}</span>
+                                <span className="text-xs mb-1">{value}</span>
                                 <input
                                   type="radio"
                                   name="q2_task_quick"
                                   value={value.toString()}
                                   checked={field.value === value.toString()}
                                   onChange={e => field.onChange(e.target.value)}
-                                  className="w-5 h-5"
+                                  className="w-4 h-4"
                                 />
                               </label>
                             ))}
@@ -309,21 +317,25 @@ export default function PostTaskSurvey() {
                     )} />
                     <FormField control={form.control} name="q3_task_familiar" rules={{ required: "This field is required" }} render={({ field }) => (
                       <div className="space-y-2">
-                        <p className="text-base font-normal leading-tight">
+                        <p className="text-sm font-normal leading-tight">
                           <span className="mr-1.5">21.</span>I was familiar with this type of task. <span className="text-red-500">*</span>
                         </p>
                         <div className="bg-gray-100 rounded-lg p-3">
+                          <div className="flex justify-between items-center text-[10px] text-gray-600 mb-2">
+                              <span>1 - Strongly Disagree</span>
+                              <span>7 - Strongly Agree</span>
+                            </div>
                           <div className="flex justify-between gap-1">
                             {[1,2,3,4,5,6,7].map((value) => (
                               <label key={value} className="flex flex-col items-center cursor-pointer">
-                                <span className="text-xs text-gray-600 mb-1">{value}</span>
+                                <span className="text-xs mb-1">{value}</span>
                                 <input
                                   type="radio"
                                   name="q3_task_familiar"
                                   value={value.toString()}
                                   checked={field.value === value.toString()}
                                   onChange={e => field.onChange(e.target.value)}
-                                  className="w-5 h-5"
+                                  className="w-4 h-4"
                                 />
                               </label>
                             ))}
@@ -405,21 +417,25 @@ export default function PostTaskSurvey() {
                     ].map((item) => (
                       <FormField key={item.name} control={form.control} name={item.name as keyof PostTaskSurveyForm} rules={{ required: "This field is required" }} render={({ field }) => (
                         <div className="space-y-2">
-                          <p className="text-base font-normal leading-tight">
+                          <p className="text-sm font-normal leading-tight">
                             <span className="mr-1.5">{item.num}.</span>{item.text} <span className="text-red-500">*</span>
                           </p>
                           <div className="bg-gray-100 rounded-lg p-3">
+                            <div className="flex justify-between items-center text-[10px] text-gray-600 mb-2">
+                              <span>1 - Strongly Disagree</span>
+                              <span>7 - Strongly Agree</span>
+                            </div>
                             <div className="flex justify-between gap-1">
                               {[1,2,3,4,5,6,7].map((value) => (
                                 <label key={value} className="flex flex-col items-center cursor-pointer">
-                                  <span className="text-xs text-gray-600 mb-1">{value}</span>
+                                  <span className="text-xs mb-1">{value}</span>
                                   <input
                                     type="radio"
                                     name={item.name}
                                     value={value.toString()}
                                     checked={field.value === value.toString()}
                                     onChange={e => field.onChange(e.target.value)}
-                                    className="w-5 h-5"
+                                    className="w-4 h-4"
                                   />
                                 </label>
                               ))}
@@ -494,21 +510,25 @@ export default function PostTaskSurvey() {
                     ].map((item) => (
                       <FormField key={item.name} control={form.control} name={item.name as keyof PostTaskSurveyForm} rules={{ required: "This field is required" }} render={({ field }) => (
                         <div className="space-y-2">
-                          <p className="text-base font-normal leading-tight">
+                          <p className="text-sm font-normal leading-tight">
                             <span className="mr-1.5">{item.num}.</span>{item.text} <span className="text-red-500">*</span>
                           </p>
                           <div className="bg-gray-100 rounded-lg p-3">
+                            <div className="flex justify-between items-center text-[10px] text-gray-600 mb-2">
+                              <span>1 - Strongly Disagree</span>
+                              <span>7 - Strongly Agree</span>
+                            </div>
                             <div className="flex justify-between gap-1">
                               {[1,2,3,4,5,6,7].map((value) => (
                                 <label key={value} className="flex flex-col items-center cursor-pointer">
-                                  <span className="text-xs text-gray-600 mb-1">{value}</span>
+                                  <span className="text-xs mb-1">{value}</span>
                                   <input
                                     type="radio"
                                     name={item.name}
                                     value={value.toString()}
                                     checked={field.value === value.toString()}
                                     onChange={e => field.onChange(e.target.value)}
-                                    className="w-5 h-5"
+                                    className="w-4 h-4"
                                   />
                                 </label>
                               ))}
@@ -601,17 +621,21 @@ export default function PostTaskSurvey() {
                       </table>
                       {/* Mobile layout */}
                       <div className="md:hidden bg-gray-100 rounded-lg p-3">
+                        <div className="flex justify-between items-center text-[10px] text-gray-600 mb-2">
+                          <span>1 - Very Unlikely</span>
+                          <span>7 - Very Likely</span>
+                        </div>
                         <div className="flex justify-between gap-1">
                           {[1,2,3,4,5,6,7].map((value) => (
                             <label key={value} className="flex flex-col items-center cursor-pointer">
-                              <span className="text-xs text-gray-600 mb-1">{value}</span>
+                              <span className="text-xs mb-1">{value}</span>
                               <input
                                 type="radio"
                                 name="q20_purchase_likelihood"
                                 value={value.toString()}
                                 checked={field.value === value.toString()}
                                 onChange={e => field.onChange(e.target.value)}
-                                className="w-5 h-5"
+                                className="w-4 h-4"
                               />
                             </label>
                           ))}

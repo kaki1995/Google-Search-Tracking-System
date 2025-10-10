@@ -72,7 +72,7 @@ serve(async (req) => {
 
       if (sessionError || !sessionData) {
         console.log('No session found for participant:', participant_id);
-        currentSessionId = undefined; // Allow saving without session for robustness
+        currentSessionId = null; // Allow saving without session for robustness
       } else {
         currentSessionId = sessionData.id;
       }
@@ -156,7 +156,7 @@ serve(async (req) => {
   } catch (error) {
     console.error('Unexpected error in save-responses:', error);
     return new Response(
-      JSON.stringify({ ok: false, error: 'Internal server error', details: error instanceof Error ? error.message : String(error) }),
+      JSON.stringify({ ok: false, error: 'Internal server error', details: error.message }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
     )
   }
