@@ -201,7 +201,7 @@ export default function PostTaskSurvey() {
                             </FormLabel>
                           </td>
                           {[1,2,3,4,5,6,7].map((value) => (
-                            <td key={value} className="text-center px-1 py-1" style={{ verticalAlign: 'middle', padding: '0 2px' }}>
+                              <td key={value} className="text-center px-1 py-1" style={{ verticalAlign: 'middle', padding: '0 2px', fontSize: '14px' }}>
                               <input
                                 type="radio"
                                 name="q1_task_easy"
@@ -224,7 +224,7 @@ export default function PostTaskSurvey() {
                             </FormLabel>
                           </td>
                           {[1,2,3,4,5,6,7].map((value) => (
-                            <td key={value} className="text-center px-1 py-1" style={{ verticalAlign: 'middle', padding: '0 2px' }}>
+                              <td key={value} className="text-center px-1 py-1" style={{ verticalAlign: 'middle', padding: '0 2px', fontSize: '14px' }}>
                               <input
                                 type="radio"
                                 name="q2_task_quick"
@@ -247,7 +247,7 @@ export default function PostTaskSurvey() {
                             </FormLabel>
                           </td>
                           {[1,2,3,4,5,6,7].map((value) => (
-                            <td key={value} className="text-center px-1 py-1" style={{ verticalAlign: 'middle', padding: '0 2px' }}>
+                              <td key={value} className="text-center px-1 py-1" style={{ verticalAlign: 'middle', padding: '0 2px', fontSize: '14px' }}>
                               <input
                                 type="radio"
                                 name="q3_task_familiar"
@@ -279,7 +279,7 @@ export default function PostTaskSurvey() {
                           <div className="flex justify-between gap-1">
                             {[1,2,3,4,5,6,7].map((value) => (
                               <label key={value} className="flex flex-col items-center cursor-pointer">
-                                <span className="mb-1" style={{fontSize: '16px'}}>{value}</span>
+                                <span className="mb-1" style={{fontSize: '14px'}}>{value}</span>
                                 <input
                                   type="radio"
                                   name="q1_task_easy"
@@ -308,7 +308,7 @@ export default function PostTaskSurvey() {
                           <div className="flex justify-between gap-1">
                             {[1,2,3,4,5,6,7].map((value) => (
                               <label key={value} className="flex flex-col items-center cursor-pointer">
-                                <span className="text-xs mb-1">{value}</span>
+                                <span className="mb-1" style={{fontSize: '14px'}}>{value}</span>
                                 <input
                                   type="radio"
                                   name="q2_task_quick"
@@ -336,7 +336,7 @@ export default function PostTaskSurvey() {
                           <div className="flex justify-between gap-1">
                             {[1,2,3,4,5,6,7].map((value) => (
                               <label key={value} className="flex flex-col items-center cursor-pointer">
-                                <span className="text-xs mb-1">{value}</span>
+                                <span className="mb-1" style={{fontSize: '14px'}}>{value}</span>
                                 <input
                                   type="radio"
                                   name="q3_task_familiar"
@@ -442,7 +442,7 @@ export default function PostTaskSurvey() {
                             <div className="flex justify-between gap-1">
                               {[1,2,3,4,5,6,7].map((value) => (
                                 <label key={value} className="flex flex-col items-center cursor-pointer">
-                                  <span className="mb-1" style={{fontSize: '16px'}}>{value}</span>
+                                  <span className="mb-1" style={{fontSize: '14px'}}>{value}</span>
                                   <input
                                     type="radio"
                                     name={item.name}
@@ -538,7 +538,7 @@ export default function PostTaskSurvey() {
                             <div className="flex justify-between gap-1">
                               {[1,2,3,4,5,6,7].map((value) => (
                                 <label key={value} className="flex flex-col items-center cursor-pointer">
-                                  <span className="text-xs mb-1">{value}</span>
+                                  <span className="mb-1" style={{fontSize: '14px'}}>{value}</span>
                                   <input
                                     type="radio"
                                     name={item.name}
@@ -546,6 +546,7 @@ export default function PostTaskSurvey() {
                                     checked={field.value === value.toString()}
                                     onChange={e => field.onChange(e.target.value)}
                                     className="w-4 h-4"
+                                    style={{fontSize: '14px !important'}}
                                   />
                                 </label>
                               ))}
@@ -645,7 +646,7 @@ export default function PostTaskSurvey() {
                         <div className="flex justify-between gap-1">
                           {[1,2,3,4,5,6,7].map((value) => (
                             <label key={value} className="flex flex-col items-center cursor-pointer">
-                              <span className="text-xs mb-1">{value}</span>
+                              <span className="mb-1" style={{fontSize: '14px'}}>{value}</span>
                               <input
                                 type="radio"
                                 name="q20_purchase_likelihood"
