@@ -114,22 +114,27 @@ export default function SearchResultLog() {
       setIsSubmitting(false);
     }
   };
-  return <div className="min-h-screen relative bg-background py-8 px-6 md:px-8 lg:px-12"
+  return <div className="min-h-screen relative bg-white md:bg-background py-6 px-4 md:py-8 md:px-6 lg:px-12"
       style={{
-        backgroundImage: "url('/mountain-background.jpg')",
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat'
-      }}>
-      {/* Background overlay for better text readability */}
-      <div className="absolute inset-0 bg-black bg-opacity-20"></div>
+        backgroundImage: "none"
+      }}
+      >
+      {/* Background overlay for better text readability - desktop only */}
+      <div className="hidden md:block absolute inset-0 bg-black bg-opacity-20" 
+        style={{
+          backgroundImage: "url('/mountain-background.jpg')",
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      ></div>
       
       <div className="max-w-4xl mx-auto relative z-10">
-        <div className="bg-white bg-opacity-95 backdrop-blur-sm rounded-lg shadow-lg p-8 md:p-12 lg:p-16">
-          <h1 className="text-2xl font-bold text-foreground text-center mb-8">Your Search Results</h1>
+        <div className="bg-white md:bg-opacity-95 md:backdrop-blur-sm rounded-lg shadow-lg p-6 md:p-8 lg:p-12">
+          <h1 className="text-xl md:text-2xl font-bold text-foreground text-center mb-6 md:mb-8">Your Search Results</h1>
 
         <div className="mb-6 p-4 rounded-lg border border-blue-200 bg-sky-100">
-          <p className="text-gray-700 text-sm flex items-start gap-2">
+          <p className="text-gray-700 text-xs md:text-sm flex items-start gap-2">
             <span className="text-blue-600 text-lg flex-shrink-0">📝</span>
             <span className="text-justify">
               Please fill in the details of the smartphone you chose based on your search using the study interface:<br />
@@ -146,9 +151,9 @@ export default function SearchResultLog() {
           }} render={({
             field
           }) => <FormItem>
-                  <FormLabel className="text-base font-medium text-gray-900">
+                  <FormLabel className="text-sm md:text-base font-medium text-gray-900">
                     12. What is the brand and model of the smartphone you selected? <span className="text-red-500">*</span><br />
-                    <span className="text-sm font-normal text-gray-600 italic">(e.g., Samsung Galaxy S24, iPhone 16 Pro)</span>
+                    <span className="text-xs md:text-sm font-normal text-gray-600 italic">(e.g., Samsung Galaxy S24, iPhone 16 Pro)</span>
                   </FormLabel>
                   <FormControl>
                     <Input {...field} placeholder="" className="border-b border-t-0 border-l-0 border-r-0 rounded-none bg-transparent" />
@@ -225,31 +230,39 @@ export default function SearchResultLog() {
                 rules={{ required: "This field is required" }}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-base font-medium text-gray-900 mb-2 block">
+                    <FormLabel className="text-sm md:text-base font-medium text-gray-900 mb-2 block">
                       17. When making a smartphone purchase decision, price is a more important factor to you than technical specifications? <span className="text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
                       <div className="w-full flex flex-col items-center">
                         <div className="w-full">
-                          <div className="flex w-full justify-between mb-2">
+                          {/* Desktop labels */}
+                          <div className="hidden md:flex w-full justify-between mb-2">
                             {[1,2,3,4,5,6,7].map((value) => (
                               <span key={value} className="text-xs text-center" style={{ width: '14.2%' }}>
                                 {value === 1 ? '1 – Strongly Disagree' : value === 7 ? '7 – Strongly Agree' : value}
                               </span>
                             ))}
                           </div>
-                          <div className="flex w-full justify-between">
+                          {/* Mobile: statement first, then buttons with labels */}
+                          <div className="md:hidden mb-3 space-y-2">
+                            <div className="text-xs text-gray-600">1 – Strongly Disagree</div>
+                            <div className="text-xs text-gray-600 text-right">7 – Strongly Agree</div>
+                          </div>
+                          {/* Buttons with grey background on mobile */}
+                          <div className="flex w-full justify-between bg-gray-100 md:bg-transparent rounded-lg p-2 md:p-0">
                             {[1,2,3,4,5,6,7].map((value) => (
-                              <label key={value} className="flex flex-col items-center" style={{ width: '14.2%' }}>
+                              <label key={value} className="flex flex-col items-center gap-1" style={{ width: '14.2%' }}>
                                 <input
                                   type="radio"
                                   name="q17_price_importance"
                                   value={value.toString()}
                                   checked={field.value === value.toString()}
                                   onChange={e => field.onChange(e.target.value)}
-                                  className="w-5 h-5"
+                                  className="w-4 h-4 md:w-5 md:h-5"
                                   id={`q17_price_importance-${value}`}
                                 />
+                                <span className="text-xs md:hidden text-gray-600">{value}</span>
                               </label>
                             ))}
                           </div>
