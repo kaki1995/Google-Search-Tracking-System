@@ -204,12 +204,12 @@ export default function PostTaskSurvey() {
                               <td key={value} className="text-center px-1 py-1" style={{ verticalAlign: 'middle', padding: '0 2px', fontSize: '14px' }}>
                               <input
                                 type="radio"
-                                name="q1_task_easy"
+                                name="q1_task_easy-desktop"
                                 value={value.toString()}
                                 checked={field.value === value.toString()}
                                 onChange={e => field.onChange(e.target.value)}
                                 className="w-4 h-4 md:w-5 md:h-5"
-                                id={`q1_task_easy-${value}`}
+                                id={`q1_task_easy-desktop-${value}`}
                                 style={{ margin: '0 auto', display: 'block', fontSize: '16px' }}
                               />
                             </td>
@@ -227,12 +227,12 @@ export default function PostTaskSurvey() {
                               <td key={value} className="text-center px-1 py-1" style={{ verticalAlign: 'middle', padding: '0 2px', fontSize: '14px' }}>
                               <input
                                 type="radio"
-                                name="q2_task_quick"
+                                name="q2_task_quick-desktop"
                                 value={value.toString()}
                                 checked={field.value === value.toString()}
                                 onChange={e => field.onChange(e.target.value)}
                                 className="w-4 h-4 md:w-5 md:h-5"
-                                id={`q2_task_quick-${value}`}
+                                id={`q2_task_quick-desktop-${value}`}
                                 style={{ margin: '0 auto', display: 'block' }}
                               />
                             </td>
@@ -250,12 +250,12 @@ export default function PostTaskSurvey() {
                               <td key={value} className="text-center px-1 py-1" style={{ verticalAlign: 'middle', padding: '0 2px', fontSize: '14px' }}>
                               <input
                                 type="radio"
-                                name="q3_task_familiar"
+                                name="q3_task_familiar-desktop"
                                 value={value.toString()}
                                 checked={field.value === value.toString()}
                                 onChange={e => field.onChange(e.target.value)}
                                 className="w-4 h-4 md:w-5 md:h-5"
-                                id={`q3_task_familiar-${value}`}
+                                id={`q3_task_familiar-desktop-${value}`}
                                 style={{ margin: '0 auto', display: 'block' }}
                               />
                             </td>
@@ -282,7 +282,7 @@ export default function PostTaskSurvey() {
                                 <span className="mb-1" style={{fontSize: '14px'}}>{value}</span>
                                 <input
                                   type="radio"
-                                  name="q1_task_easy"
+                                  name="q1_task_easy-mobile"
                                   value={value.toString()}
                                   checked={field.value === value.toString()}
                                   onChange={e => field.onChange(e.target.value)}
@@ -311,7 +311,7 @@ export default function PostTaskSurvey() {
                                 <span className="mb-1" style={{fontSize: '14px'}}>{value}</span>
                                 <input
                                   type="radio"
-                                  name="q2_task_quick"
+                                  name="q2_task_quick-mobile"
                                   value={value.toString()}
                                   checked={field.value === value.toString()}
                                   onChange={e => field.onChange(e.target.value)}
@@ -339,7 +339,7 @@ export default function PostTaskSurvey() {
                                 <span className="mb-1" style={{fontSize: '14px'}}>{value}</span>
                                 <input
                                   type="radio"
-                                  name="q3_task_familiar"
+                                  name="q3_task_familiar-mobile"
                                   value={value.toString()}
                                   checked={field.value === value.toString()}
                                   onChange={e => field.onChange(e.target.value)}
@@ -399,12 +399,12 @@ export default function PostTaskSurvey() {
                               <td key={value} className="text-center px-1 py-1" style={{ verticalAlign: 'middle', padding: '0 2px' }}>
                                 <input
                                   type="radio"
-                                  name={item.name}
+                                  name={`${item.name}-desktop`}
                                   value={value.toString()}
                                   checked={field.value === value.toString()}
                                   onChange={(e) => field.onChange(e.target.value)}
                                   className="w-4 h-4 md:w-5 md:h-5"
-                                  id={`${item.name}-${value}`}
+                                  id={`${item.name}-desktop-${value}`}
                                   style={{ margin: '0 auto', display: 'block', fontSize: '16px' }}
                                 />
                               </td>
@@ -445,7 +445,7 @@ export default function PostTaskSurvey() {
                                   <span className="mb-1" style={{fontSize: '14px'}}>{value}</span>
                                   <input
                                     type="radio"
-                                    name={item.name}
+                                    name={`${item.name}-mobile`}
                                     value={value.toString()}
                                     checked={field.value === value.toString()}
                                     onChange={(e) => field.onChange(e.target.value)}
@@ -501,12 +501,12 @@ export default function PostTaskSurvey() {
                               <td key={value} className="text-center px-1 py-1" style={{ verticalAlign: 'middle', padding: '0 2px' }}>
                                 <input
                                   type="radio"
-                                  name={item.name}
+                                  name={`${item.name}-desktop`}
                                   value={value.toString()}
                                   checked={field.value === value.toString()}
                                   onChange={e => field.onChange(e.target.value)}
                                   className="w-4 h-4 md:w-5 md:h-5"
-                                  id={`${item.name}-${value}`}
+                                  id={`${item.name}-desktop-${value}`}
                                   style={{ margin: '0 auto', display: 'block' }}
                                 />
                               </td>
@@ -541,7 +541,7 @@ export default function PostTaskSurvey() {
                                   <span className="mb-1" style={{fontSize: '14px'}}>{value}</span>
                                   <input
                                     type="radio"
-                                    name={item.name}
+                                    name={`${item.name}-mobile`}
                                     value={value.toString()}
                                     checked={field.value === value.toString()}
                                     onChange={e => field.onChange(e.target.value)}
@@ -624,12 +624,12 @@ export default function PostTaskSurvey() {
                               <td key={value} className="text-center px-2 py-1" style={{ verticalAlign: 'middle' }}>
                                 <input
                                   type="radio"
-                                  name="q20_purchase_likelihood"
+                                  name="q20_purchase_likelihood-desktop"
                                   value={value.toString()}
                                   checked={field.value === value.toString()}
                                   onChange={e => field.onChange(e.target.value)}
                                   className="w-5 h-5"
-                                  id={`q20_purchase_likelihood-${value}`}
+                                  id={`q20_purchase_likelihood-desktop-${value}`}
                                   style={{ margin: '0 auto', display: 'block' }}
                                 />
                               </td>
@@ -649,7 +649,7 @@ export default function PostTaskSurvey() {
                               <span className="mb-1" style={{fontSize: '14px'}}>{value}</span>
                               <input
                                 type="radio"
-                                name="q20_purchase_likelihood"
+                                name="q20_purchase_likelihood-mobile"
                                 value={value.toString()}
                                 checked={field.value === value.toString()}
                                 onChange={e => field.onChange(e.target.value)}

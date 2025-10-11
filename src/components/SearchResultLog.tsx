@@ -250,16 +250,16 @@ export default function SearchResultLog() {
                             <tr>
                               {[1,2,3,4,5,6,7].map((value) => (
                                 <td key={value} className="text-center px-1 py-1" style={{ verticalAlign: 'middle', padding: '0 2px' }}>
-                                  <input
-                                    type="radio"
-                                    name="q17_price_importance"
-                                    value={value.toString()}
-                                    checked={field.value === value.toString()}
-                                    onChange={e => field.onChange(e.target.value)}
-                                    className="w-4 h-4 md:w-5 md:h-5"
-                                    id={`q17_price_importance-${value}`}
-                                    style={{ margin: '0 auto', display: 'block' }}
-                                  />
+                                <input
+                                  type="radio"
+                                  name="q17_price_importance-desktop"
+                                  value={value.toString()}
+                                  checked={field.value === value.toString()}
+                                  onChange={e => field.onChange(e.target.value)}
+                                  className="w-4 h-4 md:w-5 md:h-5"
+                                  id={`q17_price_importance-desktop-${value}`}
+                                  style={{ margin: '0 auto', display: 'block' }}
+                                />
                                 </td>
                               ))}
                             </tr>
@@ -277,12 +277,12 @@ export default function SearchResultLog() {
                                 <label key={value} className="flex flex-col items-center gap-1" style={{ width: '14.2%' }}>
                                   <input
                                     type="radio"
-                                    name="q17_price_importance"
+                                    name="q17_price_importance-mobile"
                                     value={value.toString()}
                                     checked={field.value === value.toString()}
                                     onChange={e => field.onChange(e.target.value)}
                                     className="w-4 h-4 md:w-5 md:h-5"
-                                    id={`q17_price_importance-${value}`}
+                                    id={`q17_price_importance-mobile-${value}`}
                                   />
                                   <span className="text-xs md:hidden text-gray-600">{value}</span>
                                 </label>
