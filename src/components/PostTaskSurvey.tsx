@@ -484,17 +484,18 @@ export default function PostTaskSurvey() {
                     </thead>
                     <tbody>
                       {[ 
-                        { name: "q15_results_accurate", text: "The search results were accurate." },
-                        { name: "q16_results_trustworthy", text: "The search results were trustworthy." },
-                        { name: "q17_results_complete", text: "The search results were complete." },
-                        { name: "q18_results_relevant", text: "The search results were relevant to my query." },
-                        { name: "q19_results_useful", text: "The search results were useful for my task." }
-                      ].map((item, idx) => (
+                        { name: "q15_results_accurate", num: 33, text: "The information provided is accurate." },
+                        { name: "q16_results_trustworthy", num: 34, text: "I can trust the results." },
+                        { name: "q17_results_complete", num: 35, text: "The results are complete." },
+                        { name: "q18_results_relevant", num: 36, text: "The search results are relevant to my needs." },
+                        { name: "q19_results_useful", num: 37, text: "The search results are useful to me." },
+                        { name: "q22_attention_check", num: 38, text: "Please select \"3\" for this question." }
+                      ].map((item) => (
                         <FormField key={item.name} control={form.control} name={item.name as keyof PostTaskSurveyForm} rules={{ required: "This field is required" }} render={({ field }) => (
                           <tr className="border-b border-gray-200">
                             <td className="align-top text-[15px] py-2 pr-0 text-left whitespace-normal" style={{ verticalAlign: 'top', lineHeight: 1.3, wordBreak: 'break-word' }}>
                               <FormLabel className="font-normal text-[15px] text-left block" style={{ lineHeight: 1.3 }}>
-                                <span className="mr-2" style={{fontSize: '16px'}}>{29 + idx}.</span> <span style={{fontSize: '16px'}}>{item.text}</span> <span className="text-red-500" style={{fontSize: '16px'}}>*</span>
+                                <span className="mr-2" style={{fontSize: '16px'}}>{item.num}.</span> <span style={{fontSize: '16px'}}>{item.text}</span> <span className="text-red-500" style={{fontSize: '16px'}}>*</span>
                               </FormLabel>
                             </td>
                             {[1,2,3,4,5,6,7].map((value) => (
@@ -519,11 +520,12 @@ export default function PostTaskSurvey() {
                   {/* Mobile layout for search results */}
                   <div className="md:hidden space-y-4">
                     {[ 
-                      { name: "q15_results_accurate", num: 33, text: "The search results were accurate." },
-                      { name: "q16_results_trustworthy", num: 34, text: "The search results were trustworthy." },
-                      { name: "q17_results_complete", num: 35, text: "The search results were complete." },
-                      { name: "q18_results_relevant", num: 36, text: "The search results were relevant to my query." },
-                      { name: "q19_results_useful", num: 37, text: "The search results were useful for my task." }
+                      { name: "q15_results_accurate", num: 33, text: "The information provided is accurate." },
+                      { name: "q16_results_trustworthy", num: 34, text: "I can trust the results." },
+                      { name: "q17_results_complete", num: 35, text: "The results are complete." },
+                      { name: "q18_results_relevant", num: 36, text: "The search results are relevant to my needs." },
+                      { name: "q19_results_useful", num: 37, text: "The search results are useful to me." },
+                      { name: "q22_attention_check", num: 38, text: "Please select \"3\" for this question." }
                     ].map((item) => (
                       <FormField key={item.name} control={form.control} name={item.name as keyof PostTaskSurveyForm} rules={{ required: "This field is required" }} render={({ field }) => (
                         <div className="space-y-2">
