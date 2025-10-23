@@ -234,61 +234,50 @@ export default function SearchResultLog() {
                       17. When making a smartphone purchase decision, price is a more important factor to you than technical specifications? <span className="text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
-                      <div className="w-full flex flex-col items-center">
-                        {/* Desktop/tablet Likert scale */}
-                        <table className="hidden md:table w-full border-separate" style={{ borderSpacing: 0 }}>
-                          <thead>
-                            <tr>
-                              {[1,2,3,4,5,6,7].map((value) => (
-                                <th key={value} className="text-center pb-2 font-normal text-xs" style={{ width: '14.2%' }}>
-                                  {value === 1 ? '1 – Strongly Disagree' : value === 7 ? '7 – Strongly Agree' : value}
-                                </th>
-                              ))}
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr>
-                              {[1,2,3,4,5,6,7].map((value) => (
-                                <td key={value} className="text-center px-1 py-1" style={{ verticalAlign: 'middle', padding: '0 2px' }}>
-                                  <input
-                                    type="radio"
-                                    name="q17_price_importance"
-                                    value={value.toString()}
-                                    checked={field.value === value.toString()}
-                                    onChange={e => field.onChange(e.target.value)}
-                                    className="w-4 h-4 md:w-5 md:h-5"
-                                    id={`q17_price_importance-${value}`}
-                                    style={{ margin: '0 auto', display: 'block' }}
-                                  />
-                                </td>
-                              ))}
-                            </tr>
-                          </tbody>
-                        </table>
-                        {/* Mobile: statement first, then buttons with labels inside grey box */}
-                        <div className="md:hidden mb-3 w-full">
-                          <div className="bg-gray-100 rounded-lg p-2">
-                            <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%'}}>
-                              <span className="text-xs text-gray-600" style={{flex: 1, textAlign: 'left'}}>1 – Strongly Disagree</span>
-                              <span className="text-xs text-gray-600" style={{flex: 1, textAlign: 'right'}}>7 – Strongly Agree</span>
-                            </div>
-                            <div className="flex w-full justify-between mt-2">
-                              {[1,2,3,4,5,6,7].map((value) => (
-                                <label key={value} className="flex flex-col items-center gap-1" style={{ width: '14.2%' }}>
-                                  <input
-                                    type="radio"
-                                    name="q17_price_importance"
-                                    value={value.toString()}
-                                    checked={field.value === value.toString()}
-                                    onChange={e => field.onChange(e.target.value)}
-                                    className="w-4 h-4 md:w-5 md:h-5"
-                                    id={`q17_price_importance-${value}`}
-                                  />
-                                  <span className="text-xs md:hidden text-gray-600">{value}</span>
-                                </label>
-                              ))}
-                            </div>
+                      {/* Desktop/tablet Likert scale: 7-column grid, no overlays, large tap targets */}
+                      <div className="hidden md:grid grid-cols-7 gap-2 w-full" style={{ minWidth: '308px' }}>
+                        {[1,2,3,4,5,6,7].map((value) => (
+                          <div key={value} className="flex flex-col items-center" style={{ pointerEvents: 'auto', minWidth: '44px' }}>
+                            <label htmlFor={`q17_price_importance-${value}`} className="flex flex-col items-center cursor-pointer w-full" style={{ minWidth: '44px', minHeight: '44px', justifyContent: 'center', touchAction: 'manipulation' }}>
+                              <span className="text-xs text-gray-600 mb-1">{value === 1 ? '1 – Strongly Disagree' : value === 7 ? '7 – Strongly Agree' : value}</span>
+                              <input
+                                type="radio"
+                                name="q17_price_importance"
+                                value={value.toString()}
+                                checked={field.value === value.toString()}
+                                onChange={e => field.onChange(e.target.value)}
+                                className="w-7 h-7 accent-blue-600 focus:ring-2 focus:ring-blue-500"
+                                id={`q17_price_importance-${value}`}
+                                style={{ minWidth: '44px', minHeight: '44px', margin: '0 auto', display: 'block', touchAction: 'manipulation' }}
+                              />
+                            </label>
                           </div>
+                        ))}
+                      </div>
+                      {/* Mobile: 7-column grid, no overlays over radios, large tap targets, labels inside grid */}
+                      <div className="md:hidden w-full" style={{ minWidth: '308px' }}>
+                        <div className="flex flex-row justify-between items-center mb-2 w-full">
+                          <span className="text-xs text-gray-600">1 – Strongly Disagree</span>
+                          <span className="text-xs text-gray-600">7 – Strongly Agree</span>
+                        </div>
+                        <div className="grid grid-cols-7 gap-2 w-full" style={{ minWidth: '308px' }}>
+                          {[1,2,3,4,5,6,7].map((value) => (
+                            <div key={value} className="flex flex-col items-center" style={{ pointerEvents: 'auto', minWidth: '44px' }}>
+                              <label htmlFor={`q17_price_importance-${value}`} className="flex flex-col items-center cursor-pointer w-full" style={{ minWidth: '44px', minHeight: '44px', justifyContent: 'center', touchAction: 'manipulation' }}>
+                                <span className="text-xs text-gray-600 mb-1">{value}</span>
+                                <input
+                                  type="radio"
+                                  name="q17_price_importance"
+                                  value={value.toString()}
+                                  checked={field.value === value.toString()}
+                                  onChange={e => field.onChange(e.target.value)}
+                                  className="w-7 h-7 accent-blue-600 focus:ring-2 focus:ring-blue-500"
+                                  id={`q17_price_importance-${value}`}
+                                  style={{ minWidth: '44px', minHeight: '44px', margin: '0 auto', display: 'block', touchAction: 'manipulation' }}
+                                />
+                              </label>
+                            </div>
+                          ))}
                         </div>
                       </div>
                     </FormControl>
