@@ -458,7 +458,7 @@ export default function BackgroundSurvey() {
               field
             }) => <FormItem>
                     <FormLabel className="text-sm md:text-base font-medium text-gray-900">
-                      8. Please choose 1 – Strongly Disagree as your answer to this question. <span className="text-red-500">*</span>
+                      8. Please choose 1 – Strongly Disagree as your answer for this statement. <span className="text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
                       <div className="bg-gray-50 p-3 md:p-4 rounded-lg">
