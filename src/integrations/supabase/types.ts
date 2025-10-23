@@ -103,90 +103,90 @@ export type Database = {
         Row: {
           id: string
           participant_id: string
-          q1_task_easy: number | null
-          q10_tool_provides_info: number | null
-          q11_tool_helps_complete: number | null
-          q12_tool_useful: number | null
-          q13_tool_too_much_info: number | null
-          q14_tool_hard_focus: number | null
-          q15_results_accurate: number | null
-          q16_results_trustworthy: number | null
-          q17_results_complete: number | null
-          q18_results_relevant: number | null
-          q19_results_useful: number | null
-          q2_task_quick: number | null
-          q20_purchase_likelihood: number | null
-          q21_contradictory_handling: string[] | null
-          q22_attention_check: number | null
-          q23_time_spent: string | null
-          q24_future_usage_feedback: string | null
-          q3_task_familiar: number | null
-          q4_tool_reliable: number | null
-          q5_tool_practical: number | null
-          q6_tool_like: number | null
-          q7_tool_easy_use: number | null
-          q8_tool_clear_interaction: number | null
-          q9_tool_control: number | null
+          q19_task_easy: number | null
+          q20_task_quick: number | null
+          q21_task_familiar: number | null
+          q22_tool_reliable: number | null
+          q23_tool_practical: number | null
+          q24_tool_like: number | null
+          q25_tool_easy_use: number | null
+          q26_tool_clear_interaction: number | null
+          q27_tool_control: number | null
+          q28_tool_provides_info: number | null
+          q29_tool_helps_complete: number | null
+          q30_tool_useful: number | null
+          q31_tool_too_much_info: number | null
+          q32_tool_hard_focus: number | null
+          q33_results_accurate: number | null
+          q34_results_trustworthy: number | null
+          q35_results_complete: number | null
+          q36_results_relevant: number | null
+          q37_results_useful: number | null
+          q38_attention_check: number | null
+          q39_contradictory_handling: string[] | null
+          q40_purchase_likelihood: number | null
+          q41_time_spent: string | null
+          q42_future_usage_feedback: string | null
           session_id: string
           submitted_at: string
         }
         Insert: {
           id?: string
           participant_id: string
-          q1_task_easy?: number | null
-          q10_tool_provides_info?: number | null
-          q11_tool_helps_complete?: number | null
-          q12_tool_useful?: number | null
-          q13_tool_too_much_info?: number | null
-          q14_tool_hard_focus?: number | null
-          q15_results_accurate?: number | null
-          q16_results_trustworthy?: number | null
-          q17_results_complete?: number | null
-          q18_results_relevant?: number | null
-          q19_results_useful?: number | null
-          q2_task_quick?: number | null
-          q20_purchase_likelihood?: number | null
-          q21_contradictory_handling?: string[] | null
-          q22_attention_check?: number | null
-          q23_time_spent?: string | null
-          q24_future_usage_feedback?: string | null
-          q3_task_familiar?: number | null
-          q4_tool_reliable?: number | null
-          q5_tool_practical?: number | null
-          q6_tool_like?: number | null
-          q7_tool_easy_use?: number | null
-          q8_tool_clear_interaction?: number | null
-          q9_tool_control?: number | null
+          q19_task_easy?: number | null
+          q20_task_quick?: number | null
+          q21_task_familiar?: number | null
+          q22_tool_reliable?: number | null
+          q23_tool_practical?: number | null
+          q24_tool_like?: number | null
+          q25_tool_easy_use?: number | null
+          q26_tool_clear_interaction?: number | null
+          q27_tool_control?: number | null
+          q28_tool_provides_info?: number | null
+          q29_tool_helps_complete?: number | null
+          q30_tool_useful?: number | null
+          q31_tool_too_much_info?: number | null
+          q32_tool_hard_focus?: number | null
+          q33_results_accurate?: number | null
+          q34_results_trustworthy?: number | null
+          q35_results_complete?: number | null
+          q36_results_relevant?: number | null
+          q37_results_useful?: number | null
+          q38_attention_check?: number | null
+          q39_contradictory_handling?: string[] | null
+          q40_purchase_likelihood?: number | null
+          q41_time_spent?: string | null
+          q42_future_usage_feedback?: string | null
           session_id: string
           submitted_at?: string
         }
         Update: {
           id?: string
           participant_id?: string
-          q1_task_easy?: number | null
-          q10_tool_provides_info?: number | null
-          q11_tool_helps_complete?: number | null
-          q12_tool_useful?: number | null
-          q13_tool_too_much_info?: number | null
-          q14_tool_hard_focus?: number | null
-          q15_results_accurate?: number | null
-          q16_results_trustworthy?: number | null
-          q17_results_complete?: number | null
-          q18_results_relevant?: number | null
-          q19_results_useful?: number | null
-          q2_task_quick?: number | null
-          q20_purchase_likelihood?: number | null
-          q21_contradictory_handling?: string[] | null
-          q22_attention_check?: number | null
-          q23_time_spent?: string | null
-          q24_future_usage_feedback?: string | null
-          q3_task_familiar?: number | null
-          q4_tool_reliable?: number | null
-          q5_tool_practical?: number | null
-          q6_tool_like?: number | null
-          q7_tool_easy_use?: number | null
-          q8_tool_clear_interaction?: number | null
-          q9_tool_control?: number | null
+          q19_task_easy?: number | null
+          q20_task_quick?: number | null
+          q21_task_familiar?: number | null
+          q22_tool_reliable?: number | null
+          q23_tool_practical?: number | null
+          q24_tool_like?: number | null
+          q25_tool_easy_use?: number | null
+          q26_tool_clear_interaction?: number | null
+          q27_tool_control?: number | null
+          q28_tool_provides_info?: number | null
+          q29_tool_helps_complete?: number | null
+          q30_tool_useful?: number | null
+          q31_tool_too_much_info?: number | null
+          q32_tool_hard_focus?: number | null
+          q33_results_accurate?: number | null
+          q34_results_trustworthy?: number | null
+          q35_results_complete?: number | null
+          q36_results_relevant?: number | null
+          q37_results_useful?: number | null
+          q38_attention_check?: number | null
+          q39_contradictory_handling?: string[] | null
+          q40_purchase_likelihood?: number | null
+          q41_time_spent?: string | null
+          q42_future_usage_feedback?: string | null
           session_id?: string
           submitted_at?: string
         }
