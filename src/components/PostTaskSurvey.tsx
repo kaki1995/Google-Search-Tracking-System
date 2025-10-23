@@ -489,7 +489,7 @@ export default function PostTaskSurvey() {
                         { name: "q17_results_complete", num: 35, text: "The results are complete." },
                         { name: "q18_results_relevant", num: 36, text: "The search results are relevant to my needs." },
                         { name: "q19_results_useful", num: 37, text: "The search results are useful to me." },
-                          { name: "q22_attention_check", num: 38, text: "Please select \"3\" as your answer for this statement." }
+                        { name: "q22_attention_check", num: 38, text: "Please select \"3\" in this statement." }
                       ].map((item) => (
                         <FormField key={item.name} control={form.control} name={item.name as keyof PostTaskSurveyForm} rules={{ required: "This field is required" }} render={({ field }) => (
                           <tr className="border-b border-gray-200">
@@ -525,7 +525,7 @@ export default function PostTaskSurvey() {
                       { name: "q17_results_complete", num: 35, text: "The results are complete." },
                       { name: "q18_results_relevant", num: 36, text: "The search results are relevant to my needs." },
                       { name: "q19_results_useful", num: 37, text: "The search results are useful to me." },
-                        { name: "q22_attention_check", num: 38, text: "Please select \"3\" as your answer for this statement." }
+                      { name: "q22_attention_check", num: 38, text: "Please select \"3\" in this statement." }
                     ].map((item) => (
                       <FormField key={item.name} control={form.control} name={item.name as keyof PostTaskSurveyForm} rules={{ required: "This field is required" }} render={({ field }) => (
                         <div className="space-y-2">
