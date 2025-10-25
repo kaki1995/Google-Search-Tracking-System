@@ -53,6 +53,14 @@ const FinalDecision = () => {
             </CardTitle>
             <CardDescription className="text-center">
               Thank you for participating in our research study.
+              <div className="mt-6 text-left text-base text-gray-800">
+                <hr className="my-6" />
+                <p>
+                  For participants from SurveySwap and SurveyCircle, redeem codes are as follows:<br />
+                  <strong>SurveySwap:</strong> <a href="https://surveyswap.io/sr/IZG4-KB1A-Q3UE" target="_blank" rel="noopener noreferrer">https://surveyswap.io/sr/IZG4-KB1A-Q3UE</a> (Code: IZG4-KB1A-Q3UE)<br />
+                  <strong>SurveyCircle:</strong> <a href="https://www.surveycircle.com" target="_blank" rel="noopener noreferrer">https://www.surveycircle.com</a> (Code: QMUX-TSN6-X6G5-KYS9)
+                </p>
+              </div>
             </CardDescription>
           </CardHeader>
           

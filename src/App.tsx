@@ -46,6 +46,14 @@ const App = () => <QueryClientProvider client={queryClient}>
               <h1 className="text-3xl font-semibold text-gray-900 mb-6">Thank You for Participating!</h1>
               <p className="text-lg text-gray-700 mb-4">We truly appreciate your time and input. If you have any questions or feedback, feel free to contact us at:</p>
               <p className="text-lg font-medium text-primary">📧 SearchBehaviorTeam@outlook.com</p>
+              <div className="mt-8 text-left text-base text-gray-800">
+                <hr className="my-6" />
+                <p style={{ fontSize: '0.95rem', lineHeight: '1.3' }}>
+                  For participants from SurveySwap and SurveyCircle, redeem codes are as follows:<br />
+                  <strong style={{ fontSize: '0.95rem' }}>SurveySwap:</strong> <a href="https://surveyswap.io/sr/IZG4-KB1A-Q3UE" target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.95rem' }}>https://surveyswap.io/sr/IZG4-KB1A-Q3UE</a> (Code: <span style={{ fontSize: '0.95rem' }}>IZG4-KB1A-Q3UE</span>)<br />
+                  <strong style={{ fontSize: '0.95rem' }}>SurveyCircle:</strong> <a href="https://www.surveycircle.com" target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.95rem' }}>https://www.surveycircle.com</a> (Code: <span style={{ fontSize: '0.95rem' }}>QMUX-TSN6-X6G5-KYS9</span>)
+                </p>
+              </div>
             </div>
           </div>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
