@@ -177,7 +177,7 @@ export default function Welcome() {
               <div className="space-y-3">
                 <div className="flex items-start gap-3">
                   <span className="text-blue-600">🕐</span>
-                  <span>The experiment will take approximately <strong>10-15 minutes</strong> to complete.</span>
+                  <span>The experiment will take approximately <strong>5-10 minutes</strong> to complete.</span>
                 </div>
                 <div className="flex items-start gap-3">
                   <span className="text-orange-600">⚠️</span>
